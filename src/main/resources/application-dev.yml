@@ -7,3 +7,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+jwt:
+  secret-key: ${SECRET_KEY}
+  expiration: 7200
+  refresh-token:
+    expiration: 604800
