@@ -10,3 +10,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+jwt:
+  secret-key: ${SECRET_KEY}
+  expiration: 7200
+  refresh-token:
+    expiration: 604800
