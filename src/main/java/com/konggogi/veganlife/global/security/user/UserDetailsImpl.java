@@ -4,6 +4,8 @@ package com.konggogi.veganlife.global.security.user;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.konggogi.veganlife.member.domain.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +14,7 @@ public record UserDetailsImpl(Long id, String email, String nickname) implements
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("USER"));
+        authorities.add(new SimpleGrantedAuthority(Role.USER.name()));
         return authorities;
     }
 
