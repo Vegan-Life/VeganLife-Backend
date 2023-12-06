@@ -5,11 +5,10 @@ import com.konggogi.veganlife.global.util.JwtUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtProvider {
@@ -46,10 +45,10 @@ public class JwtProvider {
 
         return TOKEN_PREFIX
                 + Jwts.builder()
-                .signWith(key, SignatureAlgorithm.HS256)
-                .setSubject(email)
-                .setExpiration(new Date(date.getTime() + expirationTime))
-                .setIssuedAt(date)
-                .compact();
+                        .signWith(key, SignatureAlgorithm.HS256)
+                        .setSubject(email)
+                        .setExpiration(new Date(date.getTime() + expirationTime))
+                        .setIssuedAt(date)
+                        .compact();
     }
 }
