@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.global.jwt;
+package com.konggogi.veganlife.global.security.jwt;
 
 
 import com.konggogi.veganlife.global.util.JwtUtils;
