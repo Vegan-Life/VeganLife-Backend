@@ -1,8 +1,9 @@
 package com.konggogi.veganlife.global.util;
 
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,5 +61,23 @@ public class JwtUtils {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public void validateToken(String token) {
+        try {
+            extractAllClaims(token);
+        } catch (SecurityException | MalformedJwtException e) {
+            throw new InvalidJwtException(ErrorCode.INVALID_TOKEN_SIGNATURE);
+        } catch (ExpiredJwtException e) {
+            throw new InvalidJwtException(ErrorCode.EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new InvalidJwtException(ErrorCode.UNSUPPORTED_TOKEN);
+        } catch (IllegalArgumentException e) {
+            // token claim is blank or token is null
+            throw new InvalidJwtException(ErrorCode.INVALID_TOKEN);
+        } catch (Exception e) {
+            log.warn("처리되지 않은 JWT 오류입니다.");
+            throw new InvalidJwtException(ErrorCode.UNEXPECTED_TOKEN);
+        }
     }
 }
