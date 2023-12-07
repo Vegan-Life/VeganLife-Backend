@@ -15,3 +15,6 @@ jwt:
   expiration: 7200
   refresh-token:
     expiration: 604800
+logging:
+  level:
+    com.konggogi.veganlife: debug
