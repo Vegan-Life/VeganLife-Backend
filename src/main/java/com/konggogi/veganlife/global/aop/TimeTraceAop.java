@@ -15,7 +15,10 @@ import org.springframework.util.StopWatch;
 @Slf4j
 public class TimeTraceAop {
 
-    @Around("execution(* com.konggogi.veganlife..*repository..*(..))")
+    @Around(
+            "execution(* com.konggogi.veganlife..*repository..*(..)) || "
+                    + "execution(* com.konggogi.veganlife..*controller..*(..)) || "
+                    + "execution(* com.konggogi.veganlife..*service..*(..))")
     public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         MethodSignature signature = extractMethodSignature(joinPoint);
