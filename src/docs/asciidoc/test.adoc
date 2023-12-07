@@ -1,0 +1,35 @@
+= Test API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== Get 테스트 API
+
+=== Request
+
+include::{snippets}/get-test/path-parameters.adoc[]
+
+include::{snippets}/get-test/query-parameters.adoc[]
+
+include::{snippets}/get-test/http-request.adoc[]
+
+=== Response
+
+include::{snippets}/get-test/http-response.adoc[]
+
+== 테스트 API
+
+=== Request
+
+include::{snippets}/post-test/http-request.adoc[]
+
+=== Response
+
+include::{snippets}/post-test/http-response.adoc[]
