@@ -8,4 +8,8 @@ public class InvalidJwtException extends ApiException {
     public InvalidJwtException(ErrorCode errorCode) {
         super(errorCode);
     }
+
+    public InvalidJwtException(ErrorCode errorCode, String description) {
+        super(errorCode, description);
+    }
 }
