@@ -9,6 +9,7 @@ import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ public class OauthService {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
     private final OauthUserInfoFactory oauthUserInfoFactory;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private final String KAKAO_USER_INFO_URI;
 
     public OauthLoginResponse loginWithToken(String provider, String token) {
         Member member = createMemberFromToken(provider, token);
@@ -38,7 +42,7 @@ public class OauthService {
     }
 
     private Member createMemberFromToken(String provider, String token) {
-        Map<String, Object> userAttributes = getUserAttributesByToken(token);
+        Map<String, Object> userAttributes = getUserAttributesByToken(provider, token);
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
@@ -54,10 +58,12 @@ public class OauthService {
                 .build();
     }
 
-    private Map<String, Object> getUserAttributesByToken(String token) {
+    private Map<String, Object> getUserAttributesByToken(String provider, String token) {
+        // TODO naver 요청 URI 추가
+        String userInfoUri = provider.equals("kakao") ? KAKAO_USER_INFO_URI : "";
         return WebClient.create()
                 .get()
-                .uri("https://kapi.kakao.com/v2/user/me")
+                .uri(userInfoUri)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
