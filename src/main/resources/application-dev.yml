@@ -12,3 +12,9 @@ jwt:
   expiration: 7200
   refresh-token:
     expiration: 604800
+  security:
+    oauth2:
+      client:
+        provider:
+          kakao:
+            user-info-uri: https://kapi.kakao.com/v2/user/me

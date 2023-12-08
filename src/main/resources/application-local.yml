@@ -10,6 +10,12 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+  security:
+    oauth2:
+      client:
+        provider:
+          kakao:
+            user-info-uri: https://kapi.kakao.com/v2/user/me
 jwt:
   secret-key: ${SECRET_KEY}
   expiration: 7200
