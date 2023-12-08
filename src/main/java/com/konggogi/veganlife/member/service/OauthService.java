@@ -24,7 +24,7 @@ public class OauthService {
     private final OauthUserInfoFactory oauthUserInfoFactory;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
-    private final String KAKAO_USER_INFO_URI;
+    private String KAKAO_USER_INFO_URI;
 
     public OauthLoginResponse loginWithToken(String provider, String token) {
         Member member = createMemberFromToken(provider, token);
