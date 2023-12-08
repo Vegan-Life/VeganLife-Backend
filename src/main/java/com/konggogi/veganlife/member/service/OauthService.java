@@ -5,7 +5,7 @@ import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
-import com.konggogi.veganlife.member.domain.oauth.KakaoUserInfo;
+import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
@@ -21,9 +21,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class OauthService {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private final OauthUserInfoFactory oauthUserInfoFactory;
 
-    public OauthLoginResponse loginWithToken(String token) {
-        Member member = createMemberFromToken(token);
+    public OauthLoginResponse loginWithToken(String provider, String token) {
+        Member member = createMemberFromToken(provider, token);
         String accessToken = jwtProvider.createToken(member.getEmail());
         String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
         return createOauthLoginResponse(member, accessToken, refreshToken);
@@ -37,13 +38,14 @@ public class OauthService {
                 .orElse(new OauthLoginResponse(false, accessToken, refreshToken));
     }
 
-    private Member createMemberFromToken(String token) {
+    private Member createMemberFromToken(String provider, String token) {
         Map<String, Object> userAttributes = getUserAttributesByToken(token);
-        KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(userAttributes);
-        String email = kakaoUserInfo.getEmail();
-        String imageUrl = kakaoUserInfo.getProfileImageUrl();
-        Gender gender = kakaoUserInfo.getGender();
-        String phoneNumber = kakaoUserInfo.getPhoneNumber();
+        OauthUserInfo oauthUserInfo =
+                oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
+        String email = oauthUserInfo.getEmail();
+        String imageUrl = oauthUserInfo.getProfileImageUrl();
+        Gender gender = oauthUserInfo.getGender();
+        String phoneNumber = oauthUserInfo.getPhoneNumber();
         return Member.builder()
                 .email(email)
                 .profileImageUrl(imageUrl)
