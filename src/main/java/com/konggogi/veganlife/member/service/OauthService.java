@@ -2,7 +2,6 @@ package com.konggogi.veganlife.member.service;
 
 
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
-import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
@@ -44,12 +43,12 @@ public class OauthService {
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
         String imageUrl = oauthUserInfo.getProfileImageUrl();
-        Gender gender = oauthUserInfo.getGender();
+        // TODO 동의 항목에 추가될 시 변경
+        //        Gender gender = oauthUserInfo.getGender();
         String phoneNumber = oauthUserInfo.getPhoneNumber();
         return Member.builder()
                 .email(email)
                 .profileImageUrl(imageUrl)
-                .gender(gender)
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .build();
