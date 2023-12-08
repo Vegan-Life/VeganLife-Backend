@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class LoggerAop {
-    @Pointcut("execution(* com.konggogi.veganlife..*repository..*(..))")
+    @Pointcut(
+            "execution(* com.konggogi.veganlife..*repository..*(..)) || "
+                    + "execution(* com.konggogi.veganlife..*controller..*(..)) || "
+                    + "execution(* com.konggogi.veganlife..*service..*(..))")
     private void cuts() {}
 
     @Before("cuts()")

@@ -20,13 +20,10 @@ public class Member extends TimeStamped {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
     private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -34,6 +31,9 @@ public class Member extends TimeStamped {
 
     @Enumerated(EnumType.STRING)
     private VegetarianType vegetarianType;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     private int height;
     private int weight;
@@ -44,17 +44,11 @@ public class Member extends TimeStamped {
 
     @Builder
     public Member(
-            String email,
-            String nickname,
-            String phoneNumber,
-            String profileImageUrl,
-            Gender gender,
-            VegetarianType vegetarianType) {
+            String email, String phoneNumber, String profileImageUrl, Gender gender, Role role) {
         this.email = email;
-        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
         this.gender = gender;
-        this.vegetarianType = vegetarianType;
+        this.role = role;
     }
 }

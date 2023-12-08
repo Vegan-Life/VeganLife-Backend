@@ -1,0 +1,24 @@
+package com.konggogi.veganlife.member.controller;
+
+
+import com.konggogi.veganlife.member.dto.request.OauthRequest;
+import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
+import com.konggogi.veganlife.member.service.OauthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("api/v1/members/oauth")
+public class OauthController {
+    private final OauthService oauthService;
+
+    @PostMapping("/{provider}/login")
+    public ResponseEntity<OauthLoginResponse> login(
+            @PathVariable String provider, @RequestBody OauthRequest oauthRequest) {
+        OauthLoginResponse oauthLoginResponse =
+                oauthService.loginWithToken(provider, oauthRequest.accessToken());
+        return ResponseEntity.ok(oauthLoginResponse);
+    }
+}

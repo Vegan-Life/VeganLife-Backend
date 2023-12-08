@@ -7,8 +7,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  security:
+    oauth2:
+      client:
+        provider:
+          kakao:
+            user-info-uri: https://kapi.kakao.com/v2/user/me
 jwt:
   secret-key: ${SECRET_KEY}
   expiration: 7200
   refresh-token:
     expiration: 604800
+
