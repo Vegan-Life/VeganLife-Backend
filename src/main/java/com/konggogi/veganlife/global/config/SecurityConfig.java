@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 authorize
                                         .requestMatchers(
                                                 new AntPathRequestMatcher(
-                                                        "/api/v1/members/oauth/login/kakao"))
+                                                        "/api/v1/members/oauth/*/login"))
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())
