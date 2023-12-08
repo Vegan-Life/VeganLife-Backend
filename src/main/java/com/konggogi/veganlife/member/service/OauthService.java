@@ -1,11 +1,9 @@
 package com.konggogi.veganlife.member.service;
 
 
-import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
-import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -19,29 +17,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OauthService {
-    private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
     private final OauthUserInfoFactory oauthUserInfoFactory;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
-    public OauthLoginResponse loginWithToken(String provider, String token) {
-        Member member = createMemberFromToken(provider, token);
-        String accessToken = jwtProvider.createToken(member.getEmail());
-        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
-        return createOauthLoginResponse(member, accessToken, refreshToken);
-    }
-
-    private OauthLoginResponse createOauthLoginResponse(
-            Member member, String accessToken, String refreshToken) {
-        return memberRepository
-                .findByEmail(member.getEmail())
-                .map(foundMember -> new OauthLoginResponse(true, accessToken, refreshToken))
-                .orElse(new OauthLoginResponse(false, accessToken, refreshToken));
-    }
-
-    private Member createMemberFromToken(String provider, String token) {
+    public Member createMemberFromToken(String provider, String token) {
         Map<String, Object> userAttributes = getUserAttributesByToken(provider, token);
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
@@ -68,5 +50,9 @@ public class OauthService {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
+    }
+
+    public boolean isSignedMember(Member member) {
+        return memberRepository.findByEmail(member.getEmail()).isPresent();
     }
 }
