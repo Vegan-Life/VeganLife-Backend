@@ -2,9 +2,10 @@ package com.konggogi.veganlife.member.service;
 
 
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
-import com.konggogi.veganlife.member.domain.KakaoUserInfo;
+import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
+import com.konggogi.veganlife.member.domain.oauth.KakaoUserInfo;
 import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
@@ -39,10 +40,17 @@ public class OauthService {
     private Member createMemberFromToken(String token) {
         Map<String, Object> userAttributes = getUserAttributesByToken(token);
         KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(userAttributes);
-        // TODO gender, phoneNumber 추가
         String email = kakaoUserInfo.getEmail();
         String imageUrl = kakaoUserInfo.getProfileImageUrl();
-        return Member.builder().email(email).profileImageUrl(imageUrl).role(Role.USER).build();
+        Gender gender = kakaoUserInfo.getGender();
+        String phoneNumber = kakaoUserInfo.getPhoneNumber();
+        return Member.builder()
+                .email(email)
+                .profileImageUrl(imageUrl)
+                .gender(gender)
+                .phoneNumber(phoneNumber)
+                .role(Role.USER)
+                .build();
     }
 
     private Map<String, Object> getUserAttributesByToken(String token) {
