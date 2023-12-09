@@ -28,13 +28,12 @@ public class OauthService {
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
-        String imageUrl = oauthUserInfo.getProfileImageUrl();
-        // TODO 동의 항목에 추가될 시 변경
-        //        Gender gender = oauthUserInfo.getGender();
+        String birthYear = oauthUserInfo.getBirthYear();
         String phoneNumber = oauthUserInfo.getPhoneNumber();
+        // TODO gender 추가
         return Member.builder()
                 .email(email)
-                .profileImageUrl(imageUrl)
+                .birthYear(birthYear)
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .build();
