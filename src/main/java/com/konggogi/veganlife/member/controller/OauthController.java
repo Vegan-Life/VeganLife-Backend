@@ -3,6 +3,7 @@ package com.konggogi.veganlife.member.controller;
 
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.dto.request.OauthRequest;
 import com.konggogi.veganlife.member.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.service.OauthService;
@@ -19,7 +20,7 @@ public class OauthController {
 
     @PostMapping("/{provider}/login")
     public ResponseEntity<OauthLoginResponse> login(
-            @PathVariable String provider, @RequestBody OauthRequest oauthRequest) {
+            @PathVariable OauthProvider provider, @RequestBody OauthRequest oauthRequest) {
         Member member = oauthService.createMemberFromToken(provider, oauthRequest.accessToken());
         boolean isSigned = oauthService.isSignedMember(member);
         String accessToken = jwtProvider.createToken(member.getEmail());
