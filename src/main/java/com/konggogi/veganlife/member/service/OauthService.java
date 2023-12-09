@@ -37,6 +37,7 @@ public class OauthService {
                 .birthYear(birthYear)
                 .phoneNumber(phoneNumber)
                 .role(Role.USER)
+                .provider(provider)
                 .build();
     }
 
