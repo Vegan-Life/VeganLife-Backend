@@ -54,15 +54,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
 ext {
     set('snippetsDir', file("build/generated-snippets"))
 }
 
 test {
+    useJUnitPlatform()
     outputs.dir snippetsDir
 }
 
@@ -97,4 +94,5 @@ spotless {
     }
 }
 
+copyDocument.dependsOn processResources
 spotlessJava.dependsOn copyDocument
