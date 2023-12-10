@@ -1,10 +1,10 @@
 package com.konggogi.veganlife.member.controller;
 
 
-import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.controller.dto.request.OauthRequest;
 import com.konggogi.veganlife.member.controller.dto.response.OauthLoginResponse;
+import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.service.OauthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
