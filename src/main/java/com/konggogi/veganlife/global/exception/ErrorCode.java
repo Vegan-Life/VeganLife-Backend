@@ -20,7 +20,8 @@ public enum ErrorCode {
     UNSUPPORTED_PROVIDER("OATUH_001", "지원되지 않는 provider입니다."),
 
     // member
-    DUPLICATED_NICKNAME("MEMBER_001", "중복된 닉네임입니다.");
+    DUPLICATED_NICKNAME("MEMBER_001", "중복된 닉네임입니다."),
+    NOT_FOUND_MEMBER("MEMBER_002", "사용자를 찾을 수 없습니다.");
 
     private final String code;
     private final String description;
