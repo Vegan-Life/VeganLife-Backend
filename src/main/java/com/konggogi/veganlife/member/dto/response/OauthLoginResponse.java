@@ -5,7 +5,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import lombok.Builder;
 
 @Builder
-public record OauthLoginResponse(String email, String birthYear, String phoneNumber) {
+public record OauthLoginResponse(String email, int birthYear, String phoneNumber) {
     public static OauthLoginResponse from(Member member) {
         return OauthLoginResponse.builder()
                 .email(member.getEmail())
