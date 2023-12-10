@@ -4,7 +4,6 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRequest;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.Role;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -24,7 +23,7 @@ public class MemberService {
     @Transactional
     public Member addMember(MemberRegisterRequest memberRegisterRequest) {
         validateNickname(memberRegisterRequest.nickname());
-        Member member = memberMapper.from(memberRegisterRequest, Role.USER);
+        Member member = memberMapper.toEntity(memberRegisterRequest);
         return memberRepository.save(member);
     }
 
