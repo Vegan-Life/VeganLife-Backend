@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+logging:
+  level:
+    com.konggogi.veganlife: debug # ref: https://blog.datalust.co/choosing-the-right-log-levels/
