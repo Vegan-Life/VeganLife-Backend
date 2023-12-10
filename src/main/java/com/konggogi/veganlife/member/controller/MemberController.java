@@ -29,6 +29,7 @@ public class MemberController {
         Member member = memberService.addMember(memberRegisterRequest);
         String accessToken = jwtProvider.createToken(member.getEmail());
         String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
-        return ResponseEntity.ok(memberMapper.from(member, accessToken, refreshToken));
+        return ResponseEntity.ok(
+                memberMapper.toMemberRegisterResponse(member, accessToken, refreshToken));
     }
 }
