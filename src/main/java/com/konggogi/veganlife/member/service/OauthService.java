@@ -1,10 +1,12 @@
 package com.konggogi.veganlife.member.service;
 
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
+import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +58,17 @@ public class OauthService {
     }
 
     private String getUserInfoUri(OauthProvider provider) {
-        return provider == OauthProvider.KAKAO ? KAKAO_USER_INFO_URI : NAVER_USER_INFO_URI;
+        switch (provider) {
+            case KAKAO -> {
+                return KAKAO_USER_INFO_URI;
+            }
+            case NAVER -> {
+                return NAVER_USER_INFO_URI;
+            }
+            default -> {
+                throw new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER);
+            }
+        }
     }
 
     public boolean isSignedMember(Member member) {
