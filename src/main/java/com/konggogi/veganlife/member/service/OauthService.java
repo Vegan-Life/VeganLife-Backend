@@ -3,7 +3,6 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.Role;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
@@ -36,14 +35,7 @@ public class OauthService {
         String email = oauthUserInfo.getEmail();
         String birthYear = oauthUserInfo.getBirthYear();
         String phoneNumber = oauthUserInfo.getPhoneNumber();
-        // TODO gender 추가
-        return Member.builder()
-                .email(email)
-                .birthYear(birthYear)
-                .phoneNumber(phoneNumber)
-                .role(Role.USER)
-                .provider(provider)
-                .build();
+        return Member.builder().email(email).birthYear(birthYear).phoneNumber(phoneNumber).build();
     }
 
     private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {
