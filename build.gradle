@@ -53,6 +53,10 @@ dependencies {
 
     // spring actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // map struct
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 ext {
