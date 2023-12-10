@@ -52,18 +52,10 @@ public class Member extends TimeStamped {
     private int dailyFat;
 
     @Builder
-    public Member(
-            String email,
-            String birthYear,
-            String phoneNumber,
-            Gender gender,
-            Role role,
-            OauthProvider provider) {
+    public Member(String email, String birthYear, String phoneNumber, Role role) {
         this.email = email;
         this.birthYear = birthYear;
         this.phoneNumber = phoneNumber;
-        this.gender = gender;
         this.role = role;
-        this.oauthType = provider;
     }
 }
