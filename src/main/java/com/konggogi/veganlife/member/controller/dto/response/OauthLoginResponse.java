@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.member.dto.response;
+package com.konggogi.veganlife.member.controller.dto.response;
 
 
 import com.konggogi.veganlife.member.domain.Member;
