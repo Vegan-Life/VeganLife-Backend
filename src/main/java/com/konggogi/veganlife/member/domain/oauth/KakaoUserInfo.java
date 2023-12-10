@@ -15,11 +15,6 @@ public class KakaoUserInfo extends OauthUserInfo {
     }
 
     @Override
-    public String getProfileImageUrl() {
-        return (String) getProfile().get("profile_image_url");
-    }
-
-    @Override
     public Gender getGender() {
         String gender = (String) getKakaoAccount().get("gender");
         return gender.equals("female") ? Gender.F : Gender.M;
@@ -30,11 +25,12 @@ public class KakaoUserInfo extends OauthUserInfo {
         return (String) getKakaoAccount().get("phone_number");
     }
 
-    private Map<String, Object> getKakaoAccount() {
-        return (Map<String, Object>) getAttributes().get("kakao_account");
+    @Override
+    public String getBirthYear() {
+        return (String) getKakaoAccount().get("birthyear");
     }
 
-    private Map<String, Object> getProfile() {
-        return (Map<String, Object>) getKakaoAccount().get("profile");
+    private Map<String, Object> getKakaoAccount() {
+        return (Map<String, Object>) getAttributes().get("kakao_account");
     }
 }

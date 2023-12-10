@@ -13,9 +13,9 @@ public abstract class OauthUserInfo {
 
     public abstract String getEmail();
 
-    public abstract String getProfileImageUrl();
-
     public abstract Gender getGender();
 
     public abstract String getPhoneNumber();
+
+    public abstract String getBirthYear();
 }

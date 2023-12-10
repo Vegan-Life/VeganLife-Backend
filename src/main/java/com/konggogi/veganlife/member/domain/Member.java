@@ -2,6 +2,7 @@ package com.konggogi.veganlife.member.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,9 +23,13 @@ public class Member extends TimeStamped {
 
     private String nickname;
 
+    @Column(nullable = false)
     private String phoneNumber;
 
     private String profileImageUrl;
+
+    @Column(nullable = false)
+    private String birthYear;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -35,6 +40,10 @@ public class Member extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OauthProvider oauthType;
+
     private int height;
     private int weight;
     private int age;
@@ -44,11 +53,17 @@ public class Member extends TimeStamped {
 
     @Builder
     public Member(
-            String email, String phoneNumber, String profileImageUrl, Gender gender, Role role) {
+            String email,
+            String birthYear,
+            String phoneNumber,
+            Gender gender,
+            Role role,
+            OauthProvider provider) {
         this.email = email;
+        this.birthYear = birthYear;
         this.phoneNumber = phoneNumber;
-        this.profileImageUrl = profileImageUrl;
         this.gender = gender;
         this.role = role;
+        this.oauthType = provider;
     }
 }
