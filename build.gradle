@@ -75,22 +75,9 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
-}
-
-compileJava {
-    options.compilerArgs += ['-Amapstruct.defaultComponentModel=spring']
-}
-
 test {
     useJUnitPlatform()
     outputs.dir snippetsDir
-    jvmArgs(['-Amapstruct.defaultComponentModel=spring'])
-}
-
-compileTestJava {
-    options.compilerArgs += ['-Amapstruct.defaultComponentModel=spring']
 }
 
 asciidoctor {

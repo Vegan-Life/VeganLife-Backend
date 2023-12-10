@@ -6,7 +6,7 @@ import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRespon
 import com.konggogi.veganlife.member.domain.Member;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MemberMapper {
     Member toEntity(MemberRegisterRequest registerRequest);
 
