@@ -49,10 +49,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-}
 
-tasks.named('test') {
-    useJUnitPlatform()
+    // spring actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 ext {
@@ -60,6 +59,7 @@ ext {
 }
 
 test {
+    useJUnitPlatform()
     outputs.dir snippetsDir
 }
 
@@ -94,4 +94,5 @@ spotless {
     }
 }
 
+copyDocument.dependsOn processResources
 spotlessJava.dependsOn copyDocument
