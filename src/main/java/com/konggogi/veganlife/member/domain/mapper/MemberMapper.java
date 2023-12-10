@@ -7,7 +7,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.Role;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface MemberMapper {
     Member from(MemberRegisterRequest registerRequest, Role role);
 
