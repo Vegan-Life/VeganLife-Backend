@@ -1,16 +1,16 @@
 package com.konggogi.veganlife.member.dto.response;
 
 
+import com.konggogi.veganlife.member.domain.Member;
 import lombok.Builder;
 
 @Builder
-public record OauthLoginResponse(boolean isSigned, String accessToken, String refreshToken) {
-    public static OauthLoginResponse from(
-            boolean isSigned, String accessToken, String refreshToken) {
+public record OauthLoginResponse(String email, String birthYear, String phoneNumber) {
+    public static OauthLoginResponse from(Member member) {
         return OauthLoginResponse.builder()
-                .isSigned(isSigned)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .email(member.getEmail())
+                .birthYear(member.getBirthYear())
+                .phoneNumber(member.getPhoneNumber())
                 .build();
     }
 }
