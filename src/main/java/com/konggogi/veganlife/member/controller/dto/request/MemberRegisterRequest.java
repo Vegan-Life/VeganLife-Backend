@@ -12,7 +12,7 @@ public record MemberRegisterRequest(
         @NotBlank String phoneNumber,
         @NotNull Gender gender,
         @NotNull VegetarianType vegetarianType,
-        @NotNull int birthYear,
-        @NotNull int age,
-        @NotNull int height,
-        @NotNull int weight) {}
+        @NotNull Integer birthYear,
+        @NotNull Integer age,
+        @NotNull Integer height,
+        @NotNull Integer weight) {}

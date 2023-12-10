@@ -43,17 +43,17 @@ public class Member extends TimeStamped {
     private Role role;
 
     @Column(nullable = false)
-    private int height;
+    private Integer height;
 
     @Column(nullable = false)
-    private int weight;
+    private Integer weight;
 
     @Column(nullable = false)
-    private int age;
+    private Integer age;
 
-    private int dailyCarbs;
-    private int dailyProtein;
-    private int dailyFat;
+    private Integer dailyCarbs;
+    private Integer dailyProtein;
+    private Integer dailyFat;
 
     @Builder
     public Member(
@@ -62,11 +62,10 @@ public class Member extends TimeStamped {
             String phoneNumber,
             Gender gender,
             VegetarianType vegetarianType,
-            int birthYear,
-            int age,
-            int height,
-            int weight,
-            Role role) {
+            Integer birthYear,
+            Integer age,
+            Integer height,
+            Integer weight) {
         this.email = email;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
@@ -76,6 +75,6 @@ public class Member extends TimeStamped {
         this.age = age;
         this.height = height;
         this.weight = weight;
-        this.role = role;
+        this.role = Role.USER;
     }
 }
