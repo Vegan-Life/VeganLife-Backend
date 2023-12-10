@@ -23,7 +23,9 @@ public class MemberService {
     public Member addMember(MemberRegisterRequest memberRegisterRequest) {
         validateNickname(memberRegisterRequest.nickname());
         Member member = memberMapper.toEntity(memberRegisterRequest);
-        return memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
+        savedMember.updateDailyIntake();
+        return savedMember;
     }
 
     private void validateNickname(String nickname) {

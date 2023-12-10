@@ -29,7 +29,7 @@ public class Member extends TimeStamped {
     private String profileImageUrl;
 
     @Column(nullable = false)
-    private int birthYear;
+    private Integer birthYear;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -54,6 +54,7 @@ public class Member extends TimeStamped {
     private Integer dailyCarbs;
     private Integer dailyProtein;
     private Integer dailyFat;
+    private Integer bmr;
 
     @Builder
     public Member(
@@ -76,5 +77,22 @@ public class Member extends TimeStamped {
         this.height = height;
         this.weight = weight;
         this.role = Role.USER;
+    }
+
+    private Integer calcBMR() {
+        if (gender == Gender.F) {
+            return (int) Math.round((655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)));
+        } else {
+            return (int) Math.round((66 + (13.7 * weight) + (5 * height) - (6.8 * age)));
+        }
+    }
+
+    public void updateDailyIntake() {
+        bmr = calcBMR();
+        // TODO 활동량 입력 받을 경우 변경
+        double amr = bmr * 1.375;
+        dailyCarbs = (int) ((amr * (50.0 / 100)) / 4);
+        dailyProtein = (int) ((amr * (30.0 / 100)) / 4);
+        dailyFat = (int) ((amr * (20.0 / 100)) / 9);
     }
 }
