@@ -6,7 +6,6 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
-import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OauthService {
-    private final MemberRepository memberRepository;
     private final OauthUserInfoFactory oauthUserInfoFactory;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
@@ -33,7 +31,7 @@ public class OauthService {
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
-        String birthYear = oauthUserInfo.getBirthYear();
+        int birthYear = Integer.parseInt(oauthUserInfo.getBirthYear());
         String phoneNumber = oauthUserInfo.getPhoneNumber();
         return Member.builder().email(email).birthYear(birthYear).phoneNumber(phoneNumber).build();
     }
@@ -57,13 +55,7 @@ public class OauthService {
             case NAVER -> {
                 return NAVER_USER_INFO_URI;
             }
-            default -> {
-                throw new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER);
-            }
+            default -> throw new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER);
         }
-    }
-
-    public boolean isSignedMember(Member member) {
-        return memberRepository.findByEmail(member.getEmail()).isPresent();
     }
 }

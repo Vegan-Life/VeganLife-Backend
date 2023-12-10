@@ -2,7 +2,6 @@ package com.konggogi.veganlife.member.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
-import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,6 +20,7 @@ public class Member extends TimeStamped {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(nullable = false)
@@ -29,11 +29,13 @@ public class Member extends TimeStamped {
     private String profileImageUrl;
 
     @Column(nullable = false)
-    private String birthYear;
+    private int birthYear;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private VegetarianType vegetarianType;
 
@@ -41,21 +43,38 @@ public class Member extends TimeStamped {
     private Role role;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OauthProvider oauthType;
+    private Integer height;
 
-    private int height;
-    private int weight;
-    private int age;
-    private int dailyCarbs;
-    private int dailyProtein;
-    private int dailyFat;
+    @Column(nullable = false)
+    private Integer weight;
+
+    @Column(nullable = false)
+    private Integer age;
+
+    private Integer dailyCarbs;
+    private Integer dailyProtein;
+    private Integer dailyFat;
 
     @Builder
-    public Member(String email, String birthYear, String phoneNumber, Role role) {
+    public Member(
+            String email,
+            String nickname,
+            String phoneNumber,
+            Gender gender,
+            VegetarianType vegetarianType,
+            Integer birthYear,
+            Integer age,
+            Integer height,
+            Integer weight) {
         this.email = email;
-        this.birthYear = birthYear;
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.role = role;
+        this.gender = gender;
+        this.vegetarianType = vegetarianType;
+        this.birthYear = birthYear;
+        this.age = age;
+        this.height = height;
+        this.weight = weight;
+        this.role = Role.USER;
     }
 }

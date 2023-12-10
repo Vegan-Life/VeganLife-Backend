@@ -48,6 +48,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // spring rest docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
@@ -58,21 +59,38 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-    //security
+    // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    //jwt
+    // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // spring actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // map struct
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+compileJava {
+    options.compilerArgs += ['-Amapstruct.defaultComponentModel=spring']
 }
 
 test {
     useJUnitPlatform()
     outputs.dir snippetsDir
+    jvmArgs(['-Amapstruct.defaultComponentModel=spring'])
+}
+
+compileTestJava {
+    options.compilerArgs += ['-Amapstruct.defaultComponentModel=spring']
 }
 
 asciidoctor {
