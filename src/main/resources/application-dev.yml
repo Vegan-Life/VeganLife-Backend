@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${MARIA_URL}
@@ -7,17 +10,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-  security:
-    oauth2:
-      client:
-        provider:
-          kakao:
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-          naver:
-            user-info-uri: https://openapi.naver.com/v1/nid/me
-jwt:
-  secret-key: ${SECRET_KEY}
-  expiration: 7200
-  refresh-token:
-    expiration: 604800
-
+logging:
+  level:
+    com.konggogi.veganlife: info

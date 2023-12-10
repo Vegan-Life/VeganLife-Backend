@@ -24,6 +24,22 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+spotless {
+    java {
+        target("**/*.java")
+        googleJavaFormat().aosp()
+        indentWithSpaces(4)
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -43,10 +59,10 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-    //security
+    // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    //jwt
+    // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     compileOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
@@ -96,17 +112,10 @@ tasks.register('copyDocument', Copy) {
     into file("src/main/resources/templates")
 }
 
-spotless {
-    java {
-        target("**/*.java")
-        googleJavaFormat().aosp()
-        indentWithSpaces(4)
-        importOrder()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+copyDocument{
+    dependsOn processResources
 }
 
-copyDocument.dependsOn processResources
-spotlessJava.dependsOn copyDocument
+spotlessJava{
+    dependsOn copyDocument
+}
