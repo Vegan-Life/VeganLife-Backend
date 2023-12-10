@@ -24,6 +24,22 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+spotless {
+    java {
+        target("**/*.java")
+        googleJavaFormat().aosp()
+        indentWithSpaces(4)
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -54,10 +70,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
-}
-
 test {
     useJUnitPlatform()
     outputs.dir snippetsDir
@@ -82,17 +94,10 @@ tasks.register('copyDocument', Copy) {
     into file("src/main/resources/templates")
 }
 
-spotless {
-    java {
-        target("**/*.java")
-        googleJavaFormat().aosp()
-        indentWithSpaces(4)
-        importOrder()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+copyDocument{
+    dependsOn processResources
 }
 
-copyDocument.dependsOn processResources
-spotlessJava.dependsOn copyDocument
+spotlessJava{
+    dependsOn copyDocument
+}
