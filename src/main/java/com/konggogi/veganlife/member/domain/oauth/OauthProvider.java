@@ -7,18 +7,13 @@ import lombok.Getter;
 
 @Getter
 public enum OauthProvider {
-    KAKAO("kakao"),
-    NAVER("naver");
-
-    private final String provider;
-
-    OauthProvider(String provider) {
-        this.provider = provider;
-    }
+    KAKAO,
+    NAVER;
 
     public static OauthProvider from(String provider) {
+        String providerUpperCase = provider.toUpperCase();
         for (OauthProvider oauthProvider : OauthProvider.values()) {
-            if (oauthProvider.getProvider().equals(provider)) {
+            if (oauthProvider.name().equals(providerUpperCase)) {
                 return oauthProvider;
             }
         }
