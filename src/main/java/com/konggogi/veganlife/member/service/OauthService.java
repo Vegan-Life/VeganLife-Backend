@@ -24,6 +24,9 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
+    private String NAVER_USER_INFO_URI;
+
     public Member createMemberFromToken(OauthProvider provider, String token) {
         Map<String, Object> userAttributes = getUserAttributesByToken(provider, token);
         OauthUserInfo oauthUserInfo =
@@ -42,8 +45,7 @@ public class OauthService {
     }
 
     private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {
-        // TODO naver 요청 URI 추가
-        String userInfoUri = (OauthProvider.KAKAO == provider) ? KAKAO_USER_INFO_URI : "";
+        String userInfoUri = getUserInfoUri(provider);
         return WebClient.create()
                 .get()
                 .uri(userInfoUri)
@@ -51,6 +53,10 @@ public class OauthService {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
+    }
+
+    private String getUserInfoUri(OauthProvider provider) {
+        return provider == OauthProvider.KAKAO ? KAKAO_USER_INFO_URI : NAVER_USER_INFO_URI;
     }
 
     public boolean isSignedMember(Member member) {
