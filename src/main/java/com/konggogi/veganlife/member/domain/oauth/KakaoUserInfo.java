@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.member.domain.oauth;
 
 
-import com.konggogi.veganlife.member.domain.Gender;
 import java.util.Map;
 
 public class KakaoUserInfo extends OauthUserInfo {
@@ -12,12 +11,6 @@ public class KakaoUserInfo extends OauthUserInfo {
     @Override
     public String getEmail() {
         return (String) getKakaoAccount().get("email");
-    }
-
-    @Override
-    public Gender getGender() {
-        String gender = (String) getKakaoAccount().get("gender");
-        return gender.equals("female") ? Gender.F : Gender.M;
     }
 
     @Override
