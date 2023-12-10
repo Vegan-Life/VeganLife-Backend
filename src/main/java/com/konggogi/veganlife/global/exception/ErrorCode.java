@@ -17,7 +17,10 @@ public enum ErrorCode {
     NOT_FOUND_USER_INFO_TOKEN("AUTH_006", "JWT 사용자 정보를 가져올 수 없습니다."),
 
     // oauth
-    UNSUPPORTED_PROVIDER("OATUH_001", "지원되지 않는 provider입니다.");
+    UNSUPPORTED_PROVIDER("OATUH_001", "지원되지 않는 provider입니다."),
+
+    // member
+    DUPLICATED_NICKNAME("MEMBER_001", "중복된 닉네임입니다.");
 
     private final String code;
     private final String description;
