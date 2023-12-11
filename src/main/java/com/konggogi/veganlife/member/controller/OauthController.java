@@ -31,6 +31,6 @@ public class OauthController {
         String refreshToken = jwtProvider.createRefreshToken(savedMember.getEmail());
         memberService.saveRefreshToken(savedMember.getId(), refreshToken);
         return ResponseEntity.ok(
-                memberMapper.toOauthLoginResponse(member, accessToken, refreshToken));
+                memberMapper.toOauthLoginResponse(savedMember, accessToken, refreshToken));
     }
 }

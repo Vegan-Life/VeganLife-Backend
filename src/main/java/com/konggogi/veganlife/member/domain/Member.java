@@ -2,6 +2,7 @@ package com.konggogi.veganlife.member.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -47,6 +48,9 @@ public class Member extends TimeStamped {
     private Integer dailyFat;
     private Integer AMR; // 활동 대사량
 
+    @Column(nullable = false)
+    private boolean hasAdditionalInfo;
+
     @Builder
     public Member(
             String email,
@@ -64,16 +68,17 @@ public class Member extends TimeStamped {
         this.height = height;
         this.weight = weight;
         this.role = Role.USER;
+        this.hasAdditionalInfo = false;
     }
 
-    public Integer calcAge() {
+    public int calcAge() {
         LocalDate now = LocalDate.now();
         int currentYear = now.getYear();
         return (currentYear - birthYear);
     }
 
-    private Integer calcBMR() {
-        Integer age = calcAge();
+    private int calcBMR() {
+        int age = calcAge();
         if (gender == Gender.F) {
             return (int) Math.round((655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)));
         } else {
@@ -87,5 +92,16 @@ public class Member extends TimeStamped {
         dailyCarbs = (int) ((AMR * (50.0 / 100)) / 4);
         dailyProtein = (int) ((AMR * (30.0 / 100)) / 4);
         dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
+    }
+
+    public void updateMemberInfo(MemberInfoRequest memberInfoRequest) {
+        this.nickname = memberInfoRequest.nickname();
+        this.gender = memberInfoRequest.gender();
+        this.vegetarianType = memberInfoRequest.vegetarianType();
+        this.birthYear = memberInfoRequest.birthYear();
+        this.height = memberInfoRequest.height();
+        this.weight = memberInfoRequest.weight();
+        this.hasAdditionalInfo = true;
+        updateDailyIntake();
     }
 }
