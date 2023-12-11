@@ -2,15 +2,20 @@ package com.konggogi.veganlife.support.docs;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
+import com.konggogi.veganlife.mealdata.config.MapStructConfig;
+import com.konggogi.veganlife.support.security.MockSecurityFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -26,7 +31,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @AutoConfigureRestDocs
 @ActiveProfiles("test")
 @WebMvcTest
-public class RestDocsTest {
+public abstract class RestDocsTest {
 
     @Autowired private ObjectMapper objectMapper;
     protected MockMvc mockMvc;
@@ -43,9 +48,9 @@ public class RestDocsTest {
                         .apply(
                                 documentationConfiguration(provider)
                                         .uris()
-                                        .withScheme("http")
-                                        .withHost("veganlife.com")
-                                        .withPort(8080))
+                                        .withScheme("https")
+                                        .withHost("dev.konggogi.store"))
+                        .apply(springSecurity(new MockSecurityFilter()))
                         .addFilter(new CharacterEncodingFilter("UTF-8", true))
                         .alwaysDo(print())
                         .alwaysDo(document("api/v1"))
