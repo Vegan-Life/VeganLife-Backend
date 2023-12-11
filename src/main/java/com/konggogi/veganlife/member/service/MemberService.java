@@ -43,6 +43,10 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    public Member search(Long memberId) {
+        return validateMemberExist(memberId);
+    }
+
     private Member validateMemberExist(Long memberId) {
         return memberRepository
                 .findById(memberId)
