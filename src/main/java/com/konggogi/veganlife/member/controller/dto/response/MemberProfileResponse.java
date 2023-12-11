@@ -10,5 +10,6 @@ public record MemberProfileResponse(
         VegetarianType vegetarianType,
         Gender gender,
         String imageUrl,
+        Integer birthYear,
         Integer height,
         Integer weight) {}
