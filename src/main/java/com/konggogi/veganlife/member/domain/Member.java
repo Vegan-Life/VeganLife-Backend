@@ -50,7 +50,7 @@ public class Member extends TimeStamped {
     private Integer dailyCarbs;
     private Integer dailyProtein;
     private Integer dailyFat;
-    private Integer bmr;
+    private Integer AMR; // 활동 대사량
 
     @Builder
     public Member(
@@ -87,10 +87,10 @@ public class Member extends TimeStamped {
     }
 
     public void updateDailyIntake() {
-        bmr = calcBMR();
-        double amr = bmr * 1.375;
-        dailyCarbs = (int) ((amr * (50.0 / 100)) / 4);
-        dailyProtein = (int) ((amr * (30.0 / 100)) / 4);
-        dailyFat = (int) ((amr * (20.0 / 100)) / 9);
+        int bmr = calcBMR();
+        AMR = (int) Math.round(bmr * 1.375);
+        dailyCarbs = (int) ((AMR * (50.0 / 100)) / 4);
+        dailyProtein = (int) ((AMR * (30.0 / 100)) / 4);
+        dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
     }
 }
