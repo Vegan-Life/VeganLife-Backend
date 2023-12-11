@@ -48,6 +48,7 @@ public class Member extends TimeStamped {
     private Integer dailyFat;
     private Integer AMR; // 활동 대사량
 
+    @Column(nullable = false)
     private boolean hasAdditionalInfo;
 
     @Builder
