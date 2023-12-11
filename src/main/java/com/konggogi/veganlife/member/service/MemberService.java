@@ -30,15 +30,6 @@ public class MemberService {
                         });
     }
 
-    private void validateNickname(String nickname) {
-        memberRepository
-                .findByNickname(nickname)
-                .ifPresent(
-                        member -> {
-                            throw new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME);
-                        });
-    }
-
     @Transactional
     public void removeMember(Long memberId) {
         Member member = validateMemberExist(memberId);
@@ -47,12 +38,6 @@ public class MemberService {
 
     public Member search(Long memberId) {
         return validateMemberExist(memberId);
-    }
-
-    private Member validateMemberExist(Long memberId) {
-        return memberRepository
-                .findById(memberId)
-                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
     @Transactional
@@ -65,5 +50,20 @@ public class MemberService {
                             RefreshToken newRefreshToken = new RefreshToken(token, memberId);
                             refreshTokenRepository.save(newRefreshToken);
                         });
+    }
+
+    private void validateNickname(String nickname) {
+        memberRepository
+                .findByNickname(nickname)
+                .ifPresent(
+                        member -> {
+                            throw new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME);
+                        });
+    }
+
+    private Member validateMemberExist(Long memberId) {
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 }
