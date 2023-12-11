@@ -5,6 +5,7 @@ import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterResponse;
+import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberService;
@@ -36,5 +37,12 @@ public class MemberController {
     public ResponseEntity<Void> removeMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         memberService.removeMember(userDetails.id());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<MemberProfileResponse> getMemberDetails(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Member member = memberService.search(userDetails.id());
+        return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 }
