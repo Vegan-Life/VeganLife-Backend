@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.konggogi.veganlife.config.MapStructConfig;
 import com.konggogi.veganlife.support.security.MockSecurityFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@Import(RestDocsConfiguration.class)
+@Import({RestDocsConfiguration.class, MapStructConfig.class})
 @AutoConfigureRestDocs
 @ActiveProfiles("test")
 @WebMvcTest
