@@ -12,10 +12,8 @@ import org.hibernate.validator.constraints.Length;
 public record MemberRegisterRequest(
         @Email @NotBlank String email,
         @NotBlank @Length(min = 2, max = 10) String nickname,
-        @NotBlank String phoneNumber,
         @NotNull Gender gender,
         @NotNull VegetarianType vegetarianType,
         @Positive @NotNull Integer birthYear,
-        @Positive @NotNull Integer age,
         @Positive @NotNull Integer height,
         @Positive @NotNull Integer weight) {}

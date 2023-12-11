@@ -31,9 +31,7 @@ public class OauthService {
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
-        int birthYear = Integer.parseInt(oauthUserInfo.getBirthYear());
-        String phoneNumber = oauthUserInfo.getPhoneNumber();
-        return Member.builder().email(email).birthYear(birthYear).phoneNumber(phoneNumber).build();
+        return Member.builder().email(email).build();
     }
 
     private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {

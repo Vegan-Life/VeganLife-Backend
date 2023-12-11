@@ -13,16 +13,6 @@ public class KakaoUserInfo extends OauthUserInfo {
         return (String) getKakaoAccount().get("email");
     }
 
-    @Override
-    public String getPhoneNumber() {
-        return (String) getKakaoAccount().get("phone_number");
-    }
-
-    @Override
-    public String getBirthYear() {
-        return (String) getKakaoAccount().get("birthyear");
-    }
-
     private Map<String, Object> getKakaoAccount() {
         return (Map<String, Object>) getAttributes().get("kakao_account");
     }
