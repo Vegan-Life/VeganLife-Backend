@@ -11,8 +11,4 @@ public abstract class OauthUserInfo {
     private final Map<String, Object> attributes;
 
     public abstract String getEmail();
-
-    public abstract String getPhoneNumber();
-
-    public abstract String getBirthYear();
 }

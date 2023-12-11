@@ -13,16 +13,6 @@ public class NaverUserInfo extends OauthUserInfo {
         return (String) getResponse().get("email");
     }
 
-    @Override
-    public String getPhoneNumber() {
-        return (String) getResponse().get("mobile");
-    }
-
-    @Override
-    public String getBirthYear() {
-        return (String) getResponse().get("birthyear");
-    }
-
     private Map<String, String> getResponse() {
         return (Map<String, String>) getAttributes().get("response");
     }

@@ -3,11 +3,12 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRequest;
+import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
+import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,47 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final MemberMapper memberMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public Member addMember(MemberRegisterRequest memberRegisterRequest) {
-        validateNickname(memberRegisterRequest.nickname());
-        Member member = memberMapper.toEntity(memberRegisterRequest);
-        return memberRepository.save(member);
+    public Member addMember(String email) {
+        return memberRepository
+                .findByEmail(email)
+                .orElseGet(
+                        () -> {
+                            Member member = Member.builder().email(email).build();
+                            return memberRepository.save(member);
+                        });
+    }
+
+    @Transactional
+    public void removeMember(Long memberId) {
+        Member member = validateMemberExist(memberId);
+        memberRepository.delete(member);
+    }
+
+    public Member search(Long memberId) {
+        return validateMemberExist(memberId);
+    }
+
+    @Transactional
+    public Member modifyMemberInfo(Long memberId, MemberInfoRequest memberInfoRequest) {
+        validateNickname(memberInfoRequest.nickname());
+        Member member = validateMemberExist(memberId);
+        member.updateMemberInfo(memberInfoRequest);
+        return member;
+    }
+
+    @Transactional
+    public void saveRefreshToken(Long memberId, String token) {
+        refreshTokenRepository
+                .findRefreshTokenByMemberId(memberId)
+                .ifPresentOrElse(
+                        refreshToken -> refreshToken.updateToken(token),
+                        () -> {
+                            RefreshToken newRefreshToken = new RefreshToken(token, memberId);
+                            refreshTokenRepository.save(newRefreshToken);
+                        });
     }
 
     private void validateNickname(String nickname) {
@@ -33,12 +68,6 @@ public class MemberService {
                         member -> {
                             throw new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME);
                         });
-    }
-
-    @Transactional
-    public void removeMember(Long memberId) {
-        Member member = validateMemberExist(memberId);
-        memberRepository.delete(member);
     }
 
     private Member validateMemberExist(Long memberId) {

@@ -1,14 +1,13 @@
 package com.konggogi.veganlife.member.controller;
 
 
-import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRequest;
-import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterResponse;
+import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
+import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,21 +19,25 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final JwtProvider jwtProvider;
 
     @PostMapping()
-    public ResponseEntity<MemberRegisterResponse> createMember(
-            @Valid @RequestBody MemberRegisterRequest memberRegisterRequest) {
-        Member member = memberService.addMember(memberRegisterRequest);
-        String accessToken = jwtProvider.createToken(member.getEmail());
-        String refreshToken = jwtProvider.createRefreshToken(member.getEmail());
-        return ResponseEntity.ok(
-                memberMapper.toMemberRegisterResponse(member, accessToken, refreshToken));
+    public ResponseEntity<MemberInfoResponse> modifyMemberInfo(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody MemberInfoRequest memberInfoRequest) {
+        Member member = memberService.modifyMemberInfo(userDetails.id(), memberInfoRequest);
+        return ResponseEntity.ok(memberMapper.toMemberInfoResponse(member));
     }
 
     @DeleteMapping()
     public ResponseEntity<Void> removeMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         memberService.removeMember(userDetails.id());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<MemberProfileResponse> getMemberDetails(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Member member = memberService.search(userDetails.id());
+        return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 }
