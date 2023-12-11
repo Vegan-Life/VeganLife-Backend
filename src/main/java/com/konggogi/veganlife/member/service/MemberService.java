@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -38,6 +39,14 @@ public class MemberService {
 
     public Member search(Long memberId) {
         return validateMemberExist(memberId);
+    }
+
+    @Transactional
+    public Member modifyMemberInfo(Long memberId, MemberInfoRequest memberInfoRequest) {
+        validateNickname(memberInfoRequest.nickname());
+        Member member = validateMemberExist(memberId);
+        member.updateMemberInfo(memberInfoRequest);
+        return member;
     }
 
     @Transactional
