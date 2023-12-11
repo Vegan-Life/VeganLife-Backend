@@ -21,19 +21,16 @@ public class Member extends TimeStamped {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String nickname;
 
     private String profileImageUrl;
 
-    @Column(nullable = false)
     private Integer birthYear;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private VegetarianType vegetarianType;
 
@@ -41,10 +38,8 @@ public class Member extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = false)
     private Integer height;
 
-    @Column(nullable = false)
     private Integer weight;
 
     private Integer dailyCarbs;
