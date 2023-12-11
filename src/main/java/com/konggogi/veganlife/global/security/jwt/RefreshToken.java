@@ -1,0 +1,37 @@
+package com.konggogi.veganlife.global.security.jwt;
+
+
+import com.konggogi.veganlife.global.util.JwtUtils;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RefreshToken {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String token;
+    private Long memberId;
+
+    public RefreshToken(String token, Long id) {
+        this.token = token;
+        this.memberId = id;
+    }
+
+    public void updateToken(String token) {
+        this.token = token;
+    }
+
+    public boolean isSameToken(String token) {
+        int prefixLength = JwtUtils.BEARER_PREFIX.length();
+        return this.token.substring(prefixLength).equals(token);
+    }
+}

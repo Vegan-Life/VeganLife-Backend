@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class JwtUtils {
     public static final String AUTH_TOKEN_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
+    public static final String BEARER_PREFIX = "Bearer ";
 
     @Value("${jwt.secret-key}")
     private String secretKey;
