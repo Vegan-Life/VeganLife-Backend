@@ -3,11 +3,11 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.MemberRegisterRequest;
+import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
+import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,23 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final MemberMapper memberMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public Member addMember(MemberRegisterRequest memberRegisterRequest) {
-        validateNickname(memberRegisterRequest.nickname());
-        Member member = memberMapper.toEntity(memberRegisterRequest);
-        Member savedMember = memberRepository.save(member);
-        savedMember.updateDailyIntake();
-        return savedMember;
-    }
-
-    private void validateNickname(String nickname) {
-        memberRepository
-                .findByNickname(nickname)
-                .ifPresent(
-                        member -> {
-                            throw new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME);
+    public Member addMember(String email) {
+        return memberRepository
+                .findByEmail(email)
+                .orElseGet(
+                        () -> {
+                            Member member = Member.builder().email(email).build();
+                            return memberRepository.save(member);
                         });
     }
 
@@ -45,6 +38,27 @@ public class MemberService {
 
     public Member search(Long memberId) {
         return validateMemberExist(memberId);
+    }
+
+    @Transactional
+    public void saveRefreshToken(Long memberId, String token) {
+        refreshTokenRepository
+                .findRefreshTokenByMemberId(memberId)
+                .ifPresentOrElse(
+                        refreshToken -> refreshToken.updateToken(token),
+                        () -> {
+                            RefreshToken newRefreshToken = new RefreshToken(token, memberId);
+                            refreshTokenRepository.save(newRefreshToken);
+                        });
+    }
+
+    private void validateNickname(String nickname) {
+        memberRepository
+                .findByNickname(nickname)
+                .ifPresent(
+                        member -> {
+                            throw new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME);
+                        });
     }
 
     private Member validateMemberExist(Long memberId) {
