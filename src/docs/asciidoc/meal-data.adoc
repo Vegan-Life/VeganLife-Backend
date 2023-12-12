@@ -1,0 +1,25 @@
+= Meal Data API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 식품 정보 검색 API
+
+=== Request
+
+include::{snippets}/meal-data-list/query-parameters.adoc[]
+
+한글은 URI상에서 인코딩되어 보여집니다. (keyword="통")
+
+include::{snippets}/meal-data-list/http-request.adoc[]
+
+=== Response
+
+include::{snippets}/meal-data-list/http-response.adoc[]
