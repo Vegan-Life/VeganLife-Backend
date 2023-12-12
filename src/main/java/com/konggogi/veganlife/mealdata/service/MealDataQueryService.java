@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MealDataQueryService {
 
     private final MealDataRepository mealDataRepository;
 
-    // TODO: 필요에 따라 Pagenation 적용
     public Page<MealData> searchByKeyword(String keyword, Pageable pageable) {
 
         return mealDataRepository.findMealDataByNameContaining(keyword, pageable);
