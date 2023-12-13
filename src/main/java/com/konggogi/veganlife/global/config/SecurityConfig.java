@@ -30,7 +30,8 @@ public class SecurityConfig {
         return web ->
                 web.ignoring()
                         .requestMatchers(PathRequest.toH2Console())
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/docs"));
     }
 
     @Bean
