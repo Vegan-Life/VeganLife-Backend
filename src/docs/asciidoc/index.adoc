@@ -1,0 +1,9 @@
+= Vegan Life API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+include::{docdir}/src/docs/asciidoc/meal-data.adoc[]
