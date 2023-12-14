@@ -27,8 +27,9 @@ public class AuthController {
     @PostMapping("/reissue")
     public ResponseEntity<AuthResponse> refreshToken(
             HttpServletRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String extractToken = request.getHeader(JwtUtils.AUTH_TOKEN_HEADER);
         String accessToken =
-                jwtUtils.extractTokenFromHeader(request)
+                jwtUtils.extractBearerToken(extractToken)
                         .map(token -> memberService.reissueToken(token, userDetails.id()))
                         .orElseThrow(
                                 () -> {
