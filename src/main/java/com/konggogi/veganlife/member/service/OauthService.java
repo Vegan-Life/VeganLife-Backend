@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OauthService {
     private final OauthUserInfoFactory oauthUserInfoFactory;
 
