@@ -3,7 +3,11 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
+import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
+import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
@@ -19,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtUtils jwtUtils;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public Member addMember(String email) {
@@ -58,6 +64,24 @@ public class MemberService {
                         () -> {
                             RefreshToken newRefreshToken = new RefreshToken(token, memberId);
                             refreshTokenRepository.save(newRefreshToken);
+                        });
+    }
+
+    public String reissueToken(String refreshToken, Long memberId) {
+        jwtUtils.validateToken(refreshToken);
+        return refreshTokenRepository
+                .findRefreshTokenByMemberId(memberId)
+                .map(
+                        token -> {
+                            Member member = validateMemberExist(memberId);
+                            if (!token.isSameToken(refreshToken)) {
+                                throw new MismatchTokenException(ErrorCode.MISMATCH_REFRESH_TOKEN);
+                            }
+                            return jwtProvider.createToken(member.getEmail());
+                        })
+                .orElseThrow(
+                        () -> {
+                            throw new InvalidJwtException(ErrorCode.NOT_FOUND_REFRESH_TOKEN);
                         });
     }
 
