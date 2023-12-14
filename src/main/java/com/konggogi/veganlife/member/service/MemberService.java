@@ -3,7 +3,6 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
@@ -39,18 +38,18 @@ public class MemberService {
 
     @Transactional
     public void removeMember(Long memberId) {
-        Member member = validateMemberExist(memberId);
+        Member member = findMemberById(memberId);
         memberRepository.delete(member);
     }
 
     public Member search(Long memberId) {
-        return validateMemberExist(memberId);
+        return findMemberById(memberId);
     }
 
     @Transactional
     public Member modifyMemberInfo(Long memberId, MemberInfoRequest memberInfoRequest) {
         validateNickname(memberInfoRequest.nickname());
-        Member member = validateMemberExist(memberId);
+        Member member = findMemberById(memberId);
         member.updateMemberInfo(memberInfoRequest);
         return member;
     }
@@ -67,13 +66,13 @@ public class MemberService {
                         });
     }
 
-    public String reissueToken(String refreshToken, Long memberId) {
+    public String reissueToken(String refreshToken) {
         jwtUtils.validateToken(refreshToken);
+        Member member = findMemberByToken(refreshToken);
         return refreshTokenRepository
-                .findRefreshTokenByMemberId(memberId)
+                .findRefreshTokenByMemberId(member.getId())
                 .map(
                         token -> {
-                            Member member = validateMemberExist(memberId);
                             if (!token.isSameToken(refreshToken)) {
                                 throw new MismatchTokenException(ErrorCode.MISMATCH_REFRESH_TOKEN);
                             }
@@ -81,7 +80,7 @@ public class MemberService {
                         })
                 .orElseThrow(
                         () -> {
-                            throw new InvalidJwtException(ErrorCode.NOT_FOUND_REFRESH_TOKEN);
+                            throw new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN);
                         });
     }
 
@@ -94,9 +93,15 @@ public class MemberService {
                         });
     }
 
-    private Member validateMemberExist(Long memberId) {
+    private Member findMemberById(Long memberId) {
         return memberRepository
                 .findById(memberId)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+    }
+
+    private Member findMemberByToken(String token) {
+        return jwtUtils.extractUserEmail(token)
+                .flatMap(memberRepository::findByEmail)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 }
