@@ -6,7 +6,6 @@ import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
@@ -25,8 +24,7 @@ public class JwtUtils {
     @Value("${jwt.secret-key}")
     private String secretKey;
 
-    public Optional<String> extractTokenFromHeader(HttpServletRequest request) {
-        String token = request.getHeader(AUTH_TOKEN_HEADER);
+    public Optional<String> extractBearerToken(String token) {
         if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
             return Optional.of(token.substring(BEARER_PREFIX.length()));
         }
