@@ -90,23 +90,9 @@ asciidoctor {
     dependsOn test
 }
 
-bootJar {
+bootJar { // jar의 templates에 문서 복사
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'BOOT-INF/classes/static/docs'
+    from ("${asciidoctor.outputDir}") {
+        into 'BOOT-INF/classes/templates'
     }
-    finalizedBy('copyDocument')
-}
-
-tasks.register('copyDocument', Copy) {
-    from file("build/docs/asciidoc")
-    into file("src/main/resources/templates")
-}
-
-copyDocument{
-    dependsOn processResources
-}
-
-spotlessJava{
-    dependsOn copyDocument
 }
