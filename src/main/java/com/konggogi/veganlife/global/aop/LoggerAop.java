@@ -3,6 +3,8 @@ package com.konggogi.veganlife.global.aop;
 import static com.konggogi.veganlife.global.util.AopUtils.extractMethodSignature;
 
 import com.konggogi.veganlife.global.aop.domain.MethodSignature;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -24,9 +26,14 @@ public class LoggerAop {
         log.debug("[START] - {}.{}", signature.className(), signature.methodName());
 
         Object[] args = joinPoint.getArgs();
-        for (Object arg : args) {
-            log.debug("type: {} | value: {}", arg.getClass().getSimpleName(), arg);
-        }
+        Stream.of(args)
+                .filter(Objects::nonNull)
+                .forEach(
+                        arg ->
+                                log.debug(
+                                        "type: {} | value: {}",
+                                        arg.getClass().getSimpleName(),
+                                        arg));
     }
 
     @AfterReturning(value = "cuts()")
