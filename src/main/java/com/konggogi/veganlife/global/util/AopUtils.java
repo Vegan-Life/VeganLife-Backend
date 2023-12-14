@@ -3,7 +3,6 @@ package com.konggogi.veganlife.global.util;
 
 import com.konggogi.veganlife.global.aop.domain.MethodSignature;
 import org.aspectj.lang.JoinPoint;
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 
 public class AopUtils {
