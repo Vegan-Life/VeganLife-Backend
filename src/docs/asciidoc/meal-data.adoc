@@ -14,11 +14,17 @@ endif::[]
 
 === Request
 
+==== Header
+
+include::{snippets}/meal-data-list/request-headers.adoc[]
+
+==== Parameter
+
 include::{snippets}/meal-data-list/query-parameters.adoc[]
 
-한글은 URI상에서 인코딩되어 보여집니다. (keyword="통")
-
 include::{snippets}/meal-data-list/http-request.adoc[]
+
+한글은 URI상에서 인코딩되어 보여집니다. (keyword="통")
 
 === Response
 
