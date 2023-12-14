@@ -6,7 +6,6 @@ import org.aspectj.lang.JoinPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 
-@Component
 public class AopUtils {
     public static MethodSignature extractMethodSignature(JoinPoint joinPoint) {
         String className = joinPoint.getTarget().getClass().getSimpleName();
