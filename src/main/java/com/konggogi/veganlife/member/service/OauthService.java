@@ -11,12 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OauthService {
     private final OauthUserInfoFactory oauthUserInfoFactory;
 
