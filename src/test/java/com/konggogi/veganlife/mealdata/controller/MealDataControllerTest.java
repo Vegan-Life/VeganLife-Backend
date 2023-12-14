@@ -5,6 +5,7 @@ import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRe
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -45,6 +46,7 @@ public class MealDataControllerTest extends RestDocsTest {
         ResultActions perform =
                 mockMvc.perform(
                         get("/api/v1/meal-data")
+                                .headers(authorizationHeader())
                                 .queryParam("keyword", "통")
                                 .queryParam("page", "0")
                                 .queryParam("size", "12"));
@@ -60,9 +62,10 @@ public class MealDataControllerTest extends RestDocsTest {
                                 "meal-data-list",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
                                 queryParameters(
                                         parameterWithName("keyword").description("검색을 위한 키워드"),
-                                        parameterWithName("page").description("페이지 번호"),
-                                        parameterWithName("size").description("페이지 사이즈"))));
+                                        pageDesc(),
+                                        sizeDesc())));
     }
 }
