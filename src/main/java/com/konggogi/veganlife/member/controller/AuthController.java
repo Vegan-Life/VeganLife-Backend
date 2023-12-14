@@ -7,7 +7,7 @@ import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
 import com.konggogi.veganlife.member.controller.dto.response.AuthResponse;
 import com.konggogi.veganlife.member.domain.mapper.AuthMapper;
-import com.konggogi.veganlife.member.service.MemberService;
+import com.konggogi.veganlife.member.service.MemberQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/auth")
 public class AuthController {
-    private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
     private final JwtUtils jwtUtils;
     private final AuthMapper authMapper;
 
@@ -28,7 +28,7 @@ public class AuthController {
         String refreshToken = reissueRequest.refreshToken();
         String accessToken =
                 jwtUtils.extractBearerToken(refreshToken)
-                        .map(memberService::reissueToken)
+                        .map(memberQueryService::reissueToken)
                         .orElseThrow(
                                 () -> {
                                     throw new InvalidJwtException(ErrorCode.INVALID_TOKEN);

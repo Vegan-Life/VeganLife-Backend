@@ -7,6 +7,7 @@ import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
 import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
+import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/members")
 public class MemberController {
     private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
     private final MemberMapper memberMapper;
 
     @PostMapping()
@@ -37,7 +39,7 @@ public class MemberController {
     @GetMapping("/profile")
     public ResponseEntity<MemberProfileResponse> getMemberDetails(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Member member = memberService.search(userDetails.id());
+        Member member = memberQueryService.search(userDetails.id());
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 }
