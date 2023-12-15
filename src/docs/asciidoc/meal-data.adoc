@@ -42,6 +42,10 @@ include::{snippets}/meal-data-details/request-headers.adoc[]
 
 include::{snippets}/meal-data-details/path-parameters.adoc[]
 
+==== Parameter
+
+include::{snippets}/meal-data-details/query-parameters.adoc[]
+
 include::{snippets}/meal-data-details/http-request.adoc[]
 
 === Response
