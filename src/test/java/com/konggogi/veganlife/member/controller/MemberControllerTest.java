@@ -81,7 +81,7 @@ class MemberControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("회원 정보 조회 API")
+    @DisplayName("회원 프로필 조회 API")
     void getMemberDetailsTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_F.getMember();
@@ -104,7 +104,7 @@ class MemberControllerTest extends RestDocsTest {
         perform.andDo(print())
                 .andDo(
                         document(
-                                "remove-member",
+                                "member-profile",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
