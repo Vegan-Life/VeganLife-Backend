@@ -38,28 +38,16 @@ public class MealData extends TimeStamped {
     private Integer amountPerServe;
 
     @Column(nullable = false)
-    private Double calorie;
+    private Double caloriePerUnit;
 
     @Column(nullable = false)
-    private Double protein;
+    private Double proteinPerUnit;
 
     @Column(nullable = false)
-    private Double fat;
+    private Double fatPerUnit;
 
     @Column(nullable = false)
-    private Double carbs;
-
-    @Column(nullable = false)
-    private Double caloriePerGram;
-
-    @Column(nullable = false)
-    private Double proteinPerGram;
-
-    @Column(nullable = false)
-    private Double fatPerGram;
-
-    @Column(nullable = false)
-    private Double carbsPerGram;
+    private Double carbsPerUnit;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -72,28 +60,20 @@ public class MealData extends TimeStamped {
             MealDataType type,
             Integer amount,
             Integer amountPerServe,
-            Double calorie,
-            Double protein,
-            Double fat,
-            Double carbs,
-            Double caloriePerGram,
-            Double proteinPerGram,
-            Double fatPerGram,
-            Double carbsPerGram,
+            Double caloriePerUnit,
+            Double proteinPerUnit,
+            Double fatPerUnit,
+            Double carbsPerUnit,
             IntakeUnit intakeUnit) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.amount = amount;
         this.amountPerServe = amountPerServe;
-        this.calorie = calorie;
-        this.protein = protein;
-        this.fat = fat;
-        this.carbs = carbs;
-        this.caloriePerGram = caloriePerGram;
-        this.proteinPerGram = proteinPerGram;
-        this.fatPerGram = fatPerGram;
-        this.carbsPerGram = carbsPerGram;
+        this.caloriePerUnit = caloriePerUnit;
+        this.proteinPerUnit = proteinPerUnit;
+        this.fatPerUnit = fatPerUnit;
+        this.carbsPerUnit = carbsPerUnit;
         this.intakeUnit = intakeUnit;
     }
 }

@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.mealdata.domain.mapper;
 
 
+import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import org.mapstruct.Mapper;
@@ -9,4 +10,6 @@ import org.mapstruct.Mapper;
 public interface MealDataMapper {
 
     MealDataListResponse toMealDataListResponse(MealData mealData);
+
+    MealDataDetailsResponse toMealDataDetailsResponse(MealData mealData);
 }

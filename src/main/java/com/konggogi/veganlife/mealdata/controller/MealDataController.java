@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.mealdata.controller;
 
 
+import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,5 +30,12 @@ public class MealDataController {
                 mealDataQueryService
                         .searchByKeyword(keyword, pageable)
                         .map(mealDataMapper::toMealDataListResponse));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MealDataDetailsResponse> getMealDataDetails(@PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                mealDataMapper.toMealDataDetailsResponse(mealDataQueryService.search(id)));
     }
 }
