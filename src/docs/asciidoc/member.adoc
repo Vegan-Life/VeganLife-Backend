@@ -28,6 +28,10 @@ include::{snippets}/modify-member-info/http-request.adoc[]
 
 include::{snippets}/modify-member-info/http-response.adoc[]
 
+==== 409 CONFLICT
+
+include::{snippets}/modify-member-info-duplicated-nickname/http-response.adoc[]
+
 == 회원 탈퇴 API
 
 === Request
@@ -43,7 +47,12 @@ include::{snippets}/remove-member/http-request.adoc[]
 === Response
 
 ==== 204 NO CONTENT
+
 include::{snippets}/remove-member/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/remove-member-not-found/http-response.adoc[]
 
 == 회원 프로필 조회 API
 
@@ -62,3 +71,6 @@ include::{snippets}/member-profile/http-request.adoc[]
 ==== 200 OK
 include::{snippets}/member-profile/http-response.adoc[]
 
+==== 404 NOT FOUND
+
+include::{snippets}/member-profile-not-found/http-response.adoc[]
