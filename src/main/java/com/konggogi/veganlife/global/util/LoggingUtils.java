@@ -7,6 +7,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 public class LoggingUtils {
@@ -69,6 +74,54 @@ public class LoggingUtils {
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
                 errorDate, controllerName, methodName, lineNumber, exceptionName, status, message);
+    }
+
+    public static String methodArgumentNotValidMessage(MethodArgumentNotValidException exception) {
+
+        BindingResult bindingResult = exception.getBindingResult();
+        StringBuilder errors = new StringBuilder();
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            errors.append("[");
+            errors.append(fieldError.getField());
+            errors.append("](은)는 ");
+            errors.append(fieldError.getDefaultMessage());
+            errors.append(" -> 입력된 값: ");
+            errors.append(fieldError.getRejectedValue());
+            errors.append(". ");
+        }
+        return errors.toString();
+    }
+
+    public static String methodArgumentTypeMismatchMessage(
+            MethodArgumentTypeMismatchException exception) {
+
+        StringBuilder errors = new StringBuilder();
+        errors.append("Argument: [");
+        errors.append(exception.getPropertyName());
+        ;
+        errors.append("] -> Required Type: [");
+        errors.append(exception.getRequiredType().getSimpleName());
+        errors.append("] | Actual Type: [");
+        errors.append(exception.getValue().getClass().getSimpleName());
+        errors.append("] | Actual Value: [");
+        errors.append(exception.getValue());
+        errors.append("]");
+
+        return errors.toString();
+    }
+
+    public static String missingRequestParameterMessage(
+            MissingServletRequestParameterException exception) {
+
+        StringBuilder errors = new StringBuilder();
+        errors.append("Argument: [");
+        errors.append(exception.getParameterName());
+        ;
+        errors.append("] -> Required Type: [");
+        errors.append(exception.getParameterType());
+        errors.append("] 은 null일 수 없습니다.");
+
+        return errors.toString();
     }
 
     private static String setTextColor(String color, String message) {

@@ -8,12 +8,12 @@ import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
@@ -21,28 +21,45 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             HandlerMethod handlerMethod, MethodArgumentNotValidException exception) {
-        BindingResult bindingResult = exception.getBindingResult();
 
-        StringBuilder errors = new StringBuilder();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            errors.append("[");
-            errors.append(fieldError.getField());
-            errors.append("](은)는 ");
-            errors.append(fieldError.getDefaultMessage());
-            errors.append(" -> 입력된 값: ");
-            errors.append(fieldError.getRejectedValue());
-            errors.append(". ");
-        }
-        errors.deleteCharAt(errors.length() - 1);
-
+        String message = LoggingUtils.methodArgumentNotValidMessage(exception);
         LoggingUtils.exceptionLog(
                 AopUtils.extractMethodSignature(handlerMethod),
                 HttpStatus.BAD_REQUEST,
                 exception,
-                errors.toString());
+                message);
 
-        ErrorResponse errorResponse =
-                ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE, errors.toString());
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE, message);
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            HandlerMethod handlerMethod, MethodArgumentTypeMismatchException exception) {
+
+        String message = LoggingUtils.methodArgumentTypeMismatchMessage(exception);
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod),
+                HttpStatus.BAD_REQUEST,
+                exception,
+                message);
+
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE, message);
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestParameterException(
+            HandlerMethod handlerMethod, MissingServletRequestParameterException exception) {
+
+        String message = LoggingUtils.missingRequestParameterMessage(exception);
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod),
+                HttpStatus.BAD_REQUEST,
+                exception,
+                message);
+
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE, message);
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
