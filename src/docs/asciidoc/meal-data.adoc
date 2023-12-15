@@ -10,7 +10,7 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-== 식품 정보 검색 API
+== 키워드 기반 식품 데이터 목록 검색 API
 
 === Request
 
@@ -29,3 +29,25 @@ include::{snippets}/meal-data-list/http-request.adoc[]
 === Response
 
 include::{snippets}/meal-data-list/http-response.adoc[]
+
+== ID 기반 식품 데이터 상세 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-data-details/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/meal-data-details/path-parameters.adoc[]
+
+include::{snippets}/meal-data-details/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+include::{snippets}/meal-data-details/http-response.adoc[]
+
+==== 404 NOT FOUND
+include::{snippets}/meal-data-details-not-found/http-response.adoc[]
