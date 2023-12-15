@@ -9,6 +9,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class MemberController {
     @PostMapping()
     public ResponseEntity<MemberInfoResponse> modifyMemberInfo(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody MemberInfoRequest memberInfoRequest) {
+            @RequestBody @Valid MemberInfoRequest memberInfoRequest) {
         Member member = memberService.modifyMemberInfo(userDetails.id(), memberInfoRequest);
         return ResponseEntity.ok(memberMapper.toMemberInfoResponse(member));
     }
