@@ -7,3 +7,5 @@
 :sectlinks:
 
 include::{docdir}/src/docs/asciidoc/meal-data.adoc[]
+
+include::{docdir}/src/docs/asciidoc/member.adoc[]
