@@ -105,7 +105,8 @@ public class MealDataControllerTest extends RestDocsTest {
                 .willThrow(new NotFoundEntityException(ErrorCode.MEAL_DATA_NOT_FOUND));
         // when
         ResultActions perform =
-                mockMvc.perform(get("/api/v1/meal-data/{id}", -999L).headers(authorizationHeader()));
+                mockMvc.perform(
+                        get("/api/v1/meal-data/{id}", -999L).headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 
