@@ -3,8 +3,7 @@ package com.konggogi.veganlife.mealdata.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.mealdata.domain.MealData;
-import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
+import com.konggogi.veganlife.mealdata.domain.PersonalMealData;
 import com.konggogi.veganlife.mealdata.repository.PersonalMealDataRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MealDataQueryService {
+public class PersonalMealDataQueryService {
 
-    private final MealDataRepository mealDataRepository;
     private final PersonalMealDataRepository personalMealDataRepository;
 
-    public List<MealData> searchByKeyword(String keyword, Pageable pageable) {
+    public List<PersonalMealData> searchByKeyword(String keyword, Pageable pageable) {
 
-        return mealDataRepository.findMealDataByNameContaining(keyword, pageable);
+        return personalMealDataRepository.findPersonalMealDataByNameContaining(keyword, pageable);
     }
 
-    public MealData search(Long id) {
+    public PersonalMealData search(Long id) {
 
-        return mealDataRepository
+        return personalMealDataRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.MEAL_DATA_NOT_FOUND));
     }

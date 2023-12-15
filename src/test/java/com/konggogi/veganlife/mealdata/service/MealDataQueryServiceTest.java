@@ -19,8 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,14 +32,13 @@ public class MealDataQueryServiceTest {
     void searchByKeywordTest() {
         // given
         List<String> valid = List.of("통밀빵", "통밀크래커");
-        Page<MealData> found =
-                new PageImpl<>(valid.stream().map(MealDataFixture.MEAL::getWithName).toList());
+        List<MealData> found = valid.stream().map(MealDataFixture.MEAL::getWithName).toList();
         given(mealDataRepository.findMealDataByNameContaining(anyString(), any(Pageable.class)))
                 .willReturn(found);
         String keyword = "통";
         Pageable pageable = Pageable.ofSize(12);
         // when
-        Page<MealData> result = mealDataQueryService.searchByKeyword(keyword, pageable);
+        List<MealData> result = mealDataQueryService.searchByKeyword(keyword, pageable);
         // then
         assertThat(result).hasSize(2);
     }
