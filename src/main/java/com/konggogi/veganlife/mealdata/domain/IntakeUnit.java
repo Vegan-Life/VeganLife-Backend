@@ -7,10 +7,10 @@ public enum IntakeUnit {
     G("g"),
     ML("ml");
 
-    private String unit;
+    private final String value;
 
     @JsonCreator
-    IntakeUnit(String unit) {
-        this.unit = unit;
+    IntakeUnit(String value) {
+        this.value = value;
     }
 }
