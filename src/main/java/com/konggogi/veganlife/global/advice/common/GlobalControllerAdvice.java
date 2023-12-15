@@ -2,6 +2,7 @@ package com.konggogi.veganlife.global.advice.common;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
@@ -16,6 +17,7 @@ import org.springframework.web.method.HandlerMethod;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             HandlerMethod handlerMethod, MethodArgumentNotValidException exception) {
@@ -42,5 +44,16 @@ public class GlobalControllerAdvice {
         ErrorResponse errorResponse =
                 ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE, errors.toString());
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(NotFoundEntityException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            HandlerMethod handlerMethod, NotFoundEntityException exception) {
+
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod), HttpStatus.NOT_FOUND, exception);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.from(exception.getErrorCode()));
     }
 }
