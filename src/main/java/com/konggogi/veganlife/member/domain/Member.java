@@ -53,20 +53,32 @@ public class Member extends TimeStamped {
 
     @Builder
     public Member(
+            Long id,
             String email,
             String nickname,
+            String profileImageUrl,
+            Integer birthYear,
             Gender gender,
             VegetarianType vegetarianType,
-            Integer birthYear,
             Integer height,
-            Integer weight) {
+            Integer weight,
+            Integer dailyCarbs,
+            Integer dailyProtein,
+            Integer dailyFat,
+            Integer AMR) {
+        this.id = id;
         this.email = email;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
         this.gender = gender;
         this.vegetarianType = vegetarianType;
         this.birthYear = birthYear;
         this.height = height;
         this.weight = weight;
+        this.dailyCarbs = dailyCarbs;
+        this.dailyProtein = dailyProtein;
+        this.dailyFat = dailyFat;
+        this.AMR = AMR;
         this.role = Role.USER;
         this.hasAdditionalInfo = false;
     }
