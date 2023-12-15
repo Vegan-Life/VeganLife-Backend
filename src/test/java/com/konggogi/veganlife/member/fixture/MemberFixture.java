@@ -6,8 +6,30 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 
 public enum MemberFixture {
-    DEFAULT_F("테스트유저", "profileImageUrl", 2000, Gender.F, VegetarianType.VEGAN, 165, 50, 227, 136, 40, 1821),
-    DEFAULT_M("테스트유저", "profileImageUrl", 1997, Gender.M, VegetarianType.OVO, 185, 85, 340, 204, 60, 2721);
+    DEFAULT_F(
+            "테스트유저",
+            "profileImageUrl",
+            2000,
+            Gender.F,
+            VegetarianType.VEGAN,
+            165,
+            50,
+            227,
+            136,
+            40,
+            1821),
+    DEFAULT_M(
+            "테스트유저",
+            "profileImageUrl",
+            1997,
+            Gender.M,
+            VegetarianType.OVO,
+            185,
+            85,
+            340,
+            204,
+            60,
+            2721);
     private Long id = 1L;
     private final String nickname;
     private final String profileImageUrl;
