@@ -1,0 +1,64 @@
+= Member API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 회원 추가 정보 등록 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/modify-member-info/request-headers.adoc[]
+
+==== Parameter
+
+include::{snippets}/modify-member-info/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/modify-member-info/http-response.adoc[]
+
+== 회원 탈퇴 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/remove-member/request-headers.adoc[]
+
+==== Parameter
+
+include::{snippets}/remove-member/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+include::{snippets}/remove-member/http-response.adoc[]
+
+== 회원 프로필 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/member-profile/request-headers.adoc[]
+
+==== Parameter
+
+include::{snippets}/member-profile/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+include::{snippets}/member-profile/http-response.adoc[]
+
