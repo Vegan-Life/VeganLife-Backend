@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.mealdata.domain;
 
 
-import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,11 +19,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MealData extends TimeStamped {
+public class PersonalMealData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "meal_data_id")
+    @Column(name = "personal_meal_data_id")
     private Long id;
 
     @Column(nullable = false)
@@ -57,8 +59,12 @@ public class MealData extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private IntakeUnit intakeUnit;
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
-    public MealData(
+    public PersonalMealData(
             Long id,
             String name,
             MealDataType type,
@@ -68,11 +74,12 @@ public class MealData extends TimeStamped {
             Double proteinPerUnit,
             Double fatPerUnit,
             Double carbsPerUnit,
-            IntakeUnit intakeUnit) {
+            IntakeUnit intakeUnit,
+            Member member) {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.accessType = AccessType.ALL;
+        this.accessType = AccessType.PERSONAL;
         this.amount = amount;
         this.amountPerServe = amountPerServe;
         this.caloriePerUnit = caloriePerUnit;
@@ -80,5 +87,6 @@ public class MealData extends TimeStamped {
         this.fatPerUnit = fatPerUnit;
         this.carbsPerUnit = carbsPerUnit;
         this.intakeUnit = intakeUnit;
+        this.member = member;
     }
 }
