@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @DataJpaTest
@@ -30,11 +29,10 @@ public class MealDataRepositoryTest {
         String keyword = "통";
         Pageable pageable = Pageable.ofSize(12);
         // when
-        Page<MealData> result = mealDataRepository.findMealDataByNameContaining(keyword, pageable);
+        List<MealData> result = mealDataRepository.findMealDataByNameContaining(keyword, pageable);
         // then
-        assertThat(result.getNumberOfElements()).isEqualTo(valid.size());
-        assertThat(result.getContent().stream().map(MealData::getName))
-                .allMatch(s -> s.contains(keyword));
+        assertThat(result.size()).isEqualTo(valid.size());
+        assertThat(result.stream().map(MealData::getName)).allMatch(s -> s.contains(keyword));
     }
 
     @Test
