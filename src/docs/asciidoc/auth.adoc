@@ -1,0 +1,39 @@
+= Auth API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 액세스 토큰 재발급 API
+
+=== Request
+
+==== Body
+
+include::{snippets}/reissue-token/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/reissue-token/http-response.adoc[]
+
+==== 401 UNAUTHORIZED
+
+include::{snippets}/reissue-token-invalid-token/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/reissue-token-not-found-member/http-response.adoc[]
+
+include::{snippets}/reissue-token-not-found-token/http-response.adoc[]
+
+==== 400 BAD REQUEST
+
+include::{snippets}/reissue-token-mismatch/http-response.adoc[]

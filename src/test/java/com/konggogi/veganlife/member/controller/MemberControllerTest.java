@@ -5,6 +5,7 @@ import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRe
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -12,10 +13,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
+import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.MemberService;
@@ -63,6 +67,28 @@ class MemberControllerTest extends RestDocsTest {
     }
 
     @Test
+    @DisplayName("회원 정보 수정 API - 중복 닉네임 예외 발생")
+    void modifyMemberInfoDuplicatedNicknameTest() throws Exception {
+        // given
+        MemberInfoRequest request =
+                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
+                .willThrow(new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/members")
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isConflict());
+
+        perform.andDo(print())
+                .andDo(document("modify-member-info-duplicated-nickname", getDocumentResponse()));
+    }
+
+    @Test
     @DisplayName("회원 탈퇴 API")
     void removeMember() throws Exception {
         // when
@@ -78,6 +104,22 @@ class MemberControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 API - 없는 회원 예외 발생")
+    void removeNotMember() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(memberService)
+                .removeMember(anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(delete("/api/v1/members").headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("remove-member-not-found", getDocumentResponse()));
     }
 
     @Test
@@ -108,5 +150,20 @@ class MemberControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("회원 프로필 조회 API - 없는 회원 예외 발생")
+    void getNotMemberDetailsTest() throws Exception {
+        // given
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/members/profile").headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("member-profile-not-found", getDocumentResponse()));
     }
 }

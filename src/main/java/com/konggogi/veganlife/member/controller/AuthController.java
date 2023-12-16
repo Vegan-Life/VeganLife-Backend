@@ -24,7 +24,7 @@ public class AuthController {
     private final AuthMapper authMapper;
 
     @PostMapping("/reissue")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody ReissueRequest reissueRequest) {
+    public ResponseEntity<AuthResponse> reissueToken(@RequestBody ReissueRequest reissueRequest) {
         String refreshToken = reissueRequest.refreshToken();
         String accessToken =
                 jwtUtils.extractBearerToken(refreshToken)
