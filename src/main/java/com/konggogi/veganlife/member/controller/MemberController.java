@@ -4,9 +4,9 @@ package com.konggogi.veganlife.member.controller;
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
-import com.konggogi.veganlife.member.controller.dto.response.DailyNutrientsResponse;
 import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
 import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
+import com.konggogi.veganlife.member.controller.dto.response.RecommendNutrientsResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -55,9 +55,9 @@ public class MemberController {
     }
 
     @GetMapping("/nutrients")
-    public ResponseEntity<DailyNutrientsResponse> getDailyNutrients(
+    public ResponseEntity<RecommendNutrientsResponse> getRecommendNutrients(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member member = memberQueryService.findMemberById(userDetails.id());
-        return ResponseEntity.ok(memberMapper.toDailyNutrientsResponse(member));
+        return ResponseEntity.ok(memberMapper.toRecommendNutrientsResponse(member));
     }
 }
