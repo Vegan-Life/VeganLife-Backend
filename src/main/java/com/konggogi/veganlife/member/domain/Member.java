@@ -116,4 +116,22 @@ public class Member extends TimeStamped {
         this.hasAdditionalInfo = true;
         updateDailyIntake();
     }
+
+    public void modifyMemberProfile(
+            String nickname,
+            String profileImageUrl,
+            VegetarianType vegetarianType,
+            Gender gender,
+            Integer birthYear,
+            Integer height,
+            Integer weight) {
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.vegetarianType = vegetarianType;
+        this.gender = gender;
+        this.birthYear = birthYear;
+        this.height = height;
+        this.weight = weight;
+        updateDailyIntake();
+    }
 }

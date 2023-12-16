@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -51,6 +52,18 @@ public class MemberService {
                             RefreshToken newRefreshToken = new RefreshToken(token, memberId);
                             refreshTokenRepository.save(newRefreshToken);
                         });
+    }
+
+    public void modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+        Member member = memberQueryService.findMemberById(memberId);
+        member.modifyMemberProfile(
+                profileRequest.nickname(),
+                profileRequest.imageUrl(),
+                profileRequest.vegetarianType(),
+                profileRequest.gender(),
+                profileRequest.birthYear(),
+                profileRequest.height(),
+                profileRequest.weight());
     }
 
     private void validateNickname(String nickname) {
