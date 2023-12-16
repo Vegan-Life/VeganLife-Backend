@@ -98,3 +98,22 @@ include::{snippets}/modify-profile-duplicated-nickname/http-response.adoc[]
 
 include::{snippets}/modify-profile-not-found/http-response.adoc[]
 
+== 권장 섭취량 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recommend-daily-nutrients/request-headers.adoc[]
+
+include::{snippets}/recommend-daily-nutrients/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recommend-daily-nutrients/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/recommend-daily-nutrients-not-found/http-response.adoc[]
