@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -35,10 +36,16 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member modifyMemberInfo(Long memberId, MemberInfoRequest memberInfoRequest) {
-        validateNickname(memberInfoRequest.nickname());
+    public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
+        validateNickname(infoRequest.nickname());
         Member member = memberQueryService.findMemberById(memberId);
-        member.updateMemberInfo(memberInfoRequest);
+        member.updateMemberInfo(
+                infoRequest.nickname(),
+                infoRequest.gender(),
+                infoRequest.vegetarianType(),
+                infoRequest.birthYear(),
+                infoRequest.height(),
+                infoRequest.weight());
         return member;
     }
 
@@ -51,6 +58,20 @@ public class MemberService {
                             RefreshToken newRefreshToken = new RefreshToken(token, memberId);
                             refreshTokenRepository.save(newRefreshToken);
                         });
+    }
+
+    public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+        validateNickname(profileRequest.nickname());
+        Member member = memberQueryService.findMemberById(memberId);
+        member.modifyMemberProfile(
+                profileRequest.nickname(),
+                profileRequest.imageUrl(),
+                profileRequest.vegetarianType(),
+                profileRequest.gender(),
+                profileRequest.birthYear(),
+                profileRequest.height(),
+                profileRequest.weight());
+        return member;
     }
 
     private void validateNickname(String nickname) {

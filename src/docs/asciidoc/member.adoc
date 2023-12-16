@@ -71,3 +71,30 @@ include::{snippets}/member-profile/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/member-profile-not-found/http-response.adoc[]
+
+== 회원 프로필 수정 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/modify-profile/request-headers.adoc[]
+
+==== Body
+
+include::{snippets}/modify-profile/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/modify-profile/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/modify-profile-duplicated-nickname/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/modify-profile-not-found/http-response.adoc[]
+

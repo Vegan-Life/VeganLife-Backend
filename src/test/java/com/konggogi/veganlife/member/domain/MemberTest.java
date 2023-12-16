@@ -2,7 +2,6 @@ package com.konggogi.veganlife.member.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -49,21 +48,49 @@ class MemberTest {
     void updateMemberInfoTest() {
         // given
         Member member = MemberFixture.DEFAULT_M.getMemberWithoutInfo();
-        MemberInfoRequest request =
-                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        String nickname = "닉네임";
+        Gender gender = Gender.F;
+        VegetarianType vegetarianType = VegetarianType.LACTO_OVO;
+        Integer birthYear = 2005;
+        Integer height = 170;
+        Integer weight = 55;
         // when
-        member.updateMemberInfo(request);
+        member.updateMemberInfo(nickname, gender, vegetarianType, birthYear, height, weight);
         // then
-        assertThat(member.getNickname()).isEqualTo(request.nickname());
-        assertThat(member.getGender()).isEqualTo(request.gender());
-        assertThat(member.getVegetarianType()).isEqualTo(request.vegetarianType());
-        assertThat(member.getBirthYear()).isEqualTo(request.birthYear());
-        assertThat(member.getHeight()).isEqualTo(request.height());
-        assertThat(member.getWeight()).isEqualTo(request.weight());
+        assertThat(member.getNickname()).isEqualTo(nickname);
+        assertThat(member.getGender()).isEqualTo(gender);
+        assertThat(member.getVegetarianType()).isEqualTo(vegetarianType);
+        assertThat(member.getBirthYear()).isEqualTo(birthYear);
+        assertThat(member.getHeight()).isEqualTo(height);
+        assertThat(member.getWeight()).isEqualTo(weight);
         assertThat(member.isHasAdditionalInfo()).isTrue();
         assertThat(member.getAMR()).isNotNull();
         assertThat(member.getDailyCarbs()).isNotNull();
         assertThat(member.getDailyProtein()).isNotNull();
         assertThat(member.getDailyFat()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정")
+    void modifyMemberProfileTest() {
+        // given
+        Member member = MemberFixture.DEFAULT_M.getMember();
+        String nickname = "닉네임";
+        String profileImageUrl = "imageUrl";
+        Gender gender = Gender.F;
+        VegetarianType vegetarianType = VegetarianType.LACTO_OVO;
+        Integer birthYear = 2005;
+        Integer height = 170;
+        Integer weight = 55;
+        // when
+        member.modifyMemberProfile(
+                nickname, profileImageUrl, vegetarianType, gender, birthYear, height, weight);
+        // then
+        assertThat(member.getNickname()).isEqualTo(nickname);
+        assertThat(member.getGender()).isEqualTo(gender);
+        assertThat(member.getVegetarianType()).isEqualTo(vegetarianType);
+        assertThat(member.getBirthYear()).isEqualTo(birthYear);
+        assertThat(member.getHeight()).isEqualTo(height);
+        assertThat(member.getWeight()).isEqualTo(weight);
     }
 }

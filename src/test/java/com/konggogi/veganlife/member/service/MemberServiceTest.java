@@ -2,13 +2,18 @@ package com.konggogi.veganlife.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -83,12 +88,12 @@ class MemberServiceTest {
         // when
         Member updatedMember = memberService.modifyMemberInfo(memberId, request);
         // then
-        assertThat(request.nickname()).isEqualTo(updatedMember.getNickname());
-        assertThat(request.gender()).isEqualTo(updatedMember.getGender());
-        assertThat(request.vegetarianType()).isEqualTo(updatedMember.getVegetarianType());
-        assertThat(request.birthYear()).isEqualTo(updatedMember.getBirthYear());
-        assertThat(request.height()).isEqualTo(updatedMember.getHeight());
-        assertThat(request.weight()).isEqualTo(updatedMember.getWeight());
+        assertThat(updatedMember.getNickname()).isEqualTo(request.nickname());
+        assertThat(updatedMember.getGender()).isEqualTo(request.gender());
+        assertThat(updatedMember.getVegetarianType()).isEqualTo(request.vegetarianType());
+        assertThat(updatedMember.getBirthYear()).isEqualTo(request.birthYear());
+        assertThat(updatedMember.getHeight()).isEqualTo(request.height());
+        assertThat(updatedMember.getWeight()).isEqualTo(request.weight());
         then(memberRepository).should().findByNickname(request.nickname());
     }
 
@@ -140,5 +145,74 @@ class MemberServiceTest {
         // then
         then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
         then(refreshTokenRepository).should().save(any(RefreshToken.class));
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정")
+    void modifyMemberProfileTest() {
+        // given
+        MemberProfileRequest profileRequest =
+                new MemberProfileRequest(
+                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberRepository.findByNickname(profileRequest.nickname()))
+                .willReturn(Optional.empty());
+        given(memberQueryService.findMemberById(anyLong())).willReturn(member);
+        // when
+        Member updatedMember = memberService.modifyMemberProfile(member.getId(), profileRequest);
+        // then
+        assertThat(updatedMember.getNickname()).isEqualTo(profileRequest.nickname());
+        assertThat(updatedMember.getProfileImageUrl()).isEqualTo(profileRequest.imageUrl());
+        assertThat(updatedMember.getVegetarianType()).isEqualTo(profileRequest.vegetarianType());
+        assertThat(updatedMember.getGender()).isEqualTo(profileRequest.gender());
+        assertThat(updatedMember.getBirthYear()).isEqualTo(profileRequest.birthYear());
+        assertThat(updatedMember.getHeight()).isEqualTo(profileRequest.height());
+        assertThat(updatedMember.getWeight()).isEqualTo(profileRequest.weight());
+        then(memberRepository).should().findByNickname(anyString());
+        then(memberQueryService).should().findMemberById(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 시 중복된 닉네임 중복 예외 발생")
+    void modifyMemberProfileDuplicatedNicknameTest() {
+        // given
+        Long memberId = member.getId();
+        Member existingMember = MemberFixture.DEFAULT_F.getMember();
+        MemberProfileRequest profileRequest =
+                new MemberProfileRequest(
+                        existingMember.getNickname(),
+                        "imageUrl",
+                        VegetarianType.LACTO,
+                        Gender.M,
+                        1993,
+                        190,
+                        90);
+        given(memberRepository.findByNickname(profileRequest.nickname()))
+                .willReturn(Optional.of(existingMember));
+        // when, then
+        assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
+                .isInstanceOf(DuplicateNicknameException.class)
+                .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
+        then(memberRepository).should().findByNickname(anyString());
+        then(memberQueryService).should(never()).findMemberById(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 시 회원을 찾을 수 없으면 예외 발생")
+    void modifyNotMemberProfileTest() {
+        // given
+        Long memberId = member.getId();
+        MemberProfileRequest profileRequest =
+                new MemberProfileRequest(
+                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberRepository.findByNickname(profileRequest.nickname()))
+                .willReturn(Optional.empty());
+        given(memberQueryService.findMemberById(member.getId()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(memberRepository).should().findByNickname(anyString());
+        then(memberQueryService).should().findMemberById(anyLong());
     }
 }
