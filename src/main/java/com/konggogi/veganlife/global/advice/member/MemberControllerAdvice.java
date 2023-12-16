@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.global.advice.member;
 
 
+import com.konggogi.veganlife.global.exception.ApiException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
@@ -27,7 +28,7 @@ public class MemberControllerAdvice {
 
     @ExceptionHandler({MismatchTokenException.class, UnsupportedProviderException.class})
     public ResponseEntity<ErrorResponse> handleMismatchTokenException(
-            HandlerMethod handlerMethod, MismatchTokenException exception) {
+            HandlerMethod handlerMethod, ApiException exception) {
         LoggingUtils.exceptionLog(
                 AopUtils.extractMethodSignature(handlerMethod), HttpStatus.BAD_REQUEST, exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
