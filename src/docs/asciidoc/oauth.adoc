@@ -1,0 +1,37 @@
+= Oauth API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 소셜 로그인 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/login/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/login/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/login/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/login/http-response.adoc[]
+
+==== 404 BAD REQUEST
+
+include::{snippets}/login-unsupported-provider/http-response.adoc[]
