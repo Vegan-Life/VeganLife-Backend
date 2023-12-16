@@ -11,3 +11,5 @@ include::{docdir}/src/docs/asciidoc/meal-data.adoc[]
 include::{docdir}/src/docs/asciidoc/member.adoc[]
 
 include::{docdir}/src/docs/asciidoc/auth.adoc[]
+
+include::{docdir}/src/docs/asciidoc/oauth.adoc[]

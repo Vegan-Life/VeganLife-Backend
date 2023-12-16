@@ -14,7 +14,7 @@ endif::[]
 
 === Request
 
-==== Parameter
+==== Body
 
 include::{snippets}/reissue-token/http-request.adoc[]
 
