@@ -46,7 +46,7 @@ public class MemberController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<MemberProfileResponse> modifyMemberDetails(
+    public ResponseEntity<MemberProfileResponse> modifyMemberProfile(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid MemberProfileRequest memberProfileRequest) {
         Member member = memberService.modifyMemberProfile(userDetails.id(), memberProfileRequest);
