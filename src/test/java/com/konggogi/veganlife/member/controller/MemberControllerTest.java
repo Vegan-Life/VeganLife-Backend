@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -165,5 +166,85 @@ class MemberControllerTest extends RestDocsTest {
         perform.andExpect(status().isNotFound());
 
         perform.andDo(print()).andDo(document("member-profile-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 API")
+    void modifyMemberProfileTest() throws Exception {
+        // given
+        Member member = MemberFixture.DEFAULT_F.getMember();
+        MemberProfileRequest request =
+                new MemberProfileRequest(
+                        member.getNickname(),
+                        member.getProfileImageUrl(),
+                        member.getVegetarianType(),
+                        member.getGender(),
+                        member.getBirthYear(),
+                        member.getHeight(),
+                        member.getWeight());
+        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+                .willReturn(member);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/members/profile")
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isOk());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "modify-profile",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 API - 중복된 닉네임 예외 발생")
+    void modifyMemberProfileDuplicatedNicknameTest() throws Exception {
+        // given
+        MemberProfileRequest request =
+                new MemberProfileRequest(
+                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+                .willThrow(new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/members/profile")
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isConflict());
+
+        perform.andDo(print())
+                .andDo(document("modify-profile-duplicated-nickname", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 API - 없는 회원 예외 발생")
+    void modifyNotMemberProfileTest() throws Exception {
+        // given
+        MemberProfileRequest request =
+                new MemberProfileRequest(
+                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/members/profile")
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("modify-profile-not-found", getDocumentResponse()));
     }
 }
