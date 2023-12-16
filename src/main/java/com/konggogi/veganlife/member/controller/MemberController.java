@@ -3,6 +3,7 @@ package com.konggogi.veganlife.member.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
 import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
 import com.konggogi.veganlife.member.domain.Member;
@@ -42,5 +43,13 @@ public class MemberController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member member = memberQueryService.search(userDetails.id());
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<Void> modifyMemberDetails(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody @Valid MemberProfileRequest memberProfileRequest) {
+        memberService.modifyMemberProfile(userDetails.id(), memberProfileRequest);
+        return ResponseEntity.noContent().build();
     }
 }
