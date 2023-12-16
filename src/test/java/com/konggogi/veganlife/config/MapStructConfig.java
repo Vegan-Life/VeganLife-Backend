@@ -1,8 +1,8 @@
 package com.konggogi.veganlife.config;
 
 
-import com.konggogi.veganlife.mealdata.domain.mapper.MealDataDtoMapper;
-import com.konggogi.veganlife.mealdata.domain.mapper.MealDataDtoMapperImpl;
+import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
+import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapperImpl;
 import com.konggogi.veganlife.member.domain.mapper.AuthMapper;
 import com.konggogi.veganlife.member.domain.mapper.AuthMapperImpl;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
@@ -19,8 +19,8 @@ public class MapStructConfig {
     }
 
     @Bean
-    public MealDataDtoMapper mealDataDtoMapper() {
-        return new MealDataDtoMapperImpl();
+    public MealDataMapper mealDataMapper() {
+        return new MealDataMapperImpl();
     }
 
     @Bean

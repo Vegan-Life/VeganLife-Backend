@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MealDataRepository extends JpaRepository<MealData, Long> {
 
-    List<MealData> findMealDataByNameContaining(String Keyword, Pageable pageable);
+    List<MealData> findByNameContaining(String Keyword, Pageable pageable);
 }

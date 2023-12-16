@@ -2,13 +2,17 @@ package com.konggogi.veganlife.mealdata.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,10 +36,6 @@ public class MealData extends TimeStamped {
     private MealDataType type;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AccessType accessType;
-
-    @Column(nullable = false)
     private Integer amount;
 
     @Column(nullable = false)
@@ -57,6 +57,14 @@ public class MealData extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private IntakeUnit intakeUnit;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OwnerType ownerType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
     public MealData(
             Long id,
@@ -68,11 +76,12 @@ public class MealData extends TimeStamped {
             Double proteinPerUnit,
             Double fatPerUnit,
             Double carbsPerUnit,
-            IntakeUnit intakeUnit) {
+            IntakeUnit intakeUnit,
+            OwnerType ownerType,
+            Member member) {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.accessType = AccessType.ALL;
         this.amount = amount;
         this.amountPerServe = amountPerServe;
         this.caloriePerUnit = caloriePerUnit;
@@ -80,5 +89,7 @@ public class MealData extends TimeStamped {
         this.fatPerUnit = fatPerUnit;
         this.carbsPerUnit = carbsPerUnit;
         this.intakeUnit = intakeUnit;
+        this.ownerType = ownerType;
+        this.member = member;
     }
 }

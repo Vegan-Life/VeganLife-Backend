@@ -18,17 +18,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.mealdata.domain.AccessType;
 import com.konggogi.veganlife.mealdata.domain.MealData;
-import com.konggogi.veganlife.mealdata.domain.PersonalMealData;
-import com.konggogi.veganlife.mealdata.domain.mapper.MealDataDtoMapper;
+import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
-import com.konggogi.veganlife.mealdata.fixture.PersonalMealDataFixture;
-import com.konggogi.veganlife.mealdata.service.MealDataSearchService;
-import com.konggogi.veganlife.mealdata.service.dto.MealDataDetailsDto;
-import com.konggogi.veganlife.mealdata.service.dto.MealDataListDto;
+import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
+import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -42,26 +38,22 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(MealDataController.class)
 public class MealDataControllerTest extends RestDocsTest {
 
-    @MockBean MealDataSearchService mealDataSearchService;
-    @Autowired MealDataDtoMapper mealDataDtoMapper;
+    @MockBean MealDataQueryService mealDataQueryService;
+    @Autowired MealDataMapper mealDataMapper;
+
+    Member member = MemberFixture.DEFAULT_M.getMember();
 
     @Test
     @DisplayName("키워드 기반 식품 데이터 목록 검색 API")
     void getMealDataListTest() throws Exception {
 
         // given
-        List<MealData> all =
-                Stream.of("통밀빵", "통밀크래커").map(MealDataFixture.MEAL::getWithName).toList();
-        List<PersonalMealData> personal =
-                Stream.of("참치 통조림").map(PersonalMealDataFixture.MEAL::getWithName).toList();
-        List<MealDataListDto> result =
-                Stream.concat(
-                                all.stream().map(MealDataListDto::fromMealData),
-                                personal.stream().map(MealDataListDto::fromPersonalMealData))
-                        .sorted(Comparator.comparing(MealDataListDto::name))
+        List<MealData> result =
+                Stream.of("통밀빵", "통밀크래커")
+                        .map(name -> MealDataFixture.MEAL.getWithName(name, member))
                         .toList();
 
-        given(mealDataSearchService.searchByKeyword(anyString(), any(Pageable.class)))
+        given(mealDataQueryService.searchByKeyword(anyString(), any(Pageable.class)))
                 .willReturn(result);
         // when
         ResultActions perform =
@@ -73,13 +65,9 @@ public class MealDataControllerTest extends RestDocsTest {
                                 .queryParam("size", "12"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("참치 통조림"))
-                .andExpect(jsonPath("$[0].accessType").value(AccessType.PERSONAL.name()))
-                .andExpect(jsonPath("$[1].name").value("통밀빵"))
-                .andExpect(jsonPath("$[1].accessType").value(AccessType.ALL.name()))
-                .andExpect(jsonPath("$[2].name").value("통밀크래커"))
-                .andExpect(jsonPath("$[2].accessType").value(AccessType.ALL.name()))
-                .andExpect(jsonPath("$.size()").value(3));
+                .andExpect(jsonPath("$[0].name").value("통밀빵"))
+                .andExpect(jsonPath("$[1].name").value("통밀크래커"))
+                .andExpect(jsonPath("$.size()").value(2));
 
         perform.andDo(print())
                 .andDo(
@@ -98,19 +86,24 @@ public class MealDataControllerTest extends RestDocsTest {
     @DisplayName("ID 기반 식품 데이터 상세 조회 API")
     void getMealDataDetailsTest() throws Exception {
         // given
-        MealData mealData = MealDataFixture.MEAL.get();
-        MealDataDetailsDto result = MealDataDetailsDto.fromMealData(mealData);
-        given(mealDataSearchService.search(anyLong(), any(AccessType.class))).willReturn(result);
+        MealData result = MealDataFixture.MEAL.get(member);
+        given(mealDataQueryService.search(anyLong())).willReturn(result);
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        get("/api/v1/meal-data/{id}", mealData.getId())
-                                .headers(authorizationHeader())
-                                .queryParam("accessType", "ALL"));
+                        get("/api/v1/meal-data/{id}", result.getId())
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(mealData.getName()))
-                .andExpect(jsonPath("$.type").value(mealData.getType().name()));
+                .andExpect(jsonPath("$.name").value(result.getName()))
+                .andExpect(jsonPath("$.type").value(result.getType().name()))
+                .andExpect(jsonPath("$.amount").value(result.getAmount()))
+                .andExpect(jsonPath("$.amountPerServe").value(result.getAmountPerServe()))
+                .andExpect(jsonPath("$.caloriePerUnit").value(result.getCaloriePerUnit()))
+                .andExpect(jsonPath("$.proteinPerUnit").value(result.getProteinPerUnit()))
+                .andExpect(jsonPath("$.fatPerUnit").value(result.getFatPerUnit()))
+                .andExpect(jsonPath("$.carbsPerUnit").value(result.getCarbsPerUnit()))
+                .andExpect(jsonPath("$.intakeUnit").value(result.getIntakeUnit().name()));
 
         perform.andDo(print())
                 .andDo(
@@ -119,25 +112,18 @@ public class MealDataControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc()),
-                                pathParameters(parameterWithName("id").description("식품 데이터 id")),
-                                queryParameters(
-                                        parameterWithName("accessType")
-                                                .description(
-                                                        "ALL: 데이터셋 데이터, PERSONAL: 사용자 추가 데이터"))));
+                                pathParameters(parameterWithName("id").description("식품 데이터 id"))));
     }
 
     @Test
     @DisplayName("식품 데이터 상세 조회 API NotFound 예외")
     void getMealDataDetailsNotFoundExceptionTest() throws Exception {
         // given
-        given(mealDataSearchService.search(anyLong(), any(AccessType.class)))
+        given(mealDataQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.MEAL_DATA_NOT_FOUND));
         // when
         ResultActions perform =
-                mockMvc.perform(
-                        get("/api/v1/meal-data/{id}", -999L)
-                                .headers(authorizationHeader())
-                                .queryParam("accessType", "ALL"));
+                mockMvc.perform(get("/api/v1/meal-data/{id}", 0L).headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 
