@@ -247,4 +247,45 @@ class MemberControllerTest extends RestDocsTest {
 
         perform.andDo(print()).andDo(document("modify-profile-not-found", getDocumentResponse()));
     }
+
+    @Test
+    @DisplayName("권장 섭취량 조회 API")
+    void getMemberDailyNutrientsTest() throws Exception {
+        // given
+        Member member = MemberFixture.DEFAULT_F.getMember();
+        given(memberQueryService.findMemberById(member.getId())).willReturn(member);
+        // when
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/members/nutrients").headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.dailyCalorie").value(member.getAMR()))
+                .andExpect(jsonPath("$.dailyCarbs").value(member.getDailyCarbs()))
+                .andExpect(jsonPath("$.dailyProtein").value(member.getDailyProtein()))
+                .andExpect(jsonPath("$.dailyFat").value(member.getDailyFat()));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recommend-daily-nutrients",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("권장 섭취량 조회 API - 없는 회원 예외 발생")
+    void getNotMemberDailyNutrientsTest() throws Exception {
+        // given
+        given(memberQueryService.findMemberById(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/members/nutrients").headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("recommend-daily-nutrients-not-found", getDocumentResponse()));
+    }
 }
