@@ -61,6 +61,7 @@ public class MemberService {
     }
 
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+        validateNickname(profileRequest.nickname());
         Member member = memberQueryService.findMemberById(memberId);
         member.modifyMemberProfile(
                 profileRequest.nickname(),
