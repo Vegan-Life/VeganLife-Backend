@@ -55,7 +55,7 @@ public class MemberController {
     }
 
     @GetMapping("/nutrients")
-    public ResponseEntity<RecommendNutrientsResponse> getDailyNutrients(
+    public ResponseEntity<RecommendNutrientsResponse> getRecommendNutrients(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member member = memberQueryService.findMemberById(userDetails.id());
         return ResponseEntity.ok(memberMapper.toRecommendNutrientsResponse(member));
