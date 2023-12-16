@@ -30,15 +30,14 @@ class AuthControllerTest extends RestDocsTest {
     @MockBean JwtUtils jwtUtils;
 
     private final String refreshToken = "refreshToken";
-    private final String bearerToken = JwtUtils.BEARER_PREFIX + refreshToken;
 
     @Test
     @DisplayName("accessToken 재발급 API")
     void reissueTokenTest() throws Exception {
         // given
         String accessToken = "accessToken";
-        ReissueRequest request = new ReissueRequest(bearerToken);
-        given(jwtUtils.extractBearerToken(bearerToken)).willReturn(Optional.of(refreshToken));
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
         given(memberQueryService.reissueToken(refreshToken)).willReturn(accessToken);
         // when
         ResultActions perform =
@@ -57,8 +56,8 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("accessToken 재발급 API - 유효하지 않은 refreshToken 예외 발생")
     void reissueTokenInvalidTest() throws Exception {
         // given
-        ReissueRequest request = new ReissueRequest(bearerToken);
-        given(jwtUtils.extractBearerToken(bearerToken))
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken))
                 .willThrow(new InvalidJwtException(ErrorCode.INVALID_TOKEN));
         // when
         ResultActions perform =
@@ -77,8 +76,8 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("accessToken 재발급 API - refreshToken 불일치 예외 발생")
     void reissueTokenMismatchTest() throws Exception {
         // given
-        ReissueRequest request = new ReissueRequest(bearerToken);
-        given(jwtUtils.extractBearerToken(bearerToken)).willReturn(Optional.of(refreshToken));
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
         given(memberQueryService.reissueToken(refreshToken))
                 .willThrow(new MismatchTokenException(ErrorCode.MISMATCH_REFRESH_TOKEN));
         // when
@@ -97,8 +96,8 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("accessToken 재발급 API - 없는 refreshToken 예외 발생")
     void reissueTokenNotFoundRefreshTokenTest() throws Exception {
         // given
-        ReissueRequest request = new ReissueRequest(bearerToken);
-        given(jwtUtils.extractBearerToken(bearerToken)).willReturn(Optional.of(refreshToken));
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
         given(memberQueryService.reissueToken(refreshToken))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
         // when
@@ -118,8 +117,8 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("accessToken 재발급 API - 없는 회원 예외 발생")
     void reissueTokenNotFoundMemberTest() throws Exception {
         // given
-        ReissueRequest request = new ReissueRequest(bearerToken);
-        given(jwtUtils.extractBearerToken(bearerToken)).willReturn(Optional.of(refreshToken));
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
         given(memberQueryService.reissueToken(refreshToken))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
