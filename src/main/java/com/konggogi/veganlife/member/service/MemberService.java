@@ -36,10 +36,16 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member modifyMemberInfo(Long memberId, MemberInfoRequest memberInfoRequest) {
-        validateNickname(memberInfoRequest.nickname());
+    public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
+        validateNickname(infoRequest.nickname());
         Member member = memberQueryService.findMemberById(memberId);
-        member.updateMemberInfo(memberInfoRequest);
+        member.updateMemberInfo(
+                infoRequest.nickname(),
+                infoRequest.gender(),
+                infoRequest.vegetarianType(),
+                infoRequest.birthYear(),
+                infoRequest.height(),
+                infoRequest.weight());
         return member;
     }
 

@@ -2,7 +2,6 @@ package com.konggogi.veganlife.member.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -106,13 +105,19 @@ public class Member extends TimeStamped {
         dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
     }
 
-    public void updateMemberInfo(MemberInfoRequest memberInfoRequest) {
-        this.nickname = memberInfoRequest.nickname();
-        this.gender = memberInfoRequest.gender();
-        this.vegetarianType = memberInfoRequest.vegetarianType();
-        this.birthYear = memberInfoRequest.birthYear();
-        this.height = memberInfoRequest.height();
-        this.weight = memberInfoRequest.weight();
+    public void updateMemberInfo(
+            String nickname,
+            Gender gender,
+            VegetarianType vegetarianType,
+            Integer birthYear,
+            Integer height,
+            Integer weight) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.vegetarianType = vegetarianType;
+        this.birthYear = birthYear;
+        this.height = height;
+        this.weight = weight;
         this.hasAdditionalInfo = true;
         updateDailyIntake();
     }
