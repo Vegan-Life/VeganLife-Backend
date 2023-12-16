@@ -46,10 +46,10 @@ public class MemberController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<Void> modifyMemberDetails(
+    public ResponseEntity<MemberProfileResponse> modifyMemberDetails(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid MemberProfileRequest memberProfileRequest) {
-        memberService.modifyMemberProfile(userDetails.id(), memberProfileRequest);
-        return ResponseEntity.noContent().build();
+        Member member = memberService.modifyMemberProfile(userDetails.id(), memberProfileRequest);
+        return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 }

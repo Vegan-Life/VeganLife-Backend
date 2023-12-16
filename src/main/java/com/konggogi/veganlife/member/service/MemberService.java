@@ -60,7 +60,7 @@ public class MemberService {
                         });
     }
 
-    public void modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+    public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
         Member member = memberQueryService.findMemberById(memberId);
         member.modifyMemberProfile(
                 profileRequest.nickname(),
@@ -70,6 +70,7 @@ public class MemberService {
                 profileRequest.birthYear(),
                 profileRequest.height(),
                 profileRequest.weight());
+        return member;
     }
 
     private void validateNickname(String nickname) {
