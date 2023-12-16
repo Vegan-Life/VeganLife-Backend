@@ -4,10 +4,22 @@ package com.konggogi.veganlife.mealdata.fixture;
 import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
+import com.konggogi.veganlife.mealdata.domain.OwnerType;
+import com.konggogi.veganlife.member.domain.Member;
 
 public enum MealDataFixture {
-    MEAL("디폴트 음식", MealDataType.MEAL, 100, 100, 10D, 1D, 1D, 1D, IntakeUnit.G),
-    PROCESSED("디폴트 가공식품", MealDataType.PROCESSED, 100, 100, 10D, 1D, 1D, 1D, IntakeUnit.G);
+    MEAL("디폴트 음식", MealDataType.MEAL, 100, 100, 10D, 1D, 1D, 1D, IntakeUnit.G, OwnerType.ALL),
+    PROCESSED(
+            "디폴트 가공식품",
+            MealDataType.PROCESSED,
+            100,
+            100,
+            10D,
+            1D,
+            1D,
+            1D,
+            IntakeUnit.G,
+            OwnerType.MEMBER);
 
     private Long id = 1L;
     private String name;
@@ -19,6 +31,7 @@ public enum MealDataFixture {
     private Double fatPerUnit;
     private Double carbsPerUnit;
     private IntakeUnit intakeUnit;
+    private OwnerType ownerType;
 
     MealDataFixture(
             String name,
@@ -29,7 +42,8 @@ public enum MealDataFixture {
             Double proteinPerUnit,
             Double fatPerUnit,
             Double carbsPerUnit,
-            IntakeUnit intakeUnit) {
+            IntakeUnit intakeUnit,
+            OwnerType ownerType) {
         this.name = name;
         this.type = type;
         this.amount = amount;
@@ -39,9 +53,10 @@ public enum MealDataFixture {
         this.fatPerUnit = fatPerUnit;
         this.carbsPerUnit = carbsPerUnit;
         this.intakeUnit = intakeUnit;
+        this.ownerType = ownerType;
     }
 
-    public MealData get() {
+    public MealData get(Member member) {
 
         return new MealData(
                 id++,
@@ -53,10 +68,12 @@ public enum MealDataFixture {
                 proteinPerUnit,
                 fatPerUnit,
                 carbsPerUnit,
-                intakeUnit);
+                intakeUnit,
+                ownerType,
+                member);
     }
 
-    public MealData getWithName(String name) {
+    public MealData getWithName(String name, Member member) {
 
         return new MealData(
                 id++,
@@ -68,6 +85,8 @@ public enum MealDataFixture {
                 proteinPerUnit,
                 fatPerUnit,
                 carbsPerUnit,
-                intakeUnit);
+                intakeUnit,
+                ownerType,
+                member);
     }
 }
