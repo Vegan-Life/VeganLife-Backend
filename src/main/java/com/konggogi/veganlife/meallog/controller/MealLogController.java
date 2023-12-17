@@ -3,7 +3,7 @@ package com.konggogi.veganlife.meallog.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
-import com.konggogi.veganlife.meallog.service.MealLogAddService;
+import com.konggogi.veganlife.meallog.service.MealLogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/meal-log")
 public class MealLogController {
 
-    private final MealLogAddService mealLogAddService;
+    private final MealLogService mealLogService;
 
     @PostMapping
     public ResponseEntity<Void> addMealLog(
             @Valid @RequestBody MealLogAddRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        mealLogAddService.add(request, userDetails.id());
+        mealLogService.add(request, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
