@@ -32,13 +32,13 @@ public class MemberService {
     }
 
     public void removeMember(Long memberId) {
-        Member member = memberQueryService.findMemberById(memberId);
+        Member member = memberQueryService.search(memberId);
         memberRepository.delete(member);
     }
 
     public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
         validateNickname(infoRequest.nickname());
-        Member member = memberQueryService.findMemberById(memberId);
+        Member member = memberQueryService.search(memberId);
         member.updateMemberInfo(
                 infoRequest.nickname(),
                 infoRequest.gender(),
@@ -62,7 +62,7 @@ public class MemberService {
 
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
         validateNickname(profileRequest.nickname());
-        Member member = memberQueryService.findMemberById(memberId);
+        Member member = memberQueryService.search(memberId);
         member.modifyMemberProfile(
                 profileRequest.nickname(),
                 profileRequest.imageUrl(),

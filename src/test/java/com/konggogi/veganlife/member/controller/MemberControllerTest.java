@@ -253,7 +253,7 @@ class MemberControllerTest extends RestDocsTest {
     void getMemberDailyNutrientsTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_F.getMember();
-        given(memberQueryService.findMemberById(member.getId())).willReturn(member);
+        given(memberQueryService.search(member.getId())).willReturn(member);
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/members/nutrients").headers(authorizationHeader()));
@@ -277,7 +277,7 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("권장 섭취량 조회 API - 없는 회원 예외 발생")
     void getNotMemberDailyNutrientsTest() throws Exception {
         // given
-        given(memberQueryService.findMemberById(anyLong()))
+        given(memberQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
