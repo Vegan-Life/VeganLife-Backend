@@ -69,7 +69,7 @@ class MemberServiceTest {
     void removeMemberTest() {
         // given
         Long memberId = member.getId();
-        given(memberQueryService.findMemberById(memberId)).willReturn(member);
+        given(memberQueryService.search(memberId)).willReturn(member);
         // when
         memberService.removeMember(memberId);
         // then
@@ -84,7 +84,7 @@ class MemberServiceTest {
         MemberInfoRequest request =
                 new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
-        given(memberQueryService.findMemberById(memberId)).willReturn(member);
+        given(memberQueryService.search(memberId)).willReturn(member);
         // when
         Member updatedMember = memberService.modifyMemberInfo(memberId, request);
         // then
@@ -156,7 +156,7 @@ class MemberServiceTest {
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberRepository.findByNickname(profileRequest.nickname()))
                 .willReturn(Optional.empty());
-        given(memberQueryService.findMemberById(anyLong())).willReturn(member);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         // when
         Member updatedMember = memberService.modifyMemberProfile(member.getId(), profileRequest);
         // then
@@ -168,7 +168,7 @@ class MemberServiceTest {
         assertThat(updatedMember.getHeight()).isEqualTo(profileRequest.height());
         assertThat(updatedMember.getWeight()).isEqualTo(profileRequest.weight());
         then(memberRepository).should().findByNickname(anyString());
-        then(memberQueryService).should().findMemberById(anyLong());
+        then(memberQueryService).should().search(anyLong());
     }
 
     @Test
@@ -193,7 +193,7 @@ class MemberServiceTest {
                 .isInstanceOf(DuplicateNicknameException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
         then(memberRepository).should().findByNickname(anyString());
-        then(memberQueryService).should(never()).findMemberById(anyLong());
+        then(memberQueryService).should(never()).search(anyLong());
     }
 
     @Test
@@ -206,13 +206,13 @@ class MemberServiceTest {
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberRepository.findByNickname(profileRequest.nickname()))
                 .willReturn(Optional.empty());
-        given(memberQueryService.findMemberById(member.getId()))
+        given(memberQueryService.search(member.getId()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
         assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findByNickname(anyString());
-        then(memberQueryService).should().findMemberById(anyLong());
+        then(memberQueryService).should().search(anyLong());
     }
 }

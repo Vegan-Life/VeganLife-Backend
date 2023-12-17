@@ -25,7 +25,7 @@ public class MealLogAddService {
 
     public void add(MealLogAddRequest mealLogAddRequest, Long memberId) {
 
-        Member member = memberQueryService.findMemberById(memberId);
+        Member member = memberQueryService.search(memberId);
         MealLog mealLog = mealLogService.add(mealLogAddRequest, member);
 
         List<MealAddRequest> mealAddRequests = mealLogAddRequest.mealAddRequests();

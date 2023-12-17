@@ -23,7 +23,9 @@ public class MemberQueryService {
     private final JwtProvider jwtProvider;
 
     public Member search(Long memberId) {
-        return findMemberById(memberId);
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
     public String reissueToken(String refreshToken) {
@@ -42,12 +44,6 @@ public class MemberQueryService {
                         () -> {
                             throw new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN);
                         });
-    }
-
-    public Member findMemberById(Long memberId) {
-        return memberRepository
-                .findById(memberId)
-                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
     private Member findMemberByToken(String token) {

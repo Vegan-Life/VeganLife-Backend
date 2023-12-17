@@ -134,7 +134,7 @@ class MemberQueryServiceTest {
         Long memberId = member.getId();
         given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
         // when
-        Member foundMember = memberQueryService.findMemberById(memberId);
+        Member foundMember = memberQueryService.search(memberId);
         // then
         then(memberRepository).should().findById(memberId);
         assertThat(foundMember).isEqualTo(member);
@@ -147,7 +147,7 @@ class MemberQueryServiceTest {
         Long memberId = member.getId();
         given(memberRepository.findById(memberId)).willReturn(Optional.empty());
         // when, then
-        assertThatThrownBy(() -> memberQueryService.findMemberById(memberId))
+        assertThatThrownBy(() -> memberQueryService.search(memberId))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findById(memberId);
