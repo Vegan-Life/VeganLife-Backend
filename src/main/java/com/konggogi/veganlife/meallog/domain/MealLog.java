@@ -12,9 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -34,9 +38,13 @@ public class MealLog extends TimeStamped {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public MealLog(Long id, MealType mealType, Member member) {
+    @OneToMany(mappedBy = "mealLog")
+    private List<Meal> meals = new ArrayList<>();
+
+    public MealLog(Long id, MealType mealType, Member member, List<Meal> meals) {
         this.id = id;
         this.mealType = mealType;
         this.member = member;
+        this.meals = meals;
     }
 }
