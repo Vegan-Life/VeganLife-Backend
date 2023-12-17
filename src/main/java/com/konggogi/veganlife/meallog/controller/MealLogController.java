@@ -24,7 +24,7 @@ public class MealLogController {
     @PostMapping
     public ResponseEntity<Void> addMealLog(
             @Valid @RequestBody MealLogAddRequest request,
-            @Valid @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         mealLogAddService.add(request, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
