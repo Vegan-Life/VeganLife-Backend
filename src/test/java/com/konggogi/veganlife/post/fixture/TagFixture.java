@@ -4,7 +4,9 @@ package com.konggogi.veganlife.post.fixture;
 import com.konggogi.veganlife.post.domain.Tag;
 
 public enum TagFixture {
-    DEFAULT("#태그");
+    DEFAULT("#태그"),
+    STORE("#맛집"),
+    CHALLENGE("#챌린지");
     private String name;
 
     TagFixture(String name) {
@@ -25,5 +27,9 @@ public enum TagFixture {
 
     public Tag getTagWithName(String name) {
         return Tag.builder().name(name).build();
+    }
+
+    public String getName() {
+        return name;
     }
 }
