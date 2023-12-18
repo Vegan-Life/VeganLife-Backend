@@ -2,6 +2,7 @@ package com.konggogi.veganlife.post.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +32,24 @@ public class Post extends TimeStamped {
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<PostTag> tags = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
-    public Post(String title, String content, List<PostImage> imageUrls, List<PostTag> tags) {
+    public Post(Member member, String title, String content) {
+        this.member = member;
         this.title = title;
         this.content = content;
-        this.imageUrls = imageUrls;
-        this.tags = tags;
+    }
+
+    public void addPostTag(Tag tag) {
+        PostTag postTag = PostTag.builder().post(this).tag(tag).build();
+        this.tags.add(postTag);
+    }
+
+    public void addPostImage(String imageUrl) {
+        PostImage postImage = PostImage.builder().post(this).imageUrl(imageUrl).build();
+        this.imageUrls.add(postImage);
     }
 }
