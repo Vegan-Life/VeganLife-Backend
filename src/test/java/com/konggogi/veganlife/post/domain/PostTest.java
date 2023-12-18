@@ -14,8 +14,9 @@ class PostTest {
         // given
         Post post = PostFixture.BAKERY.getPost();
         Tag tag = TagFixture.STORE.getTag();
+        PostTag postTag = PostTag.builder().tag(tag).build();
         // when
-        post.addPostTag(tag);
+        post.addPostTag(postTag);
         // then
         assertThat(post.getTags()).hasSize(1);
     }
@@ -26,8 +27,9 @@ class PostTest {
         // given
         Post post = PostFixture.BAKERY.getPost();
         String url = "imageUrl.jpg";
+        PostImage postImage = PostImage.builder().imageUrl(url).build();
         // when
-        post.addPostImage(url);
+        post.addPostImage(postImage);
         // then
         assertThat(post.getImageUrls()).hasSize(1);
     }
