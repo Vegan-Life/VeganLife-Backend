@@ -25,7 +25,8 @@ public class PostImage extends TimeStamped {
     private Post post;
 
     @Builder
-    public PostImage(String imageUrl) {
+    public PostImage(Post post, String imageUrl) {
+        this.post = post;
         this.imageUrl = imageUrl;
     }
 }
