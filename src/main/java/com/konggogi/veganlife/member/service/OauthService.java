@@ -2,6 +2,7 @@ package com.konggogi.veganlife.member.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +36,17 @@ public class OauthService {
 
     private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {
         String userInfoUri = getUserInfoUri(provider);
-        return WebClient.create()
-                .get()
-                .uri(userInfoUri)
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .block();
+        try {
+            return WebClient.create()
+                    .get()
+                    .uri(userInfoUri)
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                    .block();
+        } catch (WebClientResponseException e) {
+            throw new InvalidOauthTokenException(ErrorCode.INVALID_OAUTH_TOKEN);
+        }
     }
 
     private String getUserInfoUri(OauthProvider provider) {

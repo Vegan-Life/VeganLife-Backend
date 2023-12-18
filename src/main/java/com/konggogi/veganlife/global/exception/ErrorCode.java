@@ -19,7 +19,8 @@ public enum ErrorCode {
     MISMATCH_REFRESH_TOKEN("AUTH_008", "RefreshToken이 일치하지 않습니다."),
 
     // oauth
-    UNSUPPORTED_PROVIDER("OATUH_001", "지원되지 않는 provider입니다."),
+    UNSUPPORTED_PROVIDER("OAUTH_001", "지원되지 않는 provider입니다."),
+    INVALID_OAUTH_TOKEN("OAUTH_002", "Oauth 액세스 토큰이 유효하지 않습니다."),
 
     // member
     DUPLICATED_NICKNAME("MEMBER_001", "중복된 닉네임입니다."),
