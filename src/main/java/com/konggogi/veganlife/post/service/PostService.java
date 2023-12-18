@@ -32,23 +32,18 @@ public class PostService {
     }
 
     private void addTags(Post post, List<String> tagNames) {
-        List<Tag> tags =
-                tagNames.stream()
-                        .distinct()
-                        .map(
-                                tagName ->
-                                        tagRepository
-                                                .findByName(tagName)
-                                                .orElseGet(
-                                                        () -> {
-                                                            Tag tag =
-                                                                    Tag.builder()
-                                                                            .name(tagName)
-                                                                            .build();
-                                                            return tagRepository.save(tag);
-                                                        }))
-                        .toList();
-        tags.forEach(post::addPostTag);
+        tagNames.stream()
+                .distinct()
+                .map(
+                        tagName ->
+                                tagRepository
+                                        .findByName(tagName)
+                                        .orElseGet(
+                                                () -> {
+                                                    Tag tag = Tag.builder().name(tagName).build();
+                                                    return tagRepository.save(tag);
+                                                }))
+                .forEach(post::addPostTag);
     }
 
     private void addImages(Post post, List<String> imageUrls) {
