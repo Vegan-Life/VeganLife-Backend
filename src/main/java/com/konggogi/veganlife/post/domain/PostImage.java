@@ -30,4 +30,8 @@ public class PostImage extends TimeStamped {
         this.post = post;
         this.imageUrl = imageUrl;
     }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 }

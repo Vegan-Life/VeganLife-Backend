@@ -31,4 +31,8 @@ public class PostTag extends TimeStamped {
         this.post = post;
         this.tag = tag;
     }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 }
