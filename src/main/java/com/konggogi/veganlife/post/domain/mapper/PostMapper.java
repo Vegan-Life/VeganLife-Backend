@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper {
+    @Mapping(target = "id", ignore = true)
     Post toEntity(Member member, PostAddRequest postAddRequest);
 
     @Mapping(source = "post.id", target = "postId")
