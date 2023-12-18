@@ -4,6 +4,7 @@ package com.konggogi.veganlife.post.domain;
 import com.konggogi.veganlife.global.domain.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,4 +19,9 @@ public class Tag extends TimeStamped {
 
     @Column(nullable = false)
     private String name;
+
+    @Builder
+    public Tag(String name) {
+        this.name = name;
+    }
 }

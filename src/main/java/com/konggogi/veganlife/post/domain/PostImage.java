@@ -4,6 +4,7 @@ package com.konggogi.veganlife.post.domain;
 import com.konggogi.veganlife.global.domain.TimeStamped;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,9 @@ public class PostImage extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @Builder
+    public PostImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
