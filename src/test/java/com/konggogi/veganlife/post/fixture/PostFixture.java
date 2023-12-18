@@ -2,6 +2,8 @@ package com.konggogi.veganlife.post.fixture;
 
 
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostTag;
+import com.konggogi.veganlife.post.domain.Tag;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import org.springframework.util.ReflectionUtils;
@@ -11,12 +13,12 @@ public enum PostFixture {
     CHALLENGE("락토 챌린지 함께해요", "락토 모여라~ 30일간 진행되는 챌린지 함께하실 분 구해요. 자세한 일정은...", "#챌린지");
     private final String title;
     private final String content;
-    private final String tag;
+    private final String tagName;
 
-    PostFixture(String title, String content, String tag) {
+    PostFixture(String title, String content, String tagName) {
         this.title = title;
         this.content = content;
-        this.tag = tag;
+        this.tagName = tagName;
     }
 
     public Post getPost() {
@@ -25,8 +27,10 @@ public enum PostFixture {
 
     public Post getPostAllInfoWithId(Long postId) {
         Post post = Post.builder().id(postId).title(title).content(content).build();
-        post.addPostImage(PostImageFixture.DEFAULT.getImageUrl());
-        post.addPostTag(TagFixture.DEFAULT.getTagWithName(tag));
+        Tag tag = TagFixture.DEFAULT.getTagWithName(tagName);
+        PostTag postTag = PostTag.builder().tag(tag).build();
+        post.addPostImage(PostImageFixture.DEFAULT.getPostImage());
+        post.addPostTag(postTag);
         return setCreatedAtOfPost(post);
     }
 
