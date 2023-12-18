@@ -21,7 +21,8 @@ public class Tag extends TimeStamped {
     private String name;
 
     @Builder
-    public Tag(String name) {
+    public Tag(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }

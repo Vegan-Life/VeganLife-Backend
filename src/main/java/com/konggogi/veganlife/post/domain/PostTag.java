@@ -26,7 +26,8 @@ public class PostTag extends TimeStamped {
     private Tag tag;
 
     @Builder
-    public PostTag(Post post, Tag tag) {
+    public PostTag(Long id, Post post, Tag tag) {
+        this.id = id;
         this.post = post;
         this.tag = tag;
     }

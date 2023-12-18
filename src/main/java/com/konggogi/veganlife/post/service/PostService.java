@@ -40,7 +40,13 @@ public class PostService {
                                         tagRepository
                                                 .findByName(tagName)
                                                 .orElseGet(
-                                                        () -> tagRepository.save(new Tag(tagName))))
+                                                        () -> {
+                                                            Tag tag =
+                                                                    Tag.builder()
+                                                                            .name(tagName)
+                                                                            .build();
+                                                            return tagRepository.save(tag);
+                                                        }))
                         .toList();
         tags.forEach(post::addPostTag);
     }
