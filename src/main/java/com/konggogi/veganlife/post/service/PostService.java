@@ -6,7 +6,9 @@ import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
+import com.konggogi.veganlife.post.domain.mapper.PostImageMapper;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
+import com.konggogi.veganlife.post.domain.mapper.TagMapper;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
 import java.util.List;
@@ -22,6 +24,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
+    private final TagMapper tagMapper;
+    private final PostImageMapper postImageMapper;
 
     public Post add(Long memberId, PostAddRequest postAddRequest) {
         Member member = memberQueryService.search(memberId);
@@ -40,13 +44,14 @@ public class PostService {
                                         .findByName(tagName)
                                         .orElseGet(
                                                 () -> {
-                                                    Tag tag = Tag.builder().name(tagName).build();
+                                                    Tag tag = tagMapper.toEntity(tagName);
                                                     return tagRepository.save(tag);
                                                 }))
+                .map(tagMapper::toPostTag)
                 .forEach(post::addPostTag);
     }
 
     private void addImages(Post post, List<String> imageUrls) {
-        imageUrls.forEach(post::addPostImage);
+        imageUrls.stream().map(postImageMapper::toEntity).forEach(post::addPostImage);
     }
 }

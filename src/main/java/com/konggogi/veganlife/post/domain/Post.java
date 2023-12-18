@@ -27,10 +27,10 @@ public class Post extends TimeStamped {
     private String content;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<PostImage> imageUrls = new ArrayList<>();
+    private List<PostImage> imageUrls;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<PostTag> tags = new ArrayList<>();
+    private List<PostTag> tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -42,15 +42,17 @@ public class Post extends TimeStamped {
         this.member = member;
         this.title = title;
         this.content = content;
+        this.imageUrls = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
-    public void addPostTag(Tag tag) {
-        PostTag postTag = PostTag.builder().post(this).tag(tag).build();
-        this.tags.add(postTag);
+    public void addPostTag(PostTag postTag) {
+        tags.add(postTag);
+        postTag.setPost(this);
     }
 
-    public void addPostImage(String imageUrl) {
-        PostImage postImage = PostImage.builder().post(this).imageUrl(imageUrl).build();
-        this.imageUrls.add(postImage);
+    public void addPostImage(PostImage postImage) {
+        imageUrls.add(postImage);
+        postImage.setPost(this);
     }
 }
