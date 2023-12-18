@@ -4,6 +4,7 @@ package com.konggogi.veganlife.global.advice.member;
 import com.konggogi.veganlife.global.exception.ApiException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
+import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
@@ -35,9 +36,9 @@ public class MemberControllerAdvice {
                 .body(ErrorResponse.from(exception.getErrorCode()));
     }
 
-    @ExceptionHandler(InvalidJwtException.class)
+    @ExceptionHandler({InvalidJwtException.class, InvalidOauthTokenException.class})
     public ResponseEntity<ErrorResponse> handleInvalidJwtException(
-            HandlerMethod handlerMethod, InvalidJwtException exception) {
+            HandlerMethod handlerMethod, ApiException exception) {
         LoggingUtils.exceptionLog(
                 AopUtils.extractMethodSignature(handlerMethod), HttpStatus.UNAUTHORIZED, exception);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
