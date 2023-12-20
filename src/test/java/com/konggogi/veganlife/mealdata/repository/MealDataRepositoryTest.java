@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ public class MealDataRepositoryTest {
     @Autowired private MealDataRepository mealDataRepository;
     @Autowired private MemberRepository memberRepository;
 
-    Member member = MemberFixture.DEFAULT_M.getMember();
+    Member member = Member.builder().email("test123@test.com").build();
 
     @BeforeEach
     void setup() {
@@ -35,7 +34,6 @@ public class MealDataRepositoryTest {
         // given
         List<String> valid = List.of("통밀빵", "통밀크래커");
         List<String> invalid = List.of("가지볶음");
-        memberRepository.save(member);
         mealDataRepository.saveAll(
                 valid.stream()
                         .map(name -> MealDataFixture.MEAL.getWithName(name, member))

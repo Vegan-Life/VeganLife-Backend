@@ -23,10 +23,10 @@ import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class MealDataControllerTest extends RestDocsTest {
     @MockBean MealDataQueryService mealDataQueryService;
     @Autowired MealDataMapper mealDataMapper;
 
-    Member member = MemberFixture.DEFAULT_M.getMember();
+    Member member = Member.builder().email("test123@test.com").build();
 
     @Test
     @DisplayName("키워드 기반 식품 데이터 목록 검색 API")
@@ -49,8 +49,12 @@ public class MealDataControllerTest extends RestDocsTest {
 
         // given
         List<MealData> result =
-                Stream.of("통밀빵", "통밀크래커")
-                        .map(name -> MealDataFixture.MEAL.getWithName(name, member))
+                Map.of(1L, "통밀빵", 2L, "통밀크래커").entrySet().stream()
+                        .map(
+                                e ->
+                                        MealDataFixture.MEAL.getWithName(
+                                                e.getKey(), e.getValue(), member))
+                        .sorted(Comparator.comparing(MealData::getName))
                         .toList();
 
         given(mealDataQueryService.searchByKeyword(anyString(), any(Pageable.class)))
@@ -86,7 +90,7 @@ public class MealDataControllerTest extends RestDocsTest {
     @DisplayName("ID 기반 식품 데이터 상세 조회 API")
     void getMealDataDetailsTest() throws Exception {
         // given
-        MealData result = MealDataFixture.MEAL.get(member);
+        MealData result = MealDataFixture.MEAL.get(1L, member);
         given(mealDataQueryService.search(anyLong())).willReturn(result);
         // when
         ResultActions perform =
@@ -120,7 +124,7 @@ public class MealDataControllerTest extends RestDocsTest {
     void getMealDataDetailsNotFoundExceptionTest() throws Exception {
         // given
         given(mealDataQueryService.search(anyLong()))
-                .willThrow(new NotFoundEntityException(ErrorCode.MEAL_DATA_NOT_FOUND));
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA));
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/meal-data/{id}", 0L).headers(authorizationHeader()));
