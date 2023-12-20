@@ -1,8 +1,11 @@
 package com.konggogi.veganlife.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.domain.Meal;
@@ -61,5 +64,21 @@ class NutrientsQueryServiceTest {
         assertThat(intakeNutrients.carbs()).isEqualTo(meal.getCarbs() * expectedSize);
         assertThat(intakeNutrients.protein()).isEqualTo(meal.getProtein() * expectedSize);
         assertThat(intakeNutrients.fat()).isEqualTo(meal.getFat() * expectedSize);
+    }
+
+    @Test
+    @DisplayName("금일 섭취량 조회시 없는 회원이면 예외 발생")
+    void searchDailyIntakeNutrientsNotMemberTest() {
+        // given
+        Long memberId = member.getId();
+        given(memberQueryService.search(memberId))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                nutrientsQueryService.searchDailyIntakeNutrients(
+                                        memberId, LocalDate.now()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
 }
