@@ -15,3 +15,5 @@ include::{docdir}/src/docs/asciidoc/auth.adoc[]
 include::{docdir}/src/docs/asciidoc/oauth.adoc[]
 
 include::{docdir}/src/docs/asciidoc/post.adoc[]
+
+include::{docdir}/src/docs/asciidoc/meal-log.adoc[]

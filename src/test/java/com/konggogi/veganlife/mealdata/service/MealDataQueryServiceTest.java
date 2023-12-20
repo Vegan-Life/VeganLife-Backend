@@ -12,7 +12,6 @@ import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.fixture.MemberFixture;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +28,7 @@ public class MealDataQueryServiceTest {
     @Mock MealDataRepository mealDataRepository;
     @InjectMocks MealDataQueryService mealDataQueryService;
 
-    Member member = MemberFixture.DEFAULT_M.getMember();
+    Member member = Member.builder().email("test123@test.com").build();
 
     @Test
     @DisplayName("키워드를 포함하는 이름을 가진 식품 데이터들을 조회")
@@ -53,7 +52,7 @@ public class MealDataQueryServiceTest {
     @DisplayName("식품 데이터 ID에 해당하는 식품 데이터 상세 조회")
     void searchTest() {
         // given
-        MealData found = MealDataFixture.MEAL.getWithName("통밀빵", member);
+        MealData found = MealDataFixture.MEAL.getWithName(1L, "통밀빵", member);
         given(mealDataRepository.findById(anyLong())).willReturn(Optional.ofNullable(found));
         // when
         MealData result = mealDataQueryService.search(found.getId());
@@ -69,6 +68,6 @@ public class MealDataQueryServiceTest {
         // when
         assertThatThrownBy(() -> mealDataQueryService.search(0L))
                 .isInstanceOf(NotFoundEntityException.class)
-                .hasMessage(ErrorCode.MEAL_DATA_NOT_FOUND.getDescription());
+                .hasMessage(ErrorCode.NOT_FOUND_MEAL_DATA.getDescription());
     }
 }
