@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,7 +25,10 @@ import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.MemberService;
+import com.konggogi.veganlife.member.service.NutrientsQueryService;
+import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,6 +40,7 @@ import org.springframework.test.web.servlet.ResultActions;
 class MemberControllerTest extends RestDocsTest {
     @MockBean MemberService memberService;
     @MockBean MemberQueryService memberQueryService;
+    @MockBean NutrientsQueryService nutrientsQueryService;
 
     @Test
     @DisplayName("회원 정보 수정 API")
@@ -287,5 +292,54 @@ class MemberControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("recommend-daily-nutrients-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("금일 섭취량 조회 API")
+    void getTodayIntakeTest() throws Exception {
+        // given
+        IntakeNutrients intakeNutrients = new IntakeNutrients(200, 50, 40, 30);
+        given(nutrientsQueryService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
+                .willReturn(intakeNutrients);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/today")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2024-01-01"));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.calorie").value(intakeNutrients.calorie()))
+                .andExpect(jsonPath("$.carbs").value(intakeNutrients.carbs()))
+                .andExpect(jsonPath("$.protein").value(intakeNutrients.protein()))
+                .andExpect(jsonPath("$.fat").value(intakeNutrients.fat()));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "today-nutrients",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        parameterWithName("startDate").description("조회할 날짜"))));
+    }
+
+    @Test
+    @DisplayName("금일 섭취량 조회 API - 없는 회원 예외 발생")
+    void getTodayIntakeNotMemberTest() throws Exception {
+        // given
+        given(nutrientsQueryService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/today")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2024-01-01"));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("today-nutrients-not-found", getDocumentResponse()));
     }
 }

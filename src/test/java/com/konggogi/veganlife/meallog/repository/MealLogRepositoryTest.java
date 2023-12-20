@@ -11,6 +11,9 @@ import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.repository.MemberRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,5 +56,26 @@ public class MealLogRepositoryTest {
         assertThat(result.getMeals().size()).isEqualTo(mealLog.getMeals().size());
         assertThat(result.getMeals().stream().map(Meal::getId)).allMatch(Objects::nonNull);
         assertThat(result.getMeals().stream().map(Meal::getMealLog)).allMatch(Objects::nonNull);
+    }
+
+    @Test
+    @DisplayName("회원 Id와 날짜로 MealLog 조회")
+    void findAllByMemberIdAndModifiedAtBetweenTest() {
+        // given
+        Long memberId = member.getId();
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        MealLog mealLog = MealLogFixture.BREAKFAST.getWithDate(meals, member, LocalDate.now());
+        MealLog savedMealLog = mealLogRepository.save(mealLog);
+
+        LocalDate date = savedMealLog.getModifiedAt().toLocalDate();
+        LocalDateTime startDate = date.atStartOfDay();
+        LocalDateTime endDate = date.atTime(LocalTime.MAX);
+        // when
+        List<MealLog> mealLogs =
+                mealLogRepository.findAllByMemberIdAndModifiedAtBetween(
+                        memberId, startDate, endDate);
+        // then
+        assertThat(mealLogs).hasSize(1);
+        assertThat(mealLogs).extracting(MealLog::getMember).containsOnly(member);
     }
 }
