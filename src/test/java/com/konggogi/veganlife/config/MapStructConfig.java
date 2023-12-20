@@ -7,10 +7,7 @@ import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
 import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealMapperImpl;
-import com.konggogi.veganlife.member.domain.mapper.AuthMapper;
-import com.konggogi.veganlife.member.domain.mapper.AuthMapperImpl;
-import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
-import com.konggogi.veganlife.member.domain.mapper.MemberMapperImpl;
+import com.konggogi.veganlife.member.domain.mapper.*;
 import com.konggogi.veganlife.post.domain.mapper.*;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -56,5 +53,10 @@ public class MapStructConfig {
     @Bean
     public PostImageMapper postImageMapper() {
         return new PostImageMapperImpl();
+    }
+
+    @Bean
+    public NutrientsMapper nutrientsMapper() {
+        return new NutrientsMapperImpl();
     }
 }
