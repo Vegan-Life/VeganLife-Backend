@@ -27,6 +27,6 @@ public class MealDataQueryService {
 
         return mealDataRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.MEAL_DATA_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA));
     }
 }
