@@ -82,4 +82,8 @@ public class Meal extends TimeStamped {
         this.mealLog = mealLog;
         this.mealData = mealData;
     }
+
+    public void setMealLog(MealLog mealLog) {
+        this.mealLog = mealLog;
+    }
 }
