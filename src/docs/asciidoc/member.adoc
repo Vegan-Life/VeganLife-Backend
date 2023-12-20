@@ -117,3 +117,27 @@ include::{snippets}/recommend-daily-nutrients/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/recommend-daily-nutrients-not-found/http-response.adoc[]
+
+== 금일 섭취량 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/today-nutrients/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/today-nutrients/query-parameters.adoc[]
+
+include::{snippets}/today-nutrients/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/today-nutrients/http-response.adoc[]
+
+==== 400 NOT FOUND
+
+include::{snippets}/today-nutrients-not-found/http-response.adoc[]
