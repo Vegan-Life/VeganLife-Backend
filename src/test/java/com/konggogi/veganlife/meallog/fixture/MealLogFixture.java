@@ -6,7 +6,7 @@ import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.member.domain.Member;
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.util.ReflectionUtils;
 
@@ -25,23 +25,27 @@ public enum MealLogFixture {
     }
 
     public MealLog get(List<Meal> meals, Member member) {
-
         MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
         meals.forEach(mealLog::addMeal);
-        return setModifiedAt(mealLog);
+        return mealLog;
     }
 
     public MealLog getWithId(Long id, List<Meal> meals, Member member) {
-
         MealLog mealLog = MealLog.builder().id(id).mealType(mealType).member(member).build();
         meals.forEach(mealLog::addMeal);
-        return setModifiedAt(mealLog);
+        return mealLog;
     }
 
-    private MealLog setModifiedAt(MealLog mealLog) {
+    public MealLog getWithDate(List<Meal> meals, Member member, LocalDate date) {
+        MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
+        meals.forEach(mealLog::addMeal);
+        return setModifiedAt(mealLog, date);
+    }
+
+    private MealLog setModifiedAt(MealLog mealLog, LocalDate date) {
         Field modifiedAt = ReflectionUtils.findField(MealLog.class, "modifiedAt");
         ReflectionUtils.makeAccessible(modifiedAt);
-        ReflectionUtils.setField(modifiedAt, mealLog, LocalDateTime.now());
+        ReflectionUtils.setField(modifiedAt, mealLog, date.atStartOfDay());
         return mealLog;
     }
 }

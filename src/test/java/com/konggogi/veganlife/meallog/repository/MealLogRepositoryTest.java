@@ -64,7 +64,7 @@ public class MealLogRepositoryTest {
         // given
         Long memberId = member.getId();
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, member);
+        MealLog mealLog = MealLogFixture.BREAKFAST.getWithDate(meals, member, LocalDate.now());
         MealLog savedMealLog = mealLogRepository.save(mealLog);
 
         LocalDate date = savedMealLog.getModifiedAt().toLocalDate();
