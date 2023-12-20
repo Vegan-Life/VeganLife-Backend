@@ -21,7 +21,6 @@ public enum MealDataFixture {
             IntakeUnit.G,
             OwnerType.MEMBER);
 
-    private Long id = 1L;
     private String name;
     private MealDataType type;
     private Integer amount;
@@ -58,35 +57,71 @@ public enum MealDataFixture {
 
     public MealData get(Member member) {
 
-        return new MealData(
-                id++,
-                name,
-                type,
-                amount,
-                amountPerServe,
-                caloriePerUnit,
-                proteinPerUnit,
-                fatPerUnit,
-                carbsPerUnit,
-                intakeUnit,
-                ownerType,
-                member);
+        return MealData.builder()
+                .name(name)
+                .type(type)
+                .amount(amount)
+                .amountPerServe(amountPerServe)
+                .caloriePerUnit(caloriePerUnit)
+                .proteinPerUnit(proteinPerUnit)
+                .fatPerUnit(fatPerUnit)
+                .carbsPerUnit(carbsPerUnit)
+                .intakeUnit(intakeUnit)
+                .ownerType(ownerType)
+                .member(member)
+                .build();
+    }
+
+    public MealData get(Long id, Member member) {
+
+        return MealData.builder()
+                .id(id)
+                .name(name)
+                .type(type)
+                .amount(amount)
+                .amountPerServe(amountPerServe)
+                .caloriePerUnit(caloriePerUnit)
+                .proteinPerUnit(proteinPerUnit)
+                .fatPerUnit(fatPerUnit)
+                .carbsPerUnit(carbsPerUnit)
+                .intakeUnit(intakeUnit)
+                .ownerType(ownerType)
+                .member(member)
+                .build();
     }
 
     public MealData getWithName(String name, Member member) {
 
-        return new MealData(
-                id++,
-                name,
-                type,
-                amount,
-                amountPerServe,
-                caloriePerUnit,
-                proteinPerUnit,
-                fatPerUnit,
-                carbsPerUnit,
-                intakeUnit,
-                ownerType,
-                member);
+        return MealData.builder()
+                .name(name)
+                .type(type)
+                .amount(amount)
+                .amountPerServe(amountPerServe)
+                .caloriePerUnit(caloriePerUnit)
+                .proteinPerUnit(proteinPerUnit)
+                .fatPerUnit(fatPerUnit)
+                .carbsPerUnit(carbsPerUnit)
+                .intakeUnit(intakeUnit)
+                .ownerType(ownerType)
+                .member(member)
+                .build();
+    }
+
+    public MealData getWithName(Long id, String name, Member member) {
+
+        return MealData.builder()
+                .id(id)
+                .name(name)
+                .type(type)
+                .amount(amount)
+                .amountPerServe(amountPerServe)
+                .caloriePerUnit(caloriePerUnit)
+                .proteinPerUnit(proteinPerUnit)
+                .fatPerUnit(fatPerUnit)
+                .carbsPerUnit(carbsPerUnit)
+                .intakeUnit(intakeUnit)
+                .ownerType(ownerType)
+                .member(member)
+                .build();
     }
 }
