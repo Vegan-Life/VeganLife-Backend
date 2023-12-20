@@ -15,14 +15,9 @@ import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostImage;
-import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
-import com.konggogi.veganlife.post.domain.mapper.PostImageMapper;
-import com.konggogi.veganlife.post.domain.mapper.PostMapper;
-import com.konggogi.veganlife.post.domain.mapper.TagMapper;
+import com.konggogi.veganlife.post.domain.mapper.*;
 import com.konggogi.veganlife.post.fixture.PostFixture;
-import com.konggogi.veganlife.post.fixture.PostImageFixture;
 import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
@@ -33,15 +28,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostRepository postRepository;
-    @Mock PostMapper postMapper;
-    @Mock TagMapper tagMapper;
-    @Mock PostImageMapper postImageMapper;
+    @Spy PostMapper postMapper = new PostMapperImpl();
+    @Spy TagMapper tagMapper = new TagMapperImpl();
+    @Spy PostImageMapper postImageMapper = new PostImageMapperImpl();
     @Mock TagRepository tagRepository;
     @InjectMocks PostService postService;
     private final Member member = MemberFixture.DEFAULT_M.getMember();
@@ -52,17 +48,12 @@ class PostServiceTest {
     void addTest() {
         // given
         Post post = PostFixture.BAKERY.getPost();
-        PostTag postTag = PostTag.builder().tag(tag).build();
-        PostImage postImage = PostImageFixture.DEFAULT.getPostImage();
         Long memberId = member.getId();
         PostAddRequest request = createPostAddRequest();
         given(memberQueryService.search(memberId)).willReturn(member);
         given(postMapper.toEntity(member, request)).willReturn(post);
         given(tagRepository.findByName(anyString())).willReturn(Optional.empty());
-        given(tagMapper.toEntity(anyString())).willReturn(tag);
-        given(postImageMapper.toEntity(anyString())).willReturn(postImage);
-        given(tagRepository.save(tag)).willReturn(tag);
-        given(tagMapper.toPostTag(tag)).willReturn(postTag);
+        given(tagRepository.save(any(Tag.class))).willReturn(tag);
         given(postRepository.save(post)).willReturn(post);
         // when
         Post savedPost = postService.add(memberId, request);
