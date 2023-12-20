@@ -41,7 +41,7 @@ public class NutrientsQueryService {
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
         IntakeNutrients initIntakeNutrients = new IntakeNutrients(0, 0, 0, 0);
-        return meals.stream()
+        return meals.parallelStream()
                 .reduce(
                         initIntakeNutrients,
                         (accumulator, meal) ->
