@@ -1,0 +1,35 @@
+= Meal Log API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 식사 기록 등록 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-log-add/request-headers.adoc[]
+
+==== Parameter
+
+include::{snippets}/meal-log-add/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+include::{snippets}/meal-log-add/http-response.adoc[]
+
+==== 404 NOT FOUND
+include::{snippets}/meal-log-add-meal-data-not-found/http-response.adoc[]
+
+==== 404 NOT FOUND
+include::{snippets}/meal-log-add-member-not-found/http-response.adoc[]
+
