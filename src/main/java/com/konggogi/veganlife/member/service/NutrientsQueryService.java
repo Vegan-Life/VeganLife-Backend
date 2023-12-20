@@ -25,14 +25,18 @@ public class NutrientsQueryService {
         memberQueryService.search(memberId);
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atTime(LocalTime.MAX);
-        List<Meal> meals =
-                mealLogRepository
-                        .findAllByMemberIdAndModifiedAtBetween(memberId, startDate, endDate)
-                        .stream()
-                        .map(MealLog::getMeals)
-                        .flatMap(Collection::stream)
-                        .toList();
+        List<Meal> meals = findAllMealOfMealLog(memberId, startDate, endDate);
         return sumIntakeNutrients(meals);
+    }
+
+    private List<Meal> findAllMealOfMealLog(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+        return mealLogRepository
+                .findAllByMemberIdAndModifiedAtBetween(memberId, startDate, endDate)
+                .stream()
+                .map(MealLog::getMeals)
+                .flatMap(Collection::stream)
+                .toList();
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
