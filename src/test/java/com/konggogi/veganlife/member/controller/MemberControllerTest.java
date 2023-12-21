@@ -2,8 +2,7 @@ package com.konggogi.veganlife.member.controller;
 
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -22,13 +21,17 @@ import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
+import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.MemberService;
 import com.konggogi.veganlife.member.service.NutrientsQueryService;
+import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -341,5 +344,69 @@ class MemberControllerTest extends RestDocsTest {
         perform.andExpect(status().isNotFound());
 
         perform.andDo(print()).andDo(document("today-nutrients-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("주간 섭취량 조회 API")
+    void getWeeklyIntakeTest() throws Exception {
+        // given
+        List<CaloriesOfMealType> caloriesOfMealTypes = new ArrayList<>();
+        int days = 7;
+        for (int i = 0; i < days; i++) {
+            caloriesOfMealTypes.add(CaloriesOfMealTypeFixture.DEFAULT.get());
+        }
+        int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
+        int totalCalorie = caloriePerMealType * 4 * days;
+        given(
+                        nutrientsQueryService.searchWeeklyIntakeCalories(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .willReturn(caloriesOfMealTypes);
+        given(nutrientsQueryService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/week")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2023-12-17")
+                                .queryParam("endDate", "2023-12-23"));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
+                .andExpect(jsonPath("$.weekly[0].breakfast").value(caloriePerMealType))
+                .andExpect(jsonPath("$.weekly[0].lunch").value(caloriePerMealType))
+                .andExpect(jsonPath("$.weekly[0].dinner").value(caloriePerMealType))
+                .andExpect(jsonPath("$.weekly[0].snack").value(caloriePerMealType));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "weekly-intake",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        parameterWithName("startDate").description("조회할 시작 날짜"),
+                                        parameterWithName("endDate").description("조회할 마지막 날짜"))));
+    }
+
+    @Test
+    @DisplayName("주간 섭취량 조회 API - 없는 회원 예외 발생")
+    void getWeeklyIntakeNotMemberTest() throws Exception {
+        // given
+        given(
+                        nutrientsQueryService.searchWeeklyIntakeCalories(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/week")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2023-12-17")
+                                .queryParam("endDate", "2023-12-23"));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("weekly-intake-not-found", getDocumentResponse()));
     }
 }
