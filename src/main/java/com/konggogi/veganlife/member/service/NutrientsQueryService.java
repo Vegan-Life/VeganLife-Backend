@@ -47,6 +47,19 @@ public class NutrientsQueryService {
                 .toList();
     }
 
+    public int calcTotalCalorie(List<CaloriesOfMealType> caloriesOfMealTypes) {
+        return caloriesOfMealTypes.parallelStream()
+                .reduce(
+                        0,
+                        (accumulator, mealCalorie) ->
+                                accumulator
+                                        + mealCalorie.breakfast()
+                                        + mealCalorie.lunch()
+                                        + mealCalorie.dinner()
+                                        + mealCalorie.snack(),
+                        Integer::sum);
+    }
+
     private List<Meal> findAllMealOfMealLog(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
         return findMealLog(memberId, startDate, endDate).stream()
