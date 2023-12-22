@@ -2,6 +2,7 @@ package com.konggogi.veganlife.meallog.fixture;
 
 
 import com.konggogi.veganlife.meallog.domain.Meal;
+import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.member.domain.Member;
@@ -24,15 +25,17 @@ public enum MealLogFixture {
         this.mealType = mealType;
     }
 
-    public MealLog get(List<Meal> meals, Member member) {
+    public MealLog get(List<Meal> meals, List<MealImage> mealImages, Member member) {
         MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
         meals.forEach(mealLog::addMeal);
+        mealImages.forEach(mealLog::addMealImage);
         return mealLog;
     }
 
-    public MealLog getWithId(Long id, List<Meal> meals, Member member) {
+    public MealLog get(Long id, List<Meal> meals, List<MealImage> mealImages, Member member) {
         MealLog mealLog = MealLog.builder().id(id).mealType(mealType).member(member).build();
         meals.forEach(mealLog::addMeal);
+        mealImages.forEach(mealLog::addMealImage);
         return mealLog;
     }
 
