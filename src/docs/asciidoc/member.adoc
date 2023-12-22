@@ -141,3 +141,27 @@ include::{snippets}/today-nutrients/http-response.adoc[]
 ==== 400 NOT FOUND
 
 include::{snippets}/today-nutrients-not-found/http-response.adoc[]
+
+== 주간 섭취량 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/weekly-intake/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/weekly-intake/query-parameters.adoc[]
+
+include::{snippets}/weekly-intake/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/weekly-intake/http-response.adoc[]
+
+==== 400 NOT FOUND
+
+include::{snippets}/weekly-intake-not-found/http-response.adoc[]

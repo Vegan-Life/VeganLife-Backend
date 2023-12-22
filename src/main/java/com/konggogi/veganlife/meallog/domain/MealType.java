@@ -17,4 +17,8 @@ public enum MealType {
     MealType(String value) {
         this.value = value;
     }
+
+    public boolean isSnack() {
+        return this == BREAKFAST_SNACK || this == LUNCH_SNACK || this == DINNER_SNACK;
+    }
 }
