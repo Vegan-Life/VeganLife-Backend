@@ -13,6 +13,8 @@ import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
+import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapperImpl;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
 import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
@@ -37,6 +39,7 @@ public class MealLogServiceTest {
     @Mock MealLogRepository mealLogRepository;
     @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
     @Spy MealMapper mealMapper = new MealMapperImpl();
+    @Spy MealImageMapper mealImageMapper = new MealImageMapperImpl();
     @InjectMocks MealLogService mealLogService;
 
     Member member = Member.builder().id(1L).email("test123@test.com").build();
@@ -53,12 +56,14 @@ public class MealLogServiceTest {
                                             "테스트", 100, IntakeUnit.G, 100, 10, 10, 10, m.getId()))
                     .toList();
 
+    List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
+
     @Test
     @DisplayName("식사 기록 저장")
     void mealLogAddTest() {
         // given
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
         given(memberQueryService.search(1L)).willReturn(member);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
         // when
