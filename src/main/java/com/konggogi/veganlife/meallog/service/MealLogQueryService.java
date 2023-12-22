@@ -24,7 +24,7 @@ public class MealLogQueryService {
                 .map(
                         mealLog ->
                                 new MealLogList(
-                                        mealLog.getMealType(),
+                                        mealLog,
                                         getThumbnailUrl(mealLog.getMealImages()),
                                         calculateTotalCalorie(mealLog.getMeals())))
                 .toList();

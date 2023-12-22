@@ -1,6 +1,6 @@
 package com.konggogi.veganlife.meallog.service.dto;
 
 
-import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.domain.MealLog;
 
-public record MealLogList(MealType mealType, String thumbnailUrl, Integer totalCalorie) {}
+public record MealLogList(MealLog mealLog, String thumbnailUrl, Integer totalCalorie) {}
