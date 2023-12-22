@@ -32,6 +32,9 @@ public class Post extends TimeStamped {
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<PostTag> tags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<PostLike> likes = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -52,5 +55,10 @@ public class Post extends TimeStamped {
     public void addPostImage(PostImage postImage) {
         imageUrls.add(postImage);
         postImage.setPost(this);
+    }
+
+    public void addPostLike(PostLike postLike) {
+        likes.add(postLike);
+        postLike.setPostAndMember(this, member);
     }
 }
