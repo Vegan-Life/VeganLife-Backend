@@ -15,5 +15,7 @@ public interface MealLogMapper {
     @Mapping(target = "id", ignore = true)
     MealLog toEntity(MealType mealType, Member member);
 
+    @Mapping(source = "mealLogList.mealLog.id", target = "id")
+    @Mapping(source = "mealLogList.mealLog.mealType", target = "mealType")
     MealLogListResponse toMealLogListResponse(MealLogList mealLogList);
 }
