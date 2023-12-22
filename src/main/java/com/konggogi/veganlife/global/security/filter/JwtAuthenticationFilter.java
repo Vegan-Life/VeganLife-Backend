@@ -10,8 +10,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -32,12 +34,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwtUtils.extractBearerToken(extractToken)
                 .ifPresent(
                         jwt -> {
-                            jwtUtils.validateToken(jwt);
-                            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                                String email = getUserEmailFromJwt(jwt);
-                                UserDetails userDetails =
-                                        userDetailsServiceImpl.loadUserByUsername(email);
-                                setAuthenticationInSecurityContext(request, userDetails);
+                            try {
+                                jwtUtils.validateToken(jwt);
+                                setAuthentication(request, jwt);
+                            } catch (InvalidJwtException e) {
+                                request.setAttribute(
+                                        JwtUtils.EXCEPTION_ATTRIBUTE, e.getErrorCode());
                             }
                         });
         filterChain.doFilter(request, response);
@@ -46,6 +48,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getUserEmailFromJwt(String token) {
         return jwtUtils.extractUserEmail(token)
                 .orElseThrow(() -> new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
+    }
+
+    private void setAuthentication(HttpServletRequest request, String jwt) {
+        getAuthentication()
+                .ifPresentOrElse(
+                        (auth) -> {},
+                        () -> {
+                            String email = getUserEmailFromJwt(jwt);
+                            UserDetails userDetails =
+                                    userDetailsServiceImpl.loadUserByUsername(email);
+                            setAuthenticationInSecurityContext(request, userDetails);
+                        });
+    }
+
+    private Optional<Authentication> getAuthentication() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
 
     private void setAuthenticationInSecurityContext(
