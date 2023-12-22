@@ -1,0 +1,6 @@
+package com.konggogi.veganlife.meallog.controller.dto.response;
+
+
+import com.konggogi.veganlife.meallog.domain.MealType;
+
+public record MealLogListResponse(MealType mealType, String imageUrl, Integer totalCalorie) {}
