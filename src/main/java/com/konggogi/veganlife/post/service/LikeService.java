@@ -25,4 +25,11 @@ public class LikeService {
         PostLike postLike = postLikeMapper.toEntity(member, post);
         post.addPostLike(postLike);
     }
+
+    public void removePostLike(Long memberId, Long postId) {
+        memberQueryService.search(memberId);
+        Post post = postQueryService.search(postId);
+        PostLike postLike = postQueryService.validatePostLikeIsNotExist(memberId, postId);
+        post.removePostLike(postLike);
+    }
 }
