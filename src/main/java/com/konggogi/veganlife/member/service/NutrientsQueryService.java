@@ -70,8 +70,7 @@ public class NutrientsQueryService {
 
     private List<MealLog> findMealLog(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
-        return mealLogRepository.findAllByMemberIdAndModifiedAtBetween(
-                memberId, startDate, endDate);
+        return mealLogRepository.findAllByMemberIdAndCreatedAtBetween(memberId, startDate, endDate);
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
