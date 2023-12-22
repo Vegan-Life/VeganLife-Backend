@@ -24,8 +24,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @DataJpaTest
+@EnableJpaAuditing(setDates = false)
 public class MealLogRepositoryTest {
 
     @Autowired MealLogRepository mealLogRepository;
@@ -74,18 +76,48 @@ public class MealLogRepositoryTest {
         // given
         Long memberId = member.getId();
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.getWithDate(meals, member, LocalDate.now());
+        List<MealImage> mealImages =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        MealLog mealLog =
+                MealLogFixture.BREAKFAST.getWithDate(LocalDate.now(), meals, mealImages, member);
         MealLog savedMealLog = mealLogRepository.save(mealLog);
 
-        LocalDate date = savedMealLog.getModifiedAt().toLocalDate();
+        LocalDate date = savedMealLog.getCreatedAt().toLocalDate();
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atTime(LocalTime.MAX);
         // when
         List<MealLog> mealLogs =
-                mealLogRepository.findAllByMemberIdAndModifiedAtBetween(
+                mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
                         memberId, startDate, endDate);
+
         // then
         assertThat(mealLogs).hasSize(1);
         assertThat(mealLogs).extracting(MealLog::getMember).containsOnly(member);
+    }
+
+    @Test
+    @DisplayName("회원 id와 날짜에 해당하는 MealLog 레코드 조회")
+    void findAllByDateTest() {
+        // given
+        List<Meal> meals1 = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages1 =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        MealLog mealLog1 =
+                MealLogFixture.BREAKFAST.getWithDate(
+                        LocalDate.of(2023, 12, 22), meals1, mealImages1, member);
+        List<Meal> meals2 = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages2 =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        MealLog mealLog2 =
+                MealLogFixture.BREAKFAST.getWithDate(
+                        LocalDate.of(2023, 12, 23), meals2, mealImages2, member);
+        mealLogRepository.save(mealLog1);
+        mealLogRepository.save(mealLog2);
+        // when
+        LocalDate date = LocalDate.of(2023, 12, 22);
+        List<MealLog> mealLogs = mealLogRepository.findAllByDate(date, member.getId());
+        // then
+        assertThat(mealLogs.size()).isEqualTo(1);
+        assertThat(mealLogs.get(0)).isEqualTo(mealLog1);
     }
 }
