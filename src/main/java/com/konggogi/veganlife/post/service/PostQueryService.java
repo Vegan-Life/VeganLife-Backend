@@ -4,10 +4,9 @@ package com.konggogi.veganlife.post.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
+import com.konggogi.veganlife.post.exception.DuplicateLikeException;
 import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import com.konggogi.veganlife.post.repository.PostRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,12 @@ public class PostQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
     }
 
-    public Optional<PostLike> searchPostLike(Long memberId, Long postId) {
-        return postLikeRepository.findByMemberIdAndId(memberId, postId);
+    public void validatePostLikeIsExist(Long memberId, Long postId) {
+        postLikeRepository
+                .findByMemberIdAndId(memberId, postId)
+                .ifPresent(
+                        (postLike) -> {
+                            throw new DuplicateLikeException(ErrorCode.ALREADY_LIKED);
+                        });
     }
 }
