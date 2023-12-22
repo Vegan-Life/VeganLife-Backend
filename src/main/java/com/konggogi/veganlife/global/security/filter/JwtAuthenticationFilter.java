@@ -32,12 +32,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwtUtils.extractBearerToken(extractToken)
                 .ifPresent(
                         jwt -> {
-                            jwtUtils.validateToken(jwt);
-                            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                                String email = getUserEmailFromJwt(jwt);
-                                UserDetails userDetails =
-                                        userDetailsServiceImpl.loadUserByUsername(email);
-                                setAuthenticationInSecurityContext(request, userDetails);
+                            try {
+                                jwtUtils.validateToken(jwt);
+                                if (SecurityContextHolder.getContext().getAuthentication()
+                                        == null) {
+                                    String email = getUserEmailFromJwt(jwt);
+                                    UserDetails userDetails =
+                                            userDetailsServiceImpl.loadUserByUsername(email);
+                                    setAuthenticationInSecurityContext(request, userDetails);
+                                }
+                            } catch (InvalidJwtException e) {
+                                request.setAttribute(
+                                        JwtUtils.EXCEPTION_ATTRIBUTE, e.getErrorCode());
                             }
                         });
         filterChain.doFilter(request, response);
