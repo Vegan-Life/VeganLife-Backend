@@ -32,9 +32,16 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/likes")
-    public ResponseEntity<Void> addLike(
+    public ResponseEntity<Void> addPostLike(
             @PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         likeService.addPostLike(userDetails.id(), postId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{postId}/likes")
+    public ResponseEntity<Void> removePostLike(
+            @PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        likeService.removePostLike(userDetails.id(), postId);
+        return ResponseEntity.noContent().build();
     }
 }
