@@ -61,4 +61,8 @@ public class Post extends TimeStamped {
         likes.add(postLike);
         postLike.setPostAndMember(this, member);
     }
+
+    public void removePostLike(PostLike postLike) {
+        likes.remove(postLike);
+    }
 }
