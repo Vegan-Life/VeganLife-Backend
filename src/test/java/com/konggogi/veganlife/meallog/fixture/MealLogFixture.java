@@ -39,16 +39,26 @@ public enum MealLogFixture {
         return mealLog;
     }
 
-    public MealLog getWithDate(List<Meal> meals, Member member, LocalDate date) {
+    public MealLog getWithDate(
+            LocalDate date, List<Meal> meals, List<MealImage> mealImages, Member member) {
         MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
         meals.forEach(mealLog::addMeal);
-        return setModifiedAt(mealLog, date);
+        mealImages.forEach(mealLog::addMealImage);
+        return setCreatedAt(mealLog, date);
     }
 
-    private MealLog setModifiedAt(MealLog mealLog, LocalDate date) {
-        Field modifiedAt = ReflectionUtils.findField(MealLog.class, "modifiedAt");
-        ReflectionUtils.makeAccessible(modifiedAt);
-        ReflectionUtils.setField(modifiedAt, mealLog, date.atStartOfDay());
+    public MealLog getWithDate(
+            Long id, LocalDate date, List<Meal> meals, List<MealImage> mealImages, Member member) {
+        MealLog mealLog = MealLog.builder().id(id).mealType(mealType).member(member).build();
+        meals.forEach(mealLog::addMeal);
+        mealImages.forEach(mealLog::addMealImage);
+        return setCreatedAt(mealLog, date);
+    }
+
+    private MealLog setCreatedAt(MealLog mealLog, LocalDate date) {
+        Field createdAt = ReflectionUtils.findField(MealLog.class, "createdAt");
+        ReflectionUtils.makeAccessible(createdAt);
+        ReflectionUtils.setField(createdAt, mealLog, date.atStartOfDay());
         return mealLog;
     }
 }
