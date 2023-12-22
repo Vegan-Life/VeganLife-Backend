@@ -6,8 +6,10 @@ import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.meallog.domain.Meal;
+import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
+import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +50,10 @@ public class MealLogRepositoryTest {
     void mealLogSaveTest() {
         // given
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, member);
+        List<MealImage> mealImages =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
         // when
         MealLog result = mealLogRepository.save(mealLog);
         // then
@@ -56,6 +62,10 @@ public class MealLogRepositoryTest {
         assertThat(result.getMeals().size()).isEqualTo(mealLog.getMeals().size());
         assertThat(result.getMeals().stream().map(Meal::getId)).allMatch(Objects::nonNull);
         assertThat(result.getMeals().stream().map(Meal::getMealLog)).allMatch(Objects::nonNull);
+        assertThat(result.getMealImages().stream().map(MealImage::getId))
+                .allMatch(Objects::nonNull);
+        assertThat(result.getMealImages().stream().map(MealImage::getMealLog))
+                .allMatch(Objects::nonNull);
     }
 
     @Test

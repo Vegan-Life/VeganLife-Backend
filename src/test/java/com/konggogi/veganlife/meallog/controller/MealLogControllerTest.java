@@ -57,12 +57,14 @@ public class MealLogControllerTest extends RestDocsTest {
                             10,
                             MealDataFixture.PROCESSED.getWithName(2L, "통밀크래커", member).getId()));
 
+    List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
+
     @Test
     @DisplayName("식사 기록 등록 API")
     void addMealLogTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
 
         ResultActions perform =
                 mockMvc.perform(
@@ -87,7 +89,7 @@ public class MealLogControllerTest extends RestDocsTest {
     void addMealLogMemberNotFoundTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .given(mealLogService)
@@ -111,7 +113,7 @@ public class MealLogControllerTest extends RestDocsTest {
     void addMealLogMealDataNotFoundTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA))
                 .given(mealLogService)

@@ -35,8 +35,11 @@ public class MealLog extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private MealType mealType;
 
-    @OneToMany(mappedBy = "mealLog", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mealLog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meal> meals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mealLog", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MealImage> mealImages = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -52,5 +55,10 @@ public class MealLog extends TimeStamped {
     public void addMeal(Meal meal) {
         meals.add(meal);
         meal.setMealLog(this);
+    }
+
+    public void addMealImage(MealImage mealImage) {
+        mealImages.add(mealImage);
+        mealImage.setMealLog(this);
     }
 }
