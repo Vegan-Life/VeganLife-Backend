@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 public interface MealMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "mealLog", ignore = true)
     @Mapping(source = "mealAddRequest.name", target = "name")
     @Mapping(source = "mealAddRequest.intakeUnit", target = "intakeUnit")
     Meal toEntity(MealAddRequest mealAddRequest, MealData mealData);
