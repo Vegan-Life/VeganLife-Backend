@@ -18,6 +18,7 @@ import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
@@ -33,6 +34,7 @@ import org.springframework.test.web.servlet.ResultActions;
 public class MealLogControllerTest extends RestDocsTest {
 
     @MockBean MealLogService mealLogService;
+    @MockBean MealLogQueryService mealLogQueryService;
 
     Member member = Member.builder().id(1L).email("test123@test.com").build();
 
