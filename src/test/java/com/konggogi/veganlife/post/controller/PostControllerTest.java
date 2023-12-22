@@ -18,6 +18,7 @@ import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
+import com.konggogi.veganlife.post.service.LikeService;
 import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(PostController.class)
 class PostControllerTest extends RestDocsTest {
     @MockBean PostService postService;
+    @MockBean LikeService likeService;
 
     @Test
     @DisplayName("게시글 등록 API")
