@@ -75,17 +75,17 @@ public class NutrientsQueryService {
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
-        IntakeNutrients initIntakeNutrients = new IntakeNutrients(0, 0, 0, 0);
-        return meals.stream()
-                .reduce(
-                        initIntakeNutrients,
-                        (accumulator, meal) ->
-                                new IntakeNutrients(
-                                        accumulator.calorie() + meal.getCalorie(),
-                                        accumulator.carbs() + meal.getCarbs(),
-                                        accumulator.protein() + meal.getProtein(),
-                                        accumulator.fat() + meal.getFat()),
-                        IntakeNutrients::combine);
+        int totalCalorie = 0;
+        int totalCarbs = 0;
+        int totalProtein = 0;
+        int totalFat = 0;
+        for (Meal meal : meals) {
+            totalCalorie += meal.getCalorie();
+            totalCarbs += meal.getCarbs();
+            totalProtein += meal.getProtein();
+            totalFat += meal.getFat();
+        }
+        return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
     private CaloriesOfMealType sumCalorieByMealType(List<MealLog> mealLogs) {
