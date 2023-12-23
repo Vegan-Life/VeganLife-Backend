@@ -1,12 +1,18 @@
 package com.konggogi.veganlife.meallog.service;
 
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
+import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.meallog.service.dto.MealLogDetails;
 import com.konggogi.veganlife.meallog.service.dto.MealLogList;
+import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.ToIntFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +32,21 @@ public class MealLogQueryService {
                                 new MealLogList(
                                         mealLog,
                                         getThumbnailUrl(mealLog.getMealImages()),
-                                        calculateTotalCalorie(mealLog.getMeals())))
+                                        getTotalCalorie(mealLog.getMeals())))
                 .toList();
+    }
+
+    public MealLogDetails search(Long id) {
+
+        MealLog mealLog =
+                mealLogRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
+        IntakeNutrients intakeNutrients = getTotalNutrients(mealLog.getMeals());
+
+        return new MealLogDetails(
+                mealLog, intakeNutrients, mealLog.getMealImages(), mealLog.getMeals());
     }
 
     private String getThumbnailUrl(List<MealImage> mealImages) {
@@ -37,8 +56,22 @@ public class MealLogQueryService {
         return null;
     }
 
-    private Integer calculateTotalCalorie(List<Meal> meals) {
+    private Integer getTotalCalorie(List<Meal> meals) {
 
-        return meals.stream().mapToInt(Meal::getCalorie).sum();
+        return calculateTotal(Meal::getCalorie, meals);
+    }
+
+    private IntakeNutrients getTotalNutrients(List<Meal> meals) {
+        // TODO: reduce를 사용했을 때와 성능 비교해보기
+        return new IntakeNutrients(
+                calculateTotal(Meal::getCalorie, meals),
+                calculateTotal(Meal::getCarbs, meals),
+                calculateTotal(Meal::getProtein, meals),
+                calculateTotal(Meal::getFat, meals));
+    }
+
+    private Integer calculateTotal(ToIntFunction<Meal> func, List<Meal> meals) {
+
+        return meals.stream().mapToInt(func).sum();
     }
 }
