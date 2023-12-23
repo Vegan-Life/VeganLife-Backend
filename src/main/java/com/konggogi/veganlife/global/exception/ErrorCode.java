@@ -27,7 +27,10 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER("MEMBER_002", "사용자를 찾을 수 없습니다."),
 
     // meal-data
-    NOT_FOUND_MEAL_DATA("MEAL_DATA_001", "식품 정보를 찾을 수 없습니다.");
+    NOT_FOUND_MEAL_DATA("MEAL_DATA_001", "식품 정보를 찾을 수 없습니다."),
+
+    // meal-log
+    NOT_FOUND_MEAL_LOG("MEAL_LOG_001", "식사 기록을 찾을 수 없습니다.");
 
     private final String code;
     private final String description;
