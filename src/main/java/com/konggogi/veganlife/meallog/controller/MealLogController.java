@@ -3,6 +3,7 @@ package com.konggogi.veganlife.meallog.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
+import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListResponse;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,5 +49,12 @@ public class MealLogController {
                 mealLogQueryService.searchByDate(date, userDetails.id()).stream()
                         .map(mealLogMapper::toMealLogListResponse)
                         .toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MealLogDetailsResponse> getMealLogDetails(@PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                mealLogMapper.toMealLogDetailsResponse(mealLogQueryService.search(id)));
     }
 }
