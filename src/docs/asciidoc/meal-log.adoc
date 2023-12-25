@@ -18,8 +18,6 @@ endif::[]
 
 include::{snippets}/meal-log-add/request-headers.adoc[]
 
-==== Parameter
-
 include::{snippets}/meal-log-add/http-request.adoc[]
 
 === Response
@@ -42,11 +40,9 @@ include::{snippets}/meal-log-add-member-not-found/http-response.adoc[]
 
 include::{snippets}/meal-log-get-meal-log-list/request-headers.adoc[]
 
-==== Request
+==== Parameter
 
 include::{snippets}/meal-log-get-meal-log-list/query-parameters.adoc[]
-
-==== Parameter
 
 include::{snippets}/meal-log-get-meal-log-list/http-request.adoc[]
 
@@ -56,4 +52,29 @@ include::{snippets}/meal-log-get-meal-log-list/http-request.adoc[]
 ==== 200 OK
 thumbnailUrl이 존재하지 않을 경우 null 전달
 include::{snippets}/meal-log-get-meal-log-list/http-response.adoc[]
+
+== 식사 기록 상세 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-log-get-meal-details/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/meal-log-get-meal-details/path-parameters.adoc[]
+
+include::{snippets}/meal-log-get-meal-details/http-request.adoc[]
+
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/meal-log-get-meal-details/http-response.adoc[]
+
+==== 404 Not Found
+
+include::{snippets}/meal-log-get-meal-details-not-found/http-response.adoc[]
 
