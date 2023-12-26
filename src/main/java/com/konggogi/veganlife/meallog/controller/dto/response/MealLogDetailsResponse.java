@@ -8,6 +8,6 @@ import java.util.List;
 public record MealLogDetailsResponse(
         Long id,
         MealType mealType,
-        IntakeNutrients intakeNutrients,
+        IntakeNutrients totalIntakeNutrients,
         List<String> imageUrls,
         List<MealDetailsResponse> meals) {}
