@@ -5,6 +5,7 @@ import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 
 public record MealDataDetailsResponse(
+        Long id,
         String name,
         MealDataType type,
         Integer amount,
