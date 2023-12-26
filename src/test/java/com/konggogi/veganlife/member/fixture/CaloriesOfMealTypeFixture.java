@@ -20,4 +20,8 @@ public enum CaloriesOfMealTypeFixture {
     public CaloriesOfMealType get() {
         return new CaloriesOfMealType(breakfast, lunch, dinner, snack);
     }
+
+    public CaloriesOfMealType getWithIntake(int intake) {
+        return new CaloriesOfMealType(intake, intake, intake, intake);
+    }
 }
