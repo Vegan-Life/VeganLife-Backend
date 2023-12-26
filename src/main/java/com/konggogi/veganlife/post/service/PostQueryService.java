@@ -5,7 +5,7 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostLike;
-import com.konggogi.veganlife.post.exception.DuplicateLikeException;
+import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import java.util.Optional;
@@ -34,7 +34,7 @@ public class PostQueryService {
         searchPostLike(memberId, postId)
                 .ifPresent(
                         postLike -> {
-                            throw new DuplicateLikeException(ErrorCode.ALREADY_LIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED);
                         });
     }
 
@@ -42,7 +42,7 @@ public class PostQueryService {
         return searchPostLike(memberId, postId)
                 .orElseThrow(
                         () -> {
-                            throw new DuplicateLikeException(ErrorCode.ALREADY_UNLIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED);
                         });
     }
 }
