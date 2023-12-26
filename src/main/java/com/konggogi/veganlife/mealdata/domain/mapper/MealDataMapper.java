@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MealDataMapper {
 
-    MealDataListResponse toMealDataListResponse(MealData mealDataListDto);
+    MealDataListResponse toMealDataListResponse(MealData mealData);
 
-    MealDataDetailsResponse toMealDataDetailsResponse(MealData mealDataDetailsDto);
+    MealDataDetailsResponse toMealDataDetailsResponse(MealData mealData);
 }
