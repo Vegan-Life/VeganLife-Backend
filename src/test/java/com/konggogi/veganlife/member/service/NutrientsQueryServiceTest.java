@@ -193,6 +193,47 @@ class NutrientsQueryServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
 
+    @Test
+    @DisplayName("연간 섭취량 조회")
+    void searchYearlyIntakeCaloriesTest() {
+        // given
+        Long memberId = member.getId();
+        Meal meal = meals.get(0);
+        List<MealLog> mealLogs = createMealLogs(LocalDate.now());
+        given(memberQueryService.search(memberId)).willReturn(member);
+        given(
+                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .willReturn(mealLogs);
+        // when
+        List<CaloriesOfMealType> caloriesOfMealTypes =
+                nutrientsQueryService.searchYearlyIntakeCalories(
+                        memberId, LocalDate.of(2023, 1, 1));
+        // then
+        assertThat(caloriesOfMealTypes.get(0).breakfast())
+                .isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).lunch()).isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).dinner()).isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).snack())
+                .isEqualTo(meal.getCalorie() * meals.size() * 3);
+    }
+
+    @Test
+    @DisplayName("연간 섭취량 조회 시 없는 회원 예외 발생")
+    void searchYearlyIntakeCaloriesNotMemberTest() {
+        // given
+        Long memberId = member.getId();
+        given(memberQueryService.search(memberId))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                nutrientsQueryService.searchYearlyIntakeCalories(
+                                        memberId, LocalDate.now()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+    }
+
     private List<MealLog> createMealLogs(LocalDate date) {
         return List.of(
                 MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member),

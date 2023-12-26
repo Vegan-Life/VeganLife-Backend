@@ -467,4 +467,62 @@ class MemberControllerTest extends RestDocsTest {
 
         perform.andDo(print()).andDo(document("monthly-intake-not-found", getDocumentResponse()));
     }
+
+    @Test
+    @DisplayName("연간 섭취량 조회 API")
+    void getYearlyIntakeTest() throws Exception {
+        // given
+        List<CaloriesOfMealType> caloriesOfMealTypes = new ArrayList<>();
+        int months = 12;
+        for (int i = 0; i < months; i++) {
+            caloriesOfMealTypes.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(300));
+        }
+        int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
+        int totalCalorie = caloriePerMealType * 4 * months;
+        given(nutrientsQueryService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
+                .willReturn(caloriesOfMealTypes);
+        given(nutrientsQueryService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/year")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2023-01-01"));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(caloriePerMealType));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "yearly-intake",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        parameterWithName("startDate")
+                                                .description("조회할 연도의 시작 날짜"))));
+    }
+
+    @Test
+    @DisplayName("연간 섭취량 조회 API - 없는 회원 예외 발생")
+    void getYearlyIntakeNotMemberTest() throws Exception {
+        // given
+        given(nutrientsQueryService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/nutrients/year")
+                                .headers(authorizationHeader())
+                                .queryParam("startDate", "2023-01-01"));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("yearly-intake-not-found", getDocumentResponse()));
+    }
 }

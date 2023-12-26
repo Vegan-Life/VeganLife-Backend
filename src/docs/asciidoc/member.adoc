@@ -191,3 +191,28 @@ include::{snippets}/monthly-intake/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/monthly-intake-not-found/http-response.adoc[]
+
+== 연간 섭취량 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/yearly-intake/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/yearly-intake/query-parameters.adoc[]
+
+include::{snippets}/yearly-intake/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+각 월별 합산된 칼로리 값
+
+include::{snippets}/yearly-intake/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/yearly-intake-not-found/http-response.adoc[]

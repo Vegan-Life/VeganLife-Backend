@@ -24,9 +24,7 @@ public class NutrientsQueryService {
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
         memberQueryService.search(memberId);
-        LocalDateTime startDateTime = date.atStartOfDay();
-        LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
-        List<Meal> meals = findAllMealOfMealLog(memberId, startDateTime, endDateTime);
+        List<Meal> meals = findAllMealOfMealLog(memberId, date, date);
         return sumIntakeNutrients(meals);
     }
 
@@ -37,10 +35,7 @@ public class NutrientsQueryService {
                 .datesUntil(endDate.plusDays(1))
                 .map(
                         date -> {
-                            LocalDateTime startDateTime = date.atStartOfDay();
-                            LocalDateTime endDateTime = date.atTime(LocalTime.MAX);
-                            List<MealLog> mealLogs =
-                                    findMealLog(memberId, startDateTime, endDateTime);
+                            List<MealLog> mealLogs = findMealLog(memberId, date, date);
                             return sumCalorieByMealType(mealLogs);
                         })
                 .toList();
@@ -49,9 +44,21 @@ public class NutrientsQueryService {
     public List<CaloriesOfMealType> searchMonthlyIntakeCalories(
             Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
+        startDate = YearMonth.from(startDate).atDay(1);
         LocalDate endDate = YearMonth.from(startDate).atEndOfMonth();
         return getStartDatesOfWeeks(startDate, endDate).stream()
                 .map(startDayOfWeek -> calcWeekCalories(memberId, startDayOfWeek))
+                .toList();
+    }
+
+    public List<CaloriesOfMealType> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
+        memberQueryService.search(memberId);
+        int year = startDate.getYear();
+        startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+        return startDate
+                .datesUntil(endDate.plusDays(1), Period.ofMonths(1))
+                .map(startDayOfMonth -> calcMonthCalories(memberId, startDayOfMonth))
                 .toList();
     }
 
@@ -68,16 +75,16 @@ public class NutrientsQueryService {
                         Integer::sum);
     }
 
-    private List<Meal> findAllMealOfMealLog(
-            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return findMealLog(memberId, startDateTime, endDateTime).stream()
+    private List<Meal> findAllMealOfMealLog(Long memberId, LocalDate startDate, LocalDate endDate) {
+        return findMealLog(memberId, startDate, endDate).stream()
                 .map(MealLog::getMeals)
                 .flatMap(Collection::stream)
                 .toList();
     }
 
-    private List<MealLog> findMealLog(
-            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    private List<MealLog> findMealLog(Long memberId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         return mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
                 memberId, startDateTime, endDateTime);
     }
@@ -138,9 +145,13 @@ public class NutrientsQueryService {
 
     private CaloriesOfMealType calcWeekCalories(Long memberId, LocalDate startDayOfWeek) {
         LocalDate endDayOfWeek = startDayOfWeek.plusDays(6);
-        LocalDateTime startDateTime = startDayOfWeek.atStartOfDay();
-        LocalDateTime endDateTime = endDayOfWeek.atTime(LocalTime.MAX);
-        List<MealLog> mealLogs = findMealLog(memberId, startDateTime, endDateTime);
+        List<MealLog> mealLogs = findMealLog(memberId, startDayOfWeek, endDayOfWeek);
+        return sumCalorieByMealType(mealLogs);
+    }
+
+    private CaloriesOfMealType calcMonthCalories(Long memberId, LocalDate startDayOfMonth) {
+        LocalDate endDayOfMonth = YearMonth.from(startDayOfMonth).atEndOfMonth();
+        List<MealLog> mealLogs = findMealLog(memberId, startDayOfMonth, endDayOfMonth);
         return sumCalorieByMealType(mealLogs);
     }
 }
