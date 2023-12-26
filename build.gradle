@@ -43,7 +43,7 @@ spotless {
 
 jacoco {
     toolVersion = "0.8.8"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+    reportsDirectory = layout.buildDirectory.dir('jacocoReport')
 }
 
 dependencies {
