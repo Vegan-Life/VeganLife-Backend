@@ -31,3 +31,35 @@ include::{snippets}/add-post/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/add-post-not-found/http-response.adoc[]
+
+== 피드 좋아요 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/add-post-like/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/add-post-like/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/add-post-like/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/add-post-like/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/add-post-like-not-found-member/http-response.adoc[]
+
+include::{snippets}/add-post-like-not-found-post/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/add-post-like-already/http-response.adoc[]
