@@ -49,9 +49,21 @@ public class NutrientsQueryService {
     public List<CaloriesOfMealType> searchMonthlyIntakeCalories(
             Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
+        startDate = YearMonth.from(startDate).atDay(1);
         LocalDate endDate = YearMonth.from(startDate).atEndOfMonth();
         return getStartDatesOfWeeks(startDate, endDate).stream()
                 .map(startDayOfWeek -> calcWeekCalories(memberId, startDayOfWeek))
+                .toList();
+    }
+
+    public List<CaloriesOfMealType> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
+        memberQueryService.search(memberId);
+        int year = startDate.getYear();
+        startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+        return startDate
+                .datesUntil(endDate.plusDays(1), Period.ofMonths(1))
+                .map(startDayOfMonth -> calcMonthCalories(memberId, startDayOfMonth))
                 .toList();
     }
 
@@ -140,6 +152,14 @@ public class NutrientsQueryService {
         LocalDate endDayOfWeek = startDayOfWeek.plusDays(6);
         LocalDateTime startDateTime = startDayOfWeek.atStartOfDay();
         LocalDateTime endDateTime = endDayOfWeek.atTime(LocalTime.MAX);
+        List<MealLog> mealLogs = findMealLog(memberId, startDateTime, endDateTime);
+        return sumCalorieByMealType(mealLogs);
+    }
+
+    private CaloriesOfMealType calcMonthCalories(Long memberId, LocalDate startDayOfMonth) {
+        LocalDate endDayOfMonth = YearMonth.from(startDayOfMonth).atEndOfMonth();
+        LocalDateTime startDateTime = startDayOfMonth.atStartOfDay();
+        LocalDateTime endDateTime = endDayOfMonth.atTime(LocalTime.MAX);
         List<MealLog> mealLogs = findMealLog(memberId, startDateTime, endDateTime);
         return sumCalorieByMealType(mealLogs);
     }
