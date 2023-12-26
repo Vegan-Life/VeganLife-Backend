@@ -74,7 +74,7 @@ include::{snippets}/meal-log-get-meal-details/http-request.adoc[]
 
 include::{snippets}/meal-log-get-meal-details/http-response.adoc[]
 
-==== 404 Not Found
+==== 404 NOT FOUND
 
 include::{snippets}/meal-log-get-meal-details-not-found/http-response.adoc[]
 

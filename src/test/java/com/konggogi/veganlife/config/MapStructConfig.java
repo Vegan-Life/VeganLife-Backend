@@ -56,6 +56,11 @@ public class MapStructConfig {
     }
 
     @Bean
+    public PostLikeMapper postLikeMapper() {
+        return new PostLikeMapperImpl();
+    }
+
+    @Bean
     public NutrientsMapper nutrientsMapper() {
         return new NutrientsMapperImpl();
     }
