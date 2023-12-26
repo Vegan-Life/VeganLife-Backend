@@ -64,6 +64,32 @@ class MemberQueryServiceTest {
     }
 
     @Test
+    @DisplayName("이메일로 회원 조회")
+    void searchByEmailTest() {
+        // given
+        String email = member.getEmail();
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        // when
+        Member foundMember = memberQueryService.searchByEmail(email);
+        // then
+        assertThat(foundMember).isEqualTo(member);
+    }
+
+    @Test
+    @DisplayName("이메일로 회원 조회 실패")
+    void searchByEmailNotFoundTest() {
+        // given
+        String email = member.getEmail();
+        given(memberRepository.findByEmail(anyString()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(() -> memberQueryService.searchByEmail(email))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(memberRepository).should().findByEmail(anyString());
+    }
+
+    @Test
     @DisplayName("AccessToken 재발급")
     void reissueTokenTest() {
         // given
