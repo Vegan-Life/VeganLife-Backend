@@ -20,7 +20,7 @@ import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
-import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
+import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -82,7 +82,7 @@ class MemberControllerTest extends RestDocsTest {
         MemberInfoRequest request =
                 new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
-                .willThrow(new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME));
+                .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -219,7 +219,7 @@ class MemberControllerTest extends RestDocsTest {
                 new MemberProfileRequest(
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
-                .willThrow(new DuplicateNicknameException(ErrorCode.DUPLICATED_NICKNAME));
+                .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =
                 mockMvc.perform(

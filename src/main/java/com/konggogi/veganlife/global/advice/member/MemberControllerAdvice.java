@@ -8,7 +8,7 @@ import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenExcepti
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
-import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
+import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +18,9 @@ import org.springframework.web.method.HandlerMethod;
 
 @RestControllerAdvice
 public class MemberControllerAdvice {
-    @ExceptionHandler(DuplicateNicknameException.class)
+    @ExceptionHandler(DuplicatedNicknameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicatedNicknameException(
-            HandlerMethod handlerMethod, DuplicateNicknameException exception) {
+            HandlerMethod handlerMethod, DuplicatedNicknameException exception) {
         LoggingUtils.exceptionLog(
                 AopUtils.extractMethodSignature(handlerMethod), HttpStatus.CONFLICT, exception);
         return ResponseEntity.status(HttpStatus.CONFLICT)
