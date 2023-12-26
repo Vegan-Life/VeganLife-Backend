@@ -31,7 +31,7 @@ public enum ErrorCode {
 
     // meal-log
     NOT_FOUND_MEAL_LOG("MEAL_LOG_001", "식사 기록을 찾을 수 없습니다."),
-  
+
     // post
     NOT_FOUND_POST("POST_001", "게시글을 찾을 수 없습니다."),
 
