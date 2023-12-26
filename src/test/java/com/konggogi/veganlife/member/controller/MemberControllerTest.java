@@ -372,10 +372,10 @@ class MemberControllerTest extends RestDocsTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.weekly[0].breakfast").value(caloriePerMealType))
-                .andExpect(jsonPath("$.weekly[0].lunch").value(caloriePerMealType))
-                .andExpect(jsonPath("$.weekly[0].dinner").value(caloriePerMealType))
-                .andExpect(jsonPath("$.weekly[0].snack").value(caloriePerMealType));
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(caloriePerMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(caloriePerMealType));
 
         perform.andDo(print())
                 .andDo(
