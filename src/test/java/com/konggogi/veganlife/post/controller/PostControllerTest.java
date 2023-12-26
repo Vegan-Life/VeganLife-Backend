@@ -232,7 +232,7 @@ class PostControllerTest extends RestDocsTest {
     @DisplayName("게시글 좋아요 취소 API - 좋아요 되어 있지 않은 경우 예외 발생")
     void removePostLikeAlreadyTest() throws Exception {
         // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED))
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED))
                 .when(likeService)
                 .removePostLike(anyLong(), anyLong());
         // when
