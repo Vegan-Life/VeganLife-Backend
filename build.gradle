@@ -4,6 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.3'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.diffplug.spotless' version '6.11.0'
+    id 'jacoco'
 }
 
 group = 'com.konggogi'
@@ -38,6 +39,11 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = layout.buildDirectory.dir('jacocoReport')
 }
 
 dependencies {
@@ -82,6 +88,7 @@ dependencies {
 test {
     useJUnitPlatform()
     outputs.dir snippetsDir
+    finalizedBy jacocoTestReport
 }
 
 asciidoctor {
@@ -95,4 +102,58 @@ bootJar { // jar의 templates에 문서 복사
     from ("${asciidoctor.outputDir}") {
         into 'BOOT-INF/classes/templates'
     }
+}
+
+jacocoTestReport {
+    reports {
+        html.required  = true
+        xml.required  = false
+        csv.required  = false
+    }
+    excludedClassFilesForReport(classDirectories)
+    dependsOn test
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    excludedClassFilesForReport(classDirectories)
+    violationRules {
+        rule {
+            element = 'CLASS'
+            enabled = true
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                //minimum = 0.90
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                //minimum = 0.90
+            }
+        }
+    }
+}
+
+private excludedClassFilesForReport(classDirectories) {
+    classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "com/konggogi/veganlife/global/**/*",
+                        "com/konggogi/veganlife/**/dto/**",
+                        "**/OauthService.class",
+                        "**/OauthService\$*.*",
+                        "**/*domain*/**",
+                        "**/*Dto*",
+                        "**/*Request*",
+                        "**/*Response*",
+                        "**/*Interceptor*",
+                        "**/*Application*",
+                        "**/*Mapper*",
+                        "**/*Exception*"
+                ])
+            })
+    )
 }
