@@ -32,6 +32,6 @@ include::{snippets}/login/http-request.adoc[]
 
 include::{snippets}/login/http-response.adoc[]
 
-==== 404 BAD REQUEST
+==== 400 BAD REQUEST
 
 include::{snippets}/login-unsupported-provider/http-response.adoc[]
