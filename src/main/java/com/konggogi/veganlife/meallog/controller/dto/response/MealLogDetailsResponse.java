@@ -9,5 +9,5 @@ public record MealLogDetailsResponse(
         Long id,
         MealType mealType,
         IntakeNutrients intakeNutrients,
-        List<MealImageDetailsResponse> mealImages,
+        List<String> imageUrls,
         List<MealDetailsResponse> meals) {}
