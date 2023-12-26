@@ -28,6 +28,8 @@ include::{snippets}/reissue-token/http-response.adoc[]
 
 include::{snippets}/reissue-token-invalid-token/http-response.adoc[]
 
+include::{snippets}/reissue-token-not-found-user-info/http-response.adoc[]
+
 ==== 404 NOT FOUND
 
 include::{snippets}/reissue-token-not-found-member/http-response.adoc[]

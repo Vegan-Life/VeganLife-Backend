@@ -57,8 +57,7 @@ class AuthControllerTest extends RestDocsTest {
     void reissueTokenInvalidTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken))
-                .willThrow(new InvalidJwtException(ErrorCode.INVALID_TOKEN));
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.empty());
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -132,5 +131,26 @@ class AuthControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("reissue-token-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("accessToken 재발급 API - 토큰에서 이메일 추출 실패 예외 발생")
+    void reissueTokenExtractEmailTest() throws Exception {
+        // given
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
+        given(memberQueryService.reissueToken(refreshToken))
+                .willThrow(new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/auth/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isUnauthorized());
+
+        perform.andDo(print())
+                .andDo(document("reissue-token-not-found-user-info", getDocumentResponse()));
     }
 }
