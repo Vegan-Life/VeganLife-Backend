@@ -3,6 +3,7 @@ package com.konggogi.veganlife.member.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
@@ -138,8 +140,8 @@ class MemberQueryServiceTest {
         given(jwtUtils.extractUserEmail(token)).willReturn(Optional.empty());
         // when, then
         assertThatThrownBy(() -> memberQueryService.reissueToken(token))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+                .isInstanceOf(InvalidJwtException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_USER_INFO_TOKEN.getDescription());
         then(refreshTokenRepository).should(never()).findRefreshTokenByMemberId(memberId);
         then(jwtProvider).should(never()).createToken(email);
     }
@@ -168,5 +170,53 @@ class MemberQueryServiceTest {
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findById(memberId);
+    }
+
+    @Test
+    @DisplayName("토큰에서 추출한 이메일로 회원 조회")
+    void findMemberByTokenTest() {
+        // given
+        String email = member.getEmail();
+        String token = "accessToken";
+        given(jwtUtils.extractUserEmail(anyString())).willReturn(Optional.of(email));
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        // when
+        Member foundMember = memberQueryService.findMemberByToken(token);
+        // then
+        then(jwtUtils).should().extractUserEmail(anyString());
+        then(memberRepository).should().findByEmail(anyString());
+        assertThat(foundMember).isEqualTo(member);
+    }
+
+    @Test
+    @DisplayName("토큰에서 추출한 이메일로 회원 조회 시 회원 정보를 찾을 수 없으면 예외 발생")
+    void findMemberByTokenInvalidJwtTest() {
+        // given
+        String token = "accessToken";
+        given(jwtUtils.extractUserEmail(anyString())).willReturn(Optional.empty());
+        // when, then
+        assertThatThrownBy(() -> memberQueryService.findMemberByToken(token))
+                .isInstanceOf(InvalidJwtException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_USER_INFO_TOKEN.getDescription());
+        then(jwtUtils).should().extractUserEmail(anyString());
+        then(memberRepository).should(never()).findByEmail(anyString());
+    }
+
+    @Test
+    @DisplayName("토큰에서 추출한 이메일로 회원 조회 시 회원을 찾을 수 없으면 예외 발생")
+    void findMemberByTokenNotFoundMemberTest() {
+        // given
+        String email = member.getEmail();
+        String token = "accessToken";
+        given(jwtUtils.extractUserEmail(anyString())).willReturn(Optional.of(email));
+        given(memberRepository.findByEmail(anyString()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(() -> memberQueryService.findMemberByToken(token))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        // then
+        then(jwtUtils).should().extractUserEmail(anyString());
+        then(memberRepository).should().findByEmail(anyString());
     }
 }
