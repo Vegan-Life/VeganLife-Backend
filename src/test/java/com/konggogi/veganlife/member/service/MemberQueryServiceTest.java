@@ -80,8 +80,7 @@ class MemberQueryServiceTest {
     void searchByEmailNotFoundTest() {
         // given
         String email = member.getEmail();
-        given(memberRepository.findByEmail(anyString()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
         // when, then
         assertThatThrownBy(() -> memberQueryService.searchByEmail(email))
                 .isInstanceOf(NotFoundEntityException.class)
