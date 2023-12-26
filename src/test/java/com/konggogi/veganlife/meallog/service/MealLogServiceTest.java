@@ -29,7 +29,6 @@ import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +43,7 @@ public class MealLogServiceTest {
 
     @Mock MemberQueryService memberQueryService;
     @Mock MealDataQueryService mealDataQueryService;
+    @Mock MealLogQueryService mealLogQueryService;
     @Mock MealLogRepository mealLogRepository;
     @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
     @Spy MealMapper mealMapper = new MealMapperImpl();
@@ -85,7 +85,7 @@ public class MealLogServiceTest {
     }
 
     @Test
-    @DisplayName("식사 기록 저장")
+    @DisplayName("식사 기록 수정")
     void mealLogModifyTest() {
         // given
         MealLogModifyRequest mealLogModifyRequest =
@@ -94,12 +94,12 @@ public class MealLogServiceTest {
         List<MealImage> mealImages =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
-        given(mealLogRepository.findById(1L)).willReturn(Optional.ofNullable(mealLog));
+        given(mealLogQueryService.searchById(1L)).willReturn(mealLog);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
         // when
         mealLogService.modify(1L, mealLogModifyRequest);
         // then
-        then(mealLogRepository).should(times(1)).findById(1L);
+        then(mealLogQueryService).should(times(1)).searchById(1L);
         mealData.forEach(m -> then(mealDataQueryService).should(times(1)).search(m.getId()));
     }
 }
