@@ -47,7 +47,7 @@ public enum MealFixture {
                 .build();
     }
 
-    public Meal getWithId(Long id, MealData mealData) {
+    public Meal get(Long id, MealData mealData) {
 
         return Meal.builder()
                 .id(id)

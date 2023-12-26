@@ -11,8 +11,10 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.domain.Meal;
+import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
+import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +43,8 @@ class NutrientsQueryServiceTest {
     private final List<MealData> mealData =
             List.of(MealDataFixture.MEAL.get(member), MealDataFixture.MEAL.get(member));
     private List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+    private List<MealImage> mealImages =
+            IntStream.range(0, 2).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
     private List<MealLog> mealLogs;
 
     @Test
@@ -50,15 +55,17 @@ class NutrientsQueryServiceTest {
         Meal meal = meals.get(0);
         mealLogs =
                 List.of(
-                        MealLogFixture.BREAKFAST.getWithDate(meals, member, LocalDate.now()),
-                        MealLogFixture.LUNCH.getWithDate(meals, member, LocalDate.now()));
+                        MealLogFixture.BREAKFAST.getWithDate(
+                                LocalDate.now(), meals, mealImages, member),
+                        MealLogFixture.LUNCH.getWithDate(
+                                LocalDate.now(), meals, mealImages, member));
         int expectedSize = meals.size() * mealLogs.size();
-        LocalDate date = mealLogs.get(0).getModifiedAt().toLocalDate();
+        LocalDate date = mealLogs.get(0).getCreatedAt().toLocalDate();
         LocalDateTime startDate = date.atStartOfDay();
         LocalDateTime endDate = date.atTime(LocalTime.MAX);
 
         given(memberQueryService.search(memberId)).willReturn(member);
-        given(mealLogRepository.findAllByMemberIdAndModifiedAtBetween(memberId, startDate, endDate))
+        given(mealLogRepository.findAllByMemberIdAndCreatedAtBetween(memberId, startDate, endDate))
                 .willReturn(mealLogs);
         // when
         IntakeNutrients intakeNutrients =
@@ -97,7 +104,7 @@ class NutrientsQueryServiceTest {
         List<MealLog> mealLogs = createMealLogs(startDate);
         given(memberQueryService.search(memberId)).willReturn(member);
         given(
-                        mealLogRepository.findAllByMemberIdAndModifiedAtBetween(
+                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
                                 anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(mealLogs);
         // when
@@ -149,11 +156,11 @@ class NutrientsQueryServiceTest {
 
     private List<MealLog> createMealLogs(LocalDate date) {
         return List.of(
-                MealLogFixture.BREAKFAST.getWithDate(meals, member, date),
-                MealLogFixture.LUNCH.getWithDate(meals, member, date),
-                MealLogFixture.DINNER.getWithDate(meals, member, date),
-                MealLogFixture.BREAKFAST_SNACK.getWithDate(meals, member, date),
-                MealLogFixture.LUNCH_SNACK.getWithDate(meals, member, date),
-                MealLogFixture.DINNER_SNACK.getWithDate(meals, member, date));
+                MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member),
+                MealLogFixture.LUNCH.getWithDate(date, meals, mealImages, member),
+                MealLogFixture.DINNER.getWithDate(date, meals, mealImages, member),
+                MealLogFixture.BREAKFAST_SNACK.getWithDate(date, meals, mealImages, member),
+                MealLogFixture.LUNCH_SNACK.getWithDate(date, meals, mealImages, member),
+                MealLogFixture.DINNER_SNACK.getWithDate(date, meals, mealImages, member));
     }
 }

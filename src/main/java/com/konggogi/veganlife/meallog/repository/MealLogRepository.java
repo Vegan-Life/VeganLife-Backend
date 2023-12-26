@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MealLogRepository extends JpaRepository<MealLog, Long> {
-    List<MealLog> findAllByMemberIdAndModifiedAtBetween(
+    List<MealLog> findAllByMemberIdAndCreatedAtBetween(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate);
 
     @Query(
