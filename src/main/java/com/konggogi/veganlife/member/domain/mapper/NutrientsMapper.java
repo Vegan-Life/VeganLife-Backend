@@ -13,7 +13,7 @@ import org.mapstruct.Mapping;
 public interface NutrientsMapper {
     TodayIntakeResponse toTodayIntakeResponse(IntakeNutrients intakeNutrients);
 
-    @Mapping(source = "caloriesOfMealTypes", target = "weekly")
+    @Mapping(source = "caloriesOfMealTypes", target = "periodicCalorie")
     CalorieIntakeResponse toCalorieIntakeResponse(
             int totalCalorie, List<CaloriesOfMealType> caloriesOfMealTypes);
 }
