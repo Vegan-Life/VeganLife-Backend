@@ -1,11 +1,14 @@
 package com.konggogi.veganlife.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.oauth.KakaoUserInfo;
 import com.konggogi.veganlife.member.domain.oauth.NaverUserInfo;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
+import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -42,5 +45,20 @@ class OauthUserInfoFactoryTest {
                 oauthUserInfoFactory.createOauthUserInfo(OauthProvider.NAVER, userAttributes);
         // then
         assertThat(userInfo).isInstanceOf(NaverUserInfo.class);
+    }
+
+    @Test
+    @DisplayName("지원하지 않는 provider인 경우 예외 발생")
+    void createUserInfoUnsupportedProviderTest() {
+        // given
+        Map<String, Object> userAttributes = new HashMap<>();
+        userAttributes.put("key", "value");
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                oauthUserInfoFactory.createOauthUserInfo(
+                                        OauthProvider.UNKNOWN, userAttributes))
+                .isInstanceOf(UnsupportedProviderException.class)
+                .hasMessageContaining(ErrorCode.UNSUPPORTED_PROVIDER.getDescription());
     }
 }

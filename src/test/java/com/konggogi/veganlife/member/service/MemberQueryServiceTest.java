@@ -128,6 +128,23 @@ class MemberQueryServiceTest {
     }
 
     @Test
+    @DisplayName("AccessToken 재발급 시 token에서 회원 정보를 찾을 수 없으면 예외 발생")
+    void reissueTokenNotFoundMemberTest() {
+        // given
+        Long memberId = member.getId();
+        String email = member.getEmail();
+        String token = "refreshToken";
+        doNothing().when(jwtUtils).validateToken(token);
+        given(jwtUtils.extractUserEmail(token)).willReturn(Optional.empty());
+        // when, then
+        assertThatThrownBy(() -> memberQueryService.reissueToken(token))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(refreshTokenRepository).should(never()).findRefreshTokenByMemberId(memberId);
+        then(jwtProvider).should(never()).createToken(email);
+    }
+
+    @Test
     @DisplayName("회원 번호로 회원 찾기")
     void findMemberByIdTest() {
         // given

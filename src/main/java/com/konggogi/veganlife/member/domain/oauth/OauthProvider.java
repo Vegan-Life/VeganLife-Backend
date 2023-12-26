@@ -8,7 +8,8 @@ import lombok.Getter;
 @Getter
 public enum OauthProvider {
     KAKAO,
-    NAVER;
+    NAVER,
+    UNKNOWN;
 
     public static OauthProvider from(String provider) {
         String providerUpperCase = provider.toUpperCase();
