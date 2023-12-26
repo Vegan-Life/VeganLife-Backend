@@ -53,7 +53,7 @@ public class MealLogService {
         modifyMealImages(request.imageUrls(), mealLog);
     }
 
-    private void addMeals(List<? extends MealAddRequest> requests, MealLog mealLog) {
+    private void addMeals(List<MealAddRequest> requests, MealLog mealLog) {
         List<Meal> meals =
                 requests.stream()
                         .map(
