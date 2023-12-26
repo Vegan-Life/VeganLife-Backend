@@ -1,9 +1,15 @@
 package com.konggogi.veganlife.meallog.service;
 
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
+import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
+import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
+import com.konggogi.veganlife.meallog.domain.Meal;
+import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
@@ -27,26 +33,65 @@ public class MealLogService {
     private final MealMapper mealMapper;
     private final MealImageMapper mealImageMapper;
 
-    public void add(MealLogAddRequest mealLogAddRequest, Long memberId) {
+    public void add(MealLogAddRequest request, Long memberId) {
 
         MealLog mealLog =
-                mealLogMapper.toEntity(
-                        mealLogAddRequest.mealType(), memberQueryService.search(memberId));
-        addMeals(mealLogAddRequest.meals(), mealLog);
-        addMealImages(mealLogAddRequest.imageUrls(), mealLog);
+                mealLogMapper.toEntity(request.mealType(), memberQueryService.search(memberId));
+        addMeals(request.meals(), mealLog);
+        addMealImages(request.imageUrls(), mealLog);
         mealLogRepository.save(mealLog);
     }
 
-    private void addMeals(List<MealAddRequest> mealAddRequests, MealLog mealLog) {
-        mealAddRequests.stream()
-                .map(
-                        request ->
-                                mealMapper.toEntity(
-                                        request, mealDataQueryService.search(request.mealDataId())))
-                .forEach(mealLog::addMeal);
+    public void modify(Long mealLogId, MealLogModifyRequest request) {
+
+        MealLog mealLog =
+                mealLogRepository
+                        .findById(mealLogId)
+                        .orElseThrow(
+                                () -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
+        modifyMeals(request.meals(), mealLog);
+        modifyMealImages(request.imageUrls(), mealLog);
     }
 
-    private void addMealImages(List<String> mealImages, MealLog mealLog) {
-        mealImages.stream().map(mealImageMapper::toEntity).forEach(mealLog::addMealImage);
+    private void addMeals(List<? extends MealAddRequest> requests, MealLog mealLog) {
+        List<Meal> meals =
+                requests.stream()
+                        .map(
+                                request ->
+                                        mealMapper.toEntity(
+                                                request,
+                                                mealLog,
+                                                mealDataQueryService.search(request.mealDataId())))
+                        .toList();
+        mealLog.addMeals(meals);
+    }
+
+    private void addMealImages(List<String> requests, MealLog mealLog) {
+        List<MealImage> mealImages =
+                requests.stream()
+                        .map(request -> mealImageMapper.toEntity(request, mealLog))
+                        .toList();
+        mealLog.addMealImages(mealImages);
+    }
+
+    private void modifyMeals(List<MealModifyRequest> requests, MealLog mealLog) {
+        List<Meal> meals =
+                requests.stream()
+                        .map(
+                                request ->
+                                        mealMapper.toEntity(
+                                                request,
+                                                mealLog,
+                                                mealDataQueryService.search(request.mealDataId())))
+                        .toList();
+        mealLog.updateMeals(meals);
+    }
+
+    private void modifyMealImages(List<String> requests, MealLog mealLog) {
+        List<MealImage> mealImages =
+                requests.stream()
+                        .map(request -> mealImageMapper.toEntity(request, mealLog))
+                        .toList();
+        mealLog.updateMealImages(mealImages);
     }
 }
