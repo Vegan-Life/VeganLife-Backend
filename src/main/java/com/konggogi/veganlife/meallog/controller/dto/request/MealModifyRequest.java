@@ -4,7 +4,7 @@ package com.konggogi.veganlife.meallog.controller.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public record MealAddRequest(
+public record MealModifyRequest(
         @NotNull @Min(0) Integer intake,
         @NotNull @Min(0) Integer calorie,
         @NotNull @Min(0) Integer carbs,

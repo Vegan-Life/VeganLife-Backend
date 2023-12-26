@@ -3,8 +3,10 @@ package com.konggogi.veganlife.meallog.domain.mapper;
 
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
+import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealDetailsResponse;
 import com.konggogi.veganlife.meallog.domain.Meal;
+import com.konggogi.veganlife.meallog.domain.MealLog;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,8 +14,10 @@ import org.mapstruct.Mapping;
 public interface MealMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "mealLog", ignore = true)
-    Meal toEntity(MealAddRequest mealAddRequest, MealData mealData);
+    Meal toEntity(MealAddRequest request, MealLog mealLog, MealData mealData);
+
+    @Mapping(target = "id", ignore = true)
+    Meal toEntity(MealModifyRequest request, MealLog mealLog, MealData mealData);
 
     MealDetailsResponse toMealDetailsResponse(Meal meal);
 }

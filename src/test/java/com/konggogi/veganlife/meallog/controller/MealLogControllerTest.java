@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -23,6 +24,8 @@ import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
+import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
+import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
@@ -75,6 +78,23 @@ public class MealLogControllerTest extends RestDocsTest {
                             10,
                             MealDataFixture.MEAL.getWithName(1L, "통밀빵", member).getId()),
                     new MealAddRequest(
+                            100,
+                            100,
+                            10,
+                            10,
+                            10,
+                            MealDataFixture.PROCESSED.getWithName(2L, "통밀크래커", member).getId()));
+
+    List<MealModifyRequest> mealModifyRequests =
+            List.of(
+                    new MealModifyRequest(
+                            100,
+                            100,
+                            10,
+                            10,
+                            10,
+                            MealDataFixture.MEAL.getWithName(1L, "통밀빵", member).getId()),
+                    new MealModifyRequest(
                             100,
                             100,
                             10,
@@ -205,7 +225,7 @@ public class MealLogControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("$.intakeNutrients.carbs").value(30))
                 .andExpect(jsonPath("$.intakeNutrients.protein").value(30))
                 .andExpect(jsonPath("$.intakeNutrients.fat").value(30))
-                .andExpect(jsonPath("$.mealImages.size()").value(3))
+                .andExpect(jsonPath("$.imageUrls.size()").value(3))
                 .andExpect(jsonPath("$.meals.size()").value(3));
 
         perform.andDo(print())
@@ -236,6 +256,80 @@ public class MealLogControllerTest extends RestDocsTest {
                                 "meal-log-get-meal-details-not-found",
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("식사 기록 수정 API")
+    void modifyMealLogTest() throws Exception {
+
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/meal-log/{id}", 1L)
+                                .headers(authorizationHeader())
+                                .content(toJson(mealLogModifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "meal-log-modify",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("id").description("식단 기록 id"))));
+    }
+
+    @Test
+    @DisplayName("식사 기록 수정 API Member Not Found 예외")
+    void modifyMealLogMemberNotFoundTest() throws Exception {
+
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+
+        willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG))
+                .given(mealLogService)
+                .modify(anyLong(), any(MealLogModifyRequest.class));
+
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/meal-log/{id}", 1L)
+                                .headers(authorizationHeader())
+                                .content(toJson(mealLogModifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("meal-log-modify-meal-log-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("식사 기록 수정 API MealData Not Found 예외")
+    void modifyMealLogMealDataNotFoundTest() throws Exception {
+
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+
+        willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA))
+                .given(mealLogService)
+                .modify(anyLong(), any(MealLogModifyRequest.class));
+
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/meal-log/{id}", 1L)
+                                .headers(authorizationHeader())
+                                .content(toJson(mealLogModifyRequest))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("meal-log-modify-meal-data-not-found", getDocumentResponse()));
     }
 
     private MealLogList getMealLogList(long v) {

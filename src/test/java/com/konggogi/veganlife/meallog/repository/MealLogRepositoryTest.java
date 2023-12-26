@@ -16,6 +16,7 @@ import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -119,5 +120,29 @@ public class MealLogRepositoryTest {
         // then
         assertThat(mealLogs.size()).isEqualTo(1);
         assertThat(mealLogs.get(0)).isEqualTo(mealLog1);
+    }
+
+    @Test
+    @DisplayName("MealLog 업데이트 테스트")
+    void mealLogUpdateTest() {
+        // given
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        mealLogRepository.saveAndFlush(mealLog);
+        // when
+        List<Meal> modifiedMeals = new ArrayList<>();
+        modifiedMeals.add(MealFixture.DEFAULT.getWithMealLog(mealLog, mealData.get(0))); // 추가
+        List<MealImage> modifiedMealImages = new ArrayList<>();
+        modifiedMealImages.add(MealImageFixture.DEFAULT.getWithMealLog(mealLog));
+        mealLog.updateMeals(modifiedMeals);
+        mealLog.updateMealImages(modifiedMealImages);
+        mealLogRepository.flush();
+        // then
+        assertThat(mealLog.getMeals().size()).isEqualTo(1);
+        assertThat(mealLog.getMeals().get(0).getMealLog()).isEqualTo(mealLog);
+        assertThat(mealLog.getMealImages().size()).isEqualTo(1);
+        assertThat(mealLog.getMealImages().get(0).getMealLog()).isEqualTo(mealLog);
     }
 }
