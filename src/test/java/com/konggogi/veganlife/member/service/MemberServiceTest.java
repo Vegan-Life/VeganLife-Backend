@@ -17,7 +17,7 @@ import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
-import com.konggogi.veganlife.member.exception.DuplicateNicknameException;
+import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
@@ -109,7 +109,7 @@ class MemberServiceTest {
         given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
         // when, then
         assertThatThrownBy(() -> memberService.modifyMemberInfo(memberId, request))
-                .isInstanceOf(DuplicateNicknameException.class);
+                .isInstanceOf(DuplicatedNicknameException.class);
         then(memberRepository).should().findByNickname(nickname);
         then(memberRepository).should(never()).save(any(Member.class));
     }
@@ -190,7 +190,7 @@ class MemberServiceTest {
                 .willReturn(Optional.of(existingMember));
         // when, then
         assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
-                .isInstanceOf(DuplicateNicknameException.class)
+                .isInstanceOf(DuplicatedNicknameException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
         then(memberRepository).should().findByNickname(anyString());
         then(memberQueryService).should(never()).search(anyLong());

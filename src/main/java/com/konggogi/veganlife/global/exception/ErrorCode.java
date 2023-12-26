@@ -30,7 +30,14 @@ public enum ErrorCode {
     NOT_FOUND_MEAL_DATA("MEAL_DATA_001", "식품 정보를 찾을 수 없습니다."),
 
     // meal-log
-    NOT_FOUND_MEAL_LOG("MEAL_LOG_001", "식사 기록을 찾을 수 없습니다.");
+    NOT_FOUND_MEAL_LOG("MEAL_LOG_001", "식사 기록을 찾을 수 없습니다."),
+  
+    // post
+    NOT_FOUND_POST("POST_001", "게시글을 찾을 수 없습니다."),
+
+    // post-like
+    ALREADY_LIKED("POST_LIKE_001", "좋아요가 되어 있는 게시글입니다."),
+    ALREADY_UNLIKED("POST_LIKE_002", "좋아요가 되어 있지 않은 게시글입니다.");
 
     private final String code;
     private final String description;
