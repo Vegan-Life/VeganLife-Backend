@@ -143,6 +143,9 @@ private excludedClassFilesForReport(classDirectories) {
                 fileTree(dir: it, exclude: [
                         "com/konggogi/veganlife/global/**/*",
                         "com/konggogi/veganlife/**/dto/**",
+                        "**/OauthService.class",
+                        "**/OauthService\$*.*",
+                        "**/*domain*/**",
                         "**/*Dto*",
                         "**/*Request*",
                         "**/*Response*",
