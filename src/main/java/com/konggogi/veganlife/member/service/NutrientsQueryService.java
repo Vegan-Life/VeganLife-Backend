@@ -7,9 +7,8 @@ import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +46,15 @@ public class NutrientsQueryService {
                 .toList();
     }
 
+    public List<CaloriesOfMealType> searchMonthlyIntakeCalories(
+            Long memberId, LocalDate startDate) {
+        memberQueryService.search(memberId);
+        LocalDate endDate = YearMonth.from(startDate).atEndOfMonth();
+        return getStartDatesOfWeeks(startDate, endDate).stream()
+                .map(startDayOfWeek -> calcWeekCalories(memberId, startDayOfWeek))
+                .toList();
+    }
+
     public int calcTotalCalorie(List<CaloriesOfMealType> caloriesOfMealTypes) {
         return caloriesOfMealTypes.parallelStream()
                 .reduce(
@@ -61,16 +69,17 @@ public class NutrientsQueryService {
     }
 
     private List<Meal> findAllMealOfMealLog(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
-        return findMealLog(memberId, startDate, endDate).stream()
+            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return findMealLog(memberId, startDateTime, endDateTime).stream()
                 .map(MealLog::getMeals)
                 .flatMap(Collection::stream)
                 .toList();
     }
 
     private List<MealLog> findMealLog(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
-        return mealLogRepository.findAllByMemberIdAndCreatedAtBetween(memberId, startDate, endDate);
+            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
+                memberId, startDateTime, endDateTime);
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
@@ -117,5 +126,21 @@ public class NutrientsQueryService {
                 .filter(MealType::isSnack)
                 .mapToInt(type -> caloriesByType.getOrDefault(type, 0))
                 .sum();
+    }
+
+    private List<LocalDate> getStartDatesOfWeeks(LocalDate startDate, LocalDate endDate) {
+        LocalDate startDayOfFirstWeek = startDate.with(WeekFields.of(Locale.KOREA).dayOfWeek(), 1);
+        LocalDate lastDayOfLastWeek = endDate.with(WeekFields.of(Locale.KOREA).dayOfWeek(), 7);
+        return startDayOfFirstWeek
+                .datesUntil(lastDayOfLastWeek.plusDays(1), Period.ofWeeks(1))
+                .toList();
+    }
+
+    private CaloriesOfMealType calcWeekCalories(Long memberId, LocalDate startDayOfWeek) {
+        LocalDate endDayOfWeek = startDayOfWeek.plusDays(6);
+        LocalDateTime startDateTime = startDayOfWeek.atStartOfDay();
+        LocalDateTime endDateTime = endDayOfWeek.atTime(LocalTime.MAX);
+        List<MealLog> mealLogs = findMealLog(memberId, startDateTime, endDateTime);
+        return sumCalorieByMealType(mealLogs);
     }
 }
