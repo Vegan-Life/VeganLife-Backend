@@ -98,4 +98,67 @@ class LikeServiceTest {
         then(postQueryService).should().search(anyLong());
         then(postQueryService).should().validatePostLikeIsExist(anyLong(), anyLong());
     }
+
+    @Test
+    @DisplayName("게시글 좋아요 취소")
+    void removePostLikeTest() {
+        // given
+        PostLike postLike = PostLike.builder().post(post).member(member).build();
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(postQueryService.validatePostLikeIsNotExist(anyLong(), anyLong()))
+                .willReturn(postLike);
+        // when
+        likeService.removePostLike(member.getId(), post.getId());
+        // then
+        assertThat(post.getLikes()).doesNotContain(postLike);
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 취소 없는 회원 예외 발생")
+    void removePostLikeNotFoundMemberTest() {
+        // given
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(() -> likeService.removePostLike(member.getId(), post.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should(never()).search(anyLong());
+        then(postQueryService).should(never()).validatePostLikeIsNotExist(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 취소 없는 게시글 예외 발생")
+    void removePostLikeNotFoundPostTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
+        // when, then
+        assertThatThrownBy(() -> likeService.removePostLike(member.getId(), post.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(postQueryService).should(never()).validatePostLikeIsNotExist(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("이미 게시글 좋아요 취소한 경우 예외 발생")
+    void removePostLikeAlreadyTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(postQueryService.validatePostLikeIsNotExist(anyLong(), anyLong()))
+                .willThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED));
+        // when, then
+        assertThatThrownBy(() -> likeService.removePostLike(member.getId(), post.getId()))
+                .isInstanceOf(IllegalLikeStatusException.class)
+                .hasMessageContaining(ErrorCode.ALREADY_UNLIKED.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(postQueryService).should().validatePostLikeIsNotExist(anyLong(), anyLong());
+    }
 }
