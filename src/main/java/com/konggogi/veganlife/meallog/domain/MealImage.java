@@ -35,8 +35,4 @@ public class MealImage {
         this.imageUrl = imageUrl;
         this.mealLog = mealLog;
     }
-
-    public void setMealLog(MealLog mealLog) {
-        this.mealLog = mealLog;
-    }
 }
