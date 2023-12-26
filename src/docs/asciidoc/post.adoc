@@ -50,7 +50,7 @@ include::{snippets}/add-post-like/http-request.adoc[]
 
 === Response
 
-==== 200 OK
+==== 201 CREATED
 
 include::{snippets}/add-post-like/http-response.adoc[]
 
@@ -63,3 +63,35 @@ include::{snippets}/add-post-like-not-found-post/http-response.adoc[]
 ==== 409 CONFLICT
 
 include::{snippets}/add-post-like-already/http-response.adoc[]
+
+== 피드 좋아요 취소 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/remove-post-like/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/remove-post-like/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/remove-post-like/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+
+include::{snippets}/remove-post-like/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/remove-post-like-not-found-member/http-response.adoc[]
+
+include::{snippets}/remove-post-like-not-found-post/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/remove-post-like-already/http-response.adoc[]
