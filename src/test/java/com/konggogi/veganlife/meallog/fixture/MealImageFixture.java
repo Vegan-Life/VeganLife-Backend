@@ -2,6 +2,7 @@ package com.konggogi.veganlife.meallog.fixture;
 
 
 import com.konggogi.veganlife.meallog.domain.MealImage;
+import com.konggogi.veganlife.meallog.domain.MealLog;
 
 public enum MealImageFixture {
     DEFAULT("default.png");
@@ -26,5 +27,9 @@ public enum MealImageFixture {
 
     public MealImage getWithImageUrl(Long id, String imageUrl) {
         return MealImage.builder().imageUrl(imageUrl).build();
+    }
+
+    public MealImage getWithMealLog(MealLog mealLog) {
+        return MealImage.builder().imageUrl(imageUrl).mealLog(mealLog).build();
     }
 }
