@@ -110,28 +110,13 @@ jacocoTestReport {
         xml.required  = false
         csv.required  = false
     }
-    afterEvaluate {
-        classDirectories.setFrom(
-                files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                            "com/konggogi/veganlife/global/**/*",
-                            "com/konggogi/veganlife/**/dto/**",
-                            "**/*Dto*",
-                            "**/*Request*",
-                            "**/*Response*",
-                            "**/*Interceptor*",
-                            "**/*Application*",
-                            "**/*Mapper*",
-                            "**/*Exception*"
-                    ])
-                })
-        )
-    }
+    excludedClassFilesForReport(classDirectories)
     dependsOn test
     finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
+    excludedClassFilesForReport(classDirectories)
     violationRules {
         rule {
             element = 'CLASS'
@@ -150,4 +135,22 @@ jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+private excludedClassFilesForReport(classDirectories) {
+    classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "com/konggogi/veganlife/global/**/*",
+                        "com/konggogi/veganlife/**/dto/**",
+                        "**/*Dto*",
+                        "**/*Request*",
+                        "**/*Response*",
+                        "**/*Interceptor*",
+                        "**/*Application*",
+                        "**/*Mapper*",
+                        "**/*Exception*"
+                ])
+            })
+    )
 }
