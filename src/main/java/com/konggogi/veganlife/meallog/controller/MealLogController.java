@@ -57,7 +57,7 @@ public class MealLogController {
     public ResponseEntity<MealLogDetailsResponse> getMealLogDetails(@PathVariable Long id) {
 
         return ResponseEntity.ok(
-                mealLogMapper.toMealLogDetailsResponse(mealLogQueryService.search(id)));
+                mealLogMapper.toMealLogDetailsResponse(mealLogQueryService.searchById(id)));
     }
 
     @PutMapping("/{id}")

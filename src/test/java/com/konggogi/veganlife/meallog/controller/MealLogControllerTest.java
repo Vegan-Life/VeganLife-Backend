@@ -37,15 +37,10 @@ import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.meallog.service.dto.MealLogDetails;
-import com.konggogi.veganlife.meallog.service.dto.MealLogList;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
@@ -64,9 +59,9 @@ public class MealLogControllerTest extends RestDocsTest {
     Member member = Member.builder().id(1L).email("test123@test.com").build();
     List<MealData> mealData =
             List.of(
-                    MealDataFixture.MEAL.get(member),
-                    MealDataFixture.PROCESSED.get(member),
-                    MealDataFixture.MEAL.get(member));
+                    MealDataFixture.MEAL.get(1L, member),
+                    MealDataFixture.PROCESSED.get(2L, member),
+                    MealDataFixture.MEAL.get(3L, member));
 
     List<MealAddRequest> mealAddRequests =
             List.of(
@@ -182,7 +177,14 @@ public class MealLogControllerTest extends RestDocsTest {
     void getMealLogListTest() throws Exception {
 
         LocalDate date = LocalDate.of(2023, 12, 22);
-        List<MealLogList> mealLogs = IntStream.of(0, 3, 6).mapToObj(this::getMealLogList).toList();
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
+        List<MealLog> mealLogs =
+                List.of(
+                        MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member),
+                        MealLogFixture.LUNCH.get(2L, meals, mealImages, member),
+                        MealLogFixture.DINNER_SNACK.get(3L, meals, mealImages, member));
 
         given(mealLogQueryService.searchByDate(date, member.getId())).willReturn(mealLogs);
 
@@ -194,8 +196,8 @@ public class MealLogControllerTest extends RestDocsTest {
 
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[1].id").value(4))
-                .andExpect(jsonPath("$[2].id").value(7));
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[2].id").value(3));
 
         perform.andDo(print())
                 .andDo(
@@ -211,9 +213,12 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 상세 조회 API")
     void getMealLogDetailsTest() throws Exception {
 
-        MealLogDetails mealLogDetails = getMealLogDetails();
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member);
 
-        given(mealLogQueryService.search(1L)).willReturn(mealLogDetails);
+        given(mealLogQueryService.searchById(1L)).willReturn(mealLog);
 
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/meal-log/{id}", 1L).headers(authorizationHeader()));
@@ -221,10 +226,10 @@ public class MealLogControllerTest extends RestDocsTest {
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.mealType").value(MealType.BREAKFAST.name()))
-                .andExpect(jsonPath("$.intakeNutrients.calorie").value(300))
-                .andExpect(jsonPath("$.intakeNutrients.carbs").value(30))
-                .andExpect(jsonPath("$.intakeNutrients.protein").value(30))
-                .andExpect(jsonPath("$.intakeNutrients.fat").value(30))
+                .andExpect(jsonPath("$.totalIntakeNutrients.calorie").value(300))
+                .andExpect(jsonPath("$.totalIntakeNutrients.carbs").value(30))
+                .andExpect(jsonPath("$.totalIntakeNutrients.protein").value(30))
+                .andExpect(jsonPath("$.totalIntakeNutrients.fat").value(30))
                 .andExpect(jsonPath("$.imageUrls.size()").value(3))
                 .andExpect(jsonPath("$.meals.size()").value(3));
 
@@ -242,7 +247,7 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 상세 조회 API - MealLog Not Found")
     void getMealLogDetailsNotFoundTest() throws Exception {
 
-        given(mealLogQueryService.search(1L))
+        given(mealLogQueryService.searchById(1L))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
 
         ResultActions perform =
@@ -330,43 +335,5 @@ public class MealLogControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("meal-log-modify-meal-data-not-found", getDocumentResponse()));
-    }
-
-    private MealLogList getMealLogList(long v) {
-        List<Meal> meals =
-                LongStream.range(v, v + 3)
-                        .mapToObj(
-                                idx ->
-                                        MealFixture.DEFAULT.get(
-                                                idx + 1, mealData.get((int) idx % 3)))
-                        .toList();
-        List<MealImage> mealImages =
-                LongStream.range(v, v + 3)
-                        .mapToObj(idx -> MealImageFixture.DEFAULT.get(idx + 1))
-                        .toList();
-        MealLog mealLog =
-                MealLogFixture.BREAKFAST.getWithDate(
-                        v + 1, LocalDate.of(2022, 12, 22), meals, mealImages, member);
-        return new MealLogList(mealLog, "image" + (v + 1) + ".png", 300);
-    }
-
-    private MealLogDetails getMealLogDetails() {
-        List<Meal> meals =
-                List.of(
-                        MealFixture.DEFAULT.get(1L, mealData.get(0)),
-                        MealFixture.DEFAULT.get(2L, mealData.get(1)),
-                        MealFixture.DEFAULT.get(3L, mealData.get(2)));
-        IntakeNutrients intakeNutrients =
-                new IntakeNutrients(
-                        meals.stream().mapToInt(Meal::getCalorie).sum(),
-                        meals.stream().mapToInt(Meal::getCarbs).sum(),
-                        meals.stream().mapToInt(Meal::getProtein).sum(),
-                        meals.stream().mapToInt(Meal::getFat).sum());
-        List<MealImage> mealImages =
-                LongStream.range(1, 4).mapToObj(MealImageFixture.DEFAULT::get).toList();
-        MealLog mealLog =
-                MealLogFixture.BREAKFAST.getWithDate(
-                        1L, LocalDate.of(2023, 12, 22), meals, mealImages, member);
-        return new MealLogDetails(mealLog, intakeNutrients, mealImages, meals);
     }
 }

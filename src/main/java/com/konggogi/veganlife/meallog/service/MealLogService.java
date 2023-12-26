@@ -1,8 +1,6 @@
 package com.konggogi.veganlife.meallog.service;
 
 
-import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
@@ -28,7 +26,10 @@ public class MealLogService {
 
     private final MemberQueryService memberQueryService;
     private final MealDataQueryService mealDataQueryService;
+
+    private final MealLogQueryService mealLogQueryService;
     private final MealLogRepository mealLogRepository;
+
     private final MealLogMapper mealLogMapper;
     private final MealMapper mealMapper;
     private final MealImageMapper mealImageMapper;
@@ -44,11 +45,7 @@ public class MealLogService {
 
     public void modify(Long mealLogId, MealLogModifyRequest request) {
 
-        MealLog mealLog =
-                mealLogRepository
-                        .findById(mealLogId)
-                        .orElseThrow(
-                                () -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
+        MealLog mealLog = mealLogQueryService.searchById(mealLogId);
         modifyMeals(request.meals(), mealLog);
         modifyMealImages(request.imageUrls(), mealLog);
     }

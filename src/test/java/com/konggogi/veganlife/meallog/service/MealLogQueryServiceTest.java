@@ -15,11 +15,8 @@ import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
-import com.konggogi.veganlife.meallog.service.dto.MealLogDetails;
-import com.konggogi.veganlife.meallog.service.dto.MealLogList;
 import com.konggogi.veganlife.member.domain.Member;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -45,7 +42,7 @@ public class MealLogQueryServiceTest {
                     MealDataFixture.MEAL.get(3L, member));
 
     @Test
-    @DisplayName("해당 날짜의 MealLog 목록 조회 - 이미지가 있는 경우")
+    @DisplayName("해당 날짜의 MealLog 목록 조회")
     void searchByDateTest() {
 
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
@@ -54,39 +51,12 @@ public class MealLogQueryServiceTest {
         LocalDate date = LocalDate.of(2023, 12, 22);
         List<MealLog> mealLogs =
                 List.of(MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member));
-        String expectedThumbnailUrl = mealLogs.get(0).getMealImages().get(0).getImageUrl();
-        int expectedTotalCalorie =
-                mealLogs.get(0).getMeals().stream().mapToInt(Meal::getCalorie).sum();
         given(mealLogRepository.findAllByDate(date, member.getId())).willReturn(mealLogs);
 
-        List<MealLogList> mealLogList = mealLogQueryService.searchByDate(date, member.getId());
+        List<MealLog> found = mealLogQueryService.searchByDate(date, member.getId());
 
-        assertThat(mealLogList.size()).isEqualTo(1);
-        assertThat(mealLogList.get(0).mealLog()).isEqualTo(mealLogs.get(0));
-        assertThat(mealLogList.get(0).thumbnailUrl()).isEqualTo(expectedThumbnailUrl);
-        assertThat(mealLogList.get(0).totalCalorie()).isEqualTo(expectedTotalCalorie);
-    }
-
-    @Test
-    @DisplayName("해당 날짜의 MealLog 목록 조회 - 이미지가 없는 경우")
-    void searchByDateWithoutImageTest() {
-
-        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        LocalDate date = LocalDate.of(2023, 12, 22);
-        List<MealLog> mealLogs =
-                List.of(
-                        MealLogFixture.BREAKFAST.getWithDate(
-                                date, meals, new ArrayList<>(), member));
-        int expectedTotalCalorie =
-                mealLogs.get(0).getMeals().stream().mapToInt(Meal::getCalorie).sum();
-        given(mealLogRepository.findAllByDate(date, member.getId())).willReturn(mealLogs);
-
-        List<MealLogList> mealLogList = mealLogQueryService.searchByDate(date, member.getId());
-
-        assertThat(mealLogList.size()).isEqualTo(1);
-        assertThat(mealLogList.get(0).mealLog()).isEqualTo(mealLogs.get(0));
-        assertThat(mealLogList.get(0).thumbnailUrl()).isEqualTo(null);
-        assertThat(mealLogList.get(0).totalCalorie()).isEqualTo(expectedTotalCalorie);
+        assertThat(found.size()).isEqualTo(1);
+        assertThat(found.get(0)).isEqualTo(mealLogs.get(0));
     }
 
     @Test
@@ -104,15 +74,11 @@ public class MealLogQueryServiceTest {
 
         given(mealLogRepository.findById(1L)).willReturn(Optional.ofNullable(mealLog));
 
-        MealLogDetails mealLogDetails = mealLogQueryService.search(1L);
+        MealLog found = mealLogQueryService.searchById(1L);
 
-        assertThat(mealLogDetails.mealLog()).isEqualTo(mealLog);
-        assertThat(mealLogDetails.meals().size()).isEqualTo(3);
-        assertThat(mealLogDetails.mealImages().size()).isEqualTo(3);
-        assertThat(mealLogDetails.intakeNutrients().calorie()).isEqualTo(300);
-        assertThat(mealLogDetails.intakeNutrients().carbs()).isEqualTo(30);
-        assertThat(mealLogDetails.intakeNutrients().protein()).isEqualTo(30);
-        assertThat(mealLogDetails.intakeNutrients().fat()).isEqualTo(30);
+        assertThat(found).isEqualTo(mealLog);
+        assertThat(found.getMeals().size()).isEqualTo(3);
+        assertThat(found.getMealImages().size()).isEqualTo(3);
     }
 
     @Test
@@ -121,7 +87,7 @@ public class MealLogQueryServiceTest {
 
         given(mealLogRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mealLogQueryService.search(1L))
+        assertThatThrownBy(() -> mealLogQueryService.searchById(1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_MEAL_LOG.getDescription());
     }
