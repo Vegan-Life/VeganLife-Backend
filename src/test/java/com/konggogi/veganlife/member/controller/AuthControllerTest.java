@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
@@ -57,8 +56,7 @@ class AuthControllerTest extends RestDocsTest {
     void reissueTokenInvalidTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken))
-                .willThrow(new InvalidJwtException(ErrorCode.INVALID_TOKEN));
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.empty());
         // when
         ResultActions perform =
                 mockMvc.perform(
