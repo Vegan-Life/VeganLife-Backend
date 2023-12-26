@@ -6,8 +6,8 @@ import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.util.List;
 
 public record MealLogDetailsResponse(
-        Long mealLogId,
+        Long id,
         MealType mealType,
         IntakeNutrients intakeNutrients,
-        List<String> imageUrls,
+        List<MealImageDetailsResponse> mealImages,
         List<MealDetailsResponse> meals) {}

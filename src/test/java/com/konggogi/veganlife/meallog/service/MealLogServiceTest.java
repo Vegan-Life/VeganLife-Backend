@@ -5,7 +5,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
@@ -50,10 +49,7 @@ public class MealLogServiceTest {
                     MealDataFixture.MEAL.get(3L, member));
     List<MealAddRequest> mealAddRequests =
             mealData.stream()
-                    .map(
-                            m ->
-                                    new MealAddRequest(
-                                            "테스트", 100, IntakeUnit.G, 100, 10, 10, 10, m.getId()))
+                    .map(m -> new MealAddRequest(100, 100, 10, 10, 10, m.getId()))
                     .toList();
 
     List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");

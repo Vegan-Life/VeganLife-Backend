@@ -13,12 +13,7 @@ public interface MealMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "mealLog", ignore = true)
-    @Mapping(source = "mealAddRequest.name", target = "name")
-    @Mapping(source = "mealAddRequest.intakeUnit", target = "intakeUnit")
     Meal toEntity(MealAddRequest mealAddRequest, MealData mealData);
 
-    @Mapping(source = "meal.mealData.type", target = "mealDataType")
-    @Mapping(source = "meal.mealData.amount", target = "amount")
-    @Mapping(source = "meal.mealData.amountPerServe", target = "amountPerServe")
     MealDetailsResponse toMealDetailsResponse(Meal meal);
 }

@@ -2,12 +2,9 @@ package com.konggogi.veganlife.meallog.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,14 +27,7 @@ public class Meal extends TimeStamped {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
     private Integer intake;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private IntakeUnit intakeUnit;
 
     @Column(nullable = false)
     private Integer calorie;
@@ -62,9 +52,7 @@ public class Meal extends TimeStamped {
     @Builder
     public Meal(
             Long id,
-            String name,
             Integer intake,
-            IntakeUnit intakeUnit,
             Integer calorie,
             Integer carbs,
             Integer protein,
@@ -72,9 +60,7 @@ public class Meal extends TimeStamped {
             MealLog mealLog,
             MealData mealData) {
         this.id = id;
-        this.name = name;
         this.intake = intake;
-        this.intakeUnit = intakeUnit;
         this.calorie = calorie;
         this.carbs = carbs;
         this.protein = protein;

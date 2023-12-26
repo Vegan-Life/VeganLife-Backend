@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
@@ -69,18 +68,14 @@ public class MealLogControllerTest extends RestDocsTest {
     List<MealAddRequest> mealAddRequests =
             List.of(
                     new MealAddRequest(
-                            "통밀빵",
                             100,
-                            IntakeUnit.G,
                             100,
                             10,
                             10,
                             10,
                             MealDataFixture.MEAL.getWithName(1L, "통밀빵", member).getId()),
                     new MealAddRequest(
-                            "통밀크래커",
                             100,
-                            IntakeUnit.G,
                             100,
                             10,
                             10,
@@ -204,13 +199,13 @@ public class MealLogControllerTest extends RestDocsTest {
                 mockMvc.perform(get("/api/v1/meal-log/{id}", 1L).headers(authorizationHeader()));
 
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.mealLogId").value(1))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.mealType").value(MealType.BREAKFAST.name()))
                 .andExpect(jsonPath("$.intakeNutrients.calorie").value(300))
                 .andExpect(jsonPath("$.intakeNutrients.carbs").value(30))
                 .andExpect(jsonPath("$.intakeNutrients.protein").value(30))
                 .andExpect(jsonPath("$.intakeNutrients.fat").value(30))
-                .andExpect(jsonPath("$.imageUrls.size()").value(3))
+                .andExpect(jsonPath("$.mealImages.size()").value(3))
                 .andExpect(jsonPath("$.meals.size()").value(3));
 
         perform.andDo(print())

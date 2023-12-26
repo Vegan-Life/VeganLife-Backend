@@ -1,13 +1,6 @@
 package com.konggogi.veganlife.meallog.controller.dto.response;
 
 
-import com.konggogi.veganlife.mealdata.domain.MealDataType;
-import lombok.Builder;
+import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 
-@Builder
-public record MealDetailsResponse(
-        String name,
-        Integer intake,
-        MealDataType mealDataType,
-        Integer amount,
-        Integer amountPerServe) {}
+public record MealDetailsResponse(Long id, Integer intake, MealDataDetailsResponse mealData) {}
