@@ -89,4 +89,16 @@ public class MemberController {
         return ResponseEntity.ok(
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
     }
+
+    @GetMapping("/nutrients/month")
+    public ResponseEntity<CalorieIntakeResponse> getMonthlyIntakeCalorie(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
+                    LocalDate startDate) {
+        List<CaloriesOfMealType> mealCalories =
+                nutrientsQueryService.searchMonthlyIntakeCalories(userDetails.id(), startDate);
+        int totalCalorie = nutrientsQueryService.calcTotalCalorie(mealCalories);
+        return ResponseEntity.ok(
+                nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
+    }
 }

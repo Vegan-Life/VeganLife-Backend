@@ -22,9 +22,7 @@ import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
@@ -152,6 +150,47 @@ class NutrientsQueryServiceTest {
         int totalCalorie = nutrientsQueryService.calcTotalCalorie(caloriesOfMealTypes);
         // then
         assertThat(totalCalorie).isEqualTo(expectedCalorie);
+    }
+
+    @Test
+    @DisplayName("월간 섭취량 조회")
+    void searchMonthlyIntakeCaloriesTest() {
+        // given
+        Long memberId = member.getId();
+        Meal meal = meals.get(0);
+        List<MealLog> mealLogs = createMealLogs(LocalDate.now());
+        given(memberQueryService.search(memberId)).willReturn(member);
+        given(
+                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .willReturn(mealLogs);
+        // when
+        List<CaloriesOfMealType> caloriesOfMealTypes =
+                nutrientsQueryService.searchMonthlyIntakeCalories(
+                        memberId, LocalDate.of(2023, 12, 1));
+        // then
+        assertThat(caloriesOfMealTypes.get(0).breakfast())
+                .isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).lunch()).isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).dinner()).isEqualTo(meal.getCalorie() * meals.size());
+        assertThat(caloriesOfMealTypes.get(0).snack())
+                .isEqualTo(meal.getCalorie() * meals.size() * 3);
+    }
+
+    @Test
+    @DisplayName("월간 섭취량 조회 시 없는 회원 예외 발생")
+    void searchMonthlyIntakeCaloriesNotMemberTest() {
+        // given
+        Long memberId = member.getId();
+        given(memberQueryService.search(memberId))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                nutrientsQueryService.searchMonthlyIntakeCalories(
+                                        memberId, LocalDate.now()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
 
     private List<MealLog> createMealLogs(LocalDate date) {
