@@ -52,13 +52,21 @@ public class MealLog extends TimeStamped {
         this.member = member;
     }
 
-    public void addMeal(Meal meal) {
-        meals.add(meal);
-        meal.setMealLog(this);
+    public void addMeals(List<Meal> meals) {
+        this.meals.addAll(meals);
     }
 
-    public void addMealImage(MealImage mealImage) {
-        mealImages.add(mealImage);
-        mealImage.setMealLog(this);
+    public void addMealImages(List<MealImage> mealImages) {
+        this.mealImages.addAll(mealImages);
+    }
+
+    public void updateMeals(List<Meal> meals) {
+        this.meals.clear();
+        this.meals.addAll(meals);
+    }
+
+    public void updateMealImages(List<MealImage> mealImages) {
+        this.mealImages.clear();
+        this.mealImages.addAll(mealImages);
     }
 }
