@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
@@ -130,5 +131,26 @@ class AuthControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("reissue-token-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("accessToken 재발급 API - 토큰에서 이메일 추출 실패 예외 발생")
+    void reissueTokenExtractEmailTest() throws Exception {
+        // given
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
+        given(memberQueryService.reissueToken(refreshToken))
+                .willThrow(new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/auth/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isUnauthorized());
+
+        perform.andDo(print())
+                .andDo(document("reissue-token-not-found-user-info", getDocumentResponse()));
     }
 }
