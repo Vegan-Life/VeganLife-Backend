@@ -5,12 +5,13 @@ import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
+import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,13 +34,13 @@ public class MealDataController {
     private final MealDataMapper mealDataMapper;
 
     @GetMapping
-    public ResponseEntity<List<MealDataListResponse>> getMealDataList(
-            String keyword, Pageable pageable) {
+    public ResponseEntity<Page<MealDataListResponse>> getMealDataList(
+            String keyword, @RequestParam OwnerType ownerType, Pageable pageable) {
 
         return ResponseEntity.ok(
-                mealDataQueryService.searchByKeyword(keyword, pageable).stream()
-                        .map(mealDataMapper::toMealDataListResponse)
-                        .toList());
+                mealDataQueryService
+                        .searchByKeyword(keyword, ownerType, pageable)
+                        .map(mealDataMapper::toMealDataListResponse));
     }
 
     @GetMapping("/{id}")
