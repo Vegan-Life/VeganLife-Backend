@@ -6,9 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -18,10 +20,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
+import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
+import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.util.Comparator;
@@ -33,12 +38,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(MealDataController.class)
 public class MealDataControllerTest extends RestDocsTest {
 
     @MockBean MealDataQueryService mealDataQueryService;
+    @MockBean MealDataService mealDataService;
     @Autowired MealDataMapper mealDataMapper;
 
     Member member = Member.builder().email("test123@test.com").build();
@@ -133,5 +140,50 @@ public class MealDataControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("meal-data-details-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("식품 데이터 등록 API")
+    void addMealDataTest() throws Exception {
+        MealDataAddRequest request =
+                new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, IntakeUnit.G);
+
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/meal-data")
+                                .headers(authorizationHeader())
+                                .content(toJson(request))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(
+                document(
+                        "meal-data-add",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("식품 데이터 등록 API - Member Not Found 예외")
+    void addMealDataTestMemberNotFoundExceptionTest() throws Exception {
+        MealDataAddRequest request =
+                new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, IntakeUnit.G);
+
+        willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .given(mealDataService)
+                .add(any(MealDataAddRequest.class), anyLong());
+
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/meal-data")
+                                .headers(authorizationHeader())
+                                .content(toJson(request))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(document("meal-data-add-member-not-found", getDocumentResponse()));
     }
 }

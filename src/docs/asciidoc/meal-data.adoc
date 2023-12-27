@@ -10,6 +10,26 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
+== 식품 데이터 등록 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-data-add/request-headers.adoc[]
+
+include::{snippets}/meal-data-add/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+
+include::{snippets}/meal-data-add/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/meal-data-add-member-not-found/http-response.adoc[]
+
 == 키워드 기반 식품 데이터 목록 검색 API
 
 === Request
