@@ -92,4 +92,17 @@ public class MealData extends TimeStamped {
         this.ownerType = ownerType;
         this.member = member;
     }
+
+    public void setNutrientsPerUnit(Integer calorie, Integer carbs, Integer protein, Integer fat) {
+
+        caloriePerUnit = calculateNutrientsPerUnit(calorie);
+        carbsPerUnit = calculateNutrientsPerUnit(carbs);
+        proteinPerUnit = calculateNutrientsPerUnit(protein);
+        fatPerUnit = calculateNutrientsPerUnit(fat);
+    }
+
+    private Double calculateNutrientsPerUnit(Integer nutrients) {
+
+        return (double) nutrients / amountPerServe;
+    }
 }
