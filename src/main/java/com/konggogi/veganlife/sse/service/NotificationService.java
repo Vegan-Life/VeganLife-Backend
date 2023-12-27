@@ -51,7 +51,6 @@ public class NotificationService {
                                 emitter.send(createSseEvent(memberId, data));
                             } catch (IOException exception) {
                                 emitterRepository.deleteById(memberId);
-                                // TODO 에러 핸들링
                                 throw new SseConnectionException(ErrorCode.SSE_CONNECTION_ERROR);
                             }
                         });
