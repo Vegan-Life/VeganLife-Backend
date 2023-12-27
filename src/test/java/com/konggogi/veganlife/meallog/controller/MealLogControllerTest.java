@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -277,7 +278,7 @@ public class MealLogControllerTest extends RestDocsTest {
                                 .content(toJson(mealLogModifyRequest))
                                 .contentType(MediaType.APPLICATION_JSON));
 
-        perform.andExpect(status().isNoContent());
+        perform.andExpect(status().isCreated());
 
         perform.andDo(print())
                 .andDo(
@@ -335,5 +336,24 @@ public class MealLogControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("meal-log-modify-meal-data-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("식사 기록 삭제 API")
+    void removeMealLogTest() throws Exception {
+
+        ResultActions perform =
+                mockMvc.perform(delete("/api/v1/meal-log/{id}", 1L).headers(authorizationHeader()));
+
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "meal-log-delete",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("id").description("식단 기록 id"))));
     }
 }
