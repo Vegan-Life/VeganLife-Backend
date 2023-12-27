@@ -23,21 +23,22 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
 import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
+import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -55,16 +56,17 @@ public class MealDataControllerTest extends RestDocsTest {
     void getMealDataListTest() throws Exception {
 
         // given
-        List<MealData> result =
-                Map.of(1L, "통밀빵", 2L, "통밀크래커").entrySet().stream()
-                        .map(
-                                e ->
-                                        MealDataFixture.MEAL.getWithName(
-                                                e.getKey(), e.getValue(), member))
-                        .sorted(Comparator.comparing(MealData::getName))
-                        .toList();
+        Pageable pageable = Pageable.ofSize(20);
+        List<MealData> mealDataList =
+                List.of(
+                        MealDataFixture.TOTAL_AMOUNT.getWithName(1L, "통밀빵", member),
+                        MealDataFixture.TOTAL_AMOUNT.getWithName(2L, "통밀크래커", member));
+        Page<MealData> result =
+                PageableExecutionUtils.getPage(mealDataList, pageable, mealDataList::size);
 
-        given(mealDataQueryService.searchByKeyword(anyString(), any(Pageable.class)))
+        given(
+                        mealDataQueryService.searchByKeyword(
+                                anyString(), any(OwnerType.class), any(Pageable.class)))
                 .willReturn(result);
         // when
         ResultActions perform =
@@ -72,13 +74,16 @@ public class MealDataControllerTest extends RestDocsTest {
                         get("/api/v1/meal-data")
                                 .headers(authorizationHeader())
                                 .queryParam("keyword", "통")
+                                .queryParam("ownerType", "ALL")
                                 .queryParam("page", "0")
-                                .queryParam("size", "12"));
+                                .queryParam("size", "20"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("통밀빵"))
-                .andExpect(jsonPath("$[1].name").value("통밀크래커"))
-                .andExpect(jsonPath("$.size()").value(2));
+                .andExpect(jsonPath("$.content[0].name").value("통밀빵"))
+                .andExpect(jsonPath("$.content[1].name").value("통밀크래커"))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.pageable.pageSize").value(20));
 
         perform.andDo(print())
                 .andDo(
@@ -89,6 +94,9 @@ public class MealDataControllerTest extends RestDocsTest {
                                 requestHeaders(authorizationDesc()),
                                 queryParameters(
                                         parameterWithName("keyword").description("검색을 위한 키워드"),
+                                        parameterWithName("ownerType")
+                                                .description(
+                                                        "ALL: 데이터셋 데이터 검색, MEMBER: 사용자 추가 데이터 검색"),
                                         pageDesc(),
                                         sizeDesc())));
     }
@@ -97,7 +105,7 @@ public class MealDataControllerTest extends RestDocsTest {
     @DisplayName("ID 기반 식품 데이터 상세 조회 API")
     void getMealDataDetailsTest() throws Exception {
         // given
-        MealData result = MealDataFixture.MEAL.get(1L, member);
+        MealData result = MealDataFixture.TOTAL_AMOUNT.get(1L, member);
         given(mealDataQueryService.search(anyLong())).willReturn(result);
         // when
         ResultActions perform =
