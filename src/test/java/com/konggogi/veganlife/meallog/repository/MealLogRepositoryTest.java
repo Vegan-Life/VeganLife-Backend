@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class MealLogRepositoryTest {
 
     @Autowired MealLogRepository mealLogRepository;
+    @Autowired MealRepository mealRepository;
+    @Autowired MealImageRepository mealImageRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired MealDataRepository mealDataRepository;
 
@@ -123,7 +126,7 @@ public class MealLogRepositoryTest {
     }
 
     @Test
-    @DisplayName("MealLog 업데이트 테스트")
+    @DisplayName("MealLog 수정 테스트 - 연관된 자식 엔티티를 삭제하고 새로 삽입한다")
     void mealLogUpdateTest() {
         // given
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
@@ -144,5 +147,28 @@ public class MealLogRepositoryTest {
         assertThat(mealLog.getMeals().get(0).getMealLog()).isEqualTo(mealLog);
         assertThat(mealLog.getMealImages().size()).isEqualTo(1);
         assertThat(mealLog.getMealImages().get(0).getMealLog()).isEqualTo(mealLog);
+    }
+
+    @Test
+    @DisplayName("MealLog 삭제 테스트 - 연관된 자식 엔티티도 같이 삭제된다")
+    void mealLogDeleteTest() {
+        // given
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        mealLogRepository.saveAndFlush(mealLog);
+        // when
+        mealLogRepository.deleteById(mealLog.getId());
+        mealLogRepository.flush();
+        // then
+        Optional<MealLog> found = mealLogRepository.findById(mealLog.getId());
+        List<Optional<Meal>> foundMeals =
+                meals.stream().map(m -> mealRepository.findById(m.getId())).toList();
+        List<Optional<MealImage>> foundMealImages =
+                mealImages.stream().map(m -> mealImageRepository.findById(m.getId())).toList();
+        assertThat(found).isEmpty();
+        assertThat(foundMeals.stream().allMatch(Optional::isEmpty)).isEqualTo(true);
+        assertThat(foundMealImages.stream().allMatch(Optional::isEmpty)).isEqualTo(true);
     }
 }

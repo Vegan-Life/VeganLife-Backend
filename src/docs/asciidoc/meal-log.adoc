@@ -47,7 +47,7 @@ include::{snippets}/meal-log-modify/http-request.adoc[]
 
 === Response
 
-==== 204 NO CONTENT
+==== 201 CREATED
 include::{snippets}/meal-log-modify/http-response.adoc[]
 
 ==== 404 NOT FOUND
@@ -55,6 +55,25 @@ include::{snippets}/meal-log-modify-meal-log-not-found/http-response.adoc[]
 
 ==== 404 NOT FOUND
 include::{snippets}/meal-log-modify-meal-data-not-found/http-response.adoc[]
+
+== 식사 기록 삭제 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-log-modify/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/meal-log-delete/path-parameters.adoc[]
+
+include::{snippets}/meal-log-delete/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+include::{snippets}/meal-log-delete/http-response.adoc[]
 
 == 식사 기록 목록 조회 API
 
