@@ -50,6 +50,11 @@ public class MealLogService {
         modifyMealImages(request.imageUrls(), mealLog);
     }
 
+    public void remove(Long mealLogId) {
+
+        mealLogRepository.deleteById(mealLogId);
+    }
+
     private void addMeals(List<MealAddRequest> requests, MealLog mealLog) {
         List<Meal> meals =
                 requests.stream()
