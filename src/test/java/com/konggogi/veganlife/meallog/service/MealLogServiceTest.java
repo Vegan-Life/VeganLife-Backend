@@ -53,9 +53,9 @@ public class MealLogServiceTest {
     Member member = Member.builder().id(1L).email("test123@test.com").build();
     List<MealData> mealData =
             List.of(
-                    MealDataFixture.MEAL.get(1L, member),
-                    MealDataFixture.MEAL.get(2L, member),
-                    MealDataFixture.MEAL.get(3L, member));
+                    MealDataFixture.TOTAL_AMOUNT.get(1L, member),
+                    MealDataFixture.TOTAL_AMOUNT.get(2L, member),
+                    MealDataFixture.TOTAL_AMOUNT.get(3L, member));
     List<MealAddRequest> mealAddRequests =
             mealData.stream()
                     .map(m -> new MealAddRequest(100, 100, 10, 10, 10, m.getId()))

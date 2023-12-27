@@ -60,9 +60,9 @@ public class MealLogControllerTest extends RestDocsTest {
     Member member = Member.builder().id(1L).email("test123@test.com").build();
     List<MealData> mealData =
             List.of(
-                    MealDataFixture.MEAL.get(1L, member),
-                    MealDataFixture.PROCESSED.get(2L, member),
-                    MealDataFixture.MEAL.get(3L, member));
+                    MealDataFixture.TOTAL_AMOUNT.get(1L, member),
+                    MealDataFixture.AMOUNT_PER_SERVE.get(2L, member),
+                    MealDataFixture.TOTAL_AMOUNT.get(3L, member));
 
     List<MealAddRequest> mealAddRequests =
             List.of(
@@ -72,14 +72,16 @@ public class MealLogControllerTest extends RestDocsTest {
                             10,
                             10,
                             10,
-                            MealDataFixture.MEAL.getWithName(1L, "통밀빵", member).getId()),
+                            MealDataFixture.TOTAL_AMOUNT.getWithName(1L, "통밀빵", member).getId()),
                     new MealAddRequest(
                             100,
                             100,
                             10,
                             10,
                             10,
-                            MealDataFixture.PROCESSED.getWithName(2L, "통밀크래커", member).getId()));
+                            MealDataFixture.AMOUNT_PER_SERVE
+                                    .getWithName(2L, "통밀크래커", member)
+                                    .getId()));
 
     List<MealModifyRequest> mealModifyRequests =
             List.of(
@@ -89,14 +91,16 @@ public class MealLogControllerTest extends RestDocsTest {
                             10,
                             10,
                             10,
-                            MealDataFixture.MEAL.getWithName(1L, "통밀빵", member).getId()),
+                            MealDataFixture.TOTAL_AMOUNT.getWithName(1L, "통밀빵", member).getId()),
                     new MealModifyRequest(
                             100,
                             100,
                             10,
                             10,
                             10,
-                            MealDataFixture.PROCESSED.getWithName(2L, "통밀크래커", member).getId()));
+                            MealDataFixture.AMOUNT_PER_SERVE
+                                    .getWithName(2L, "통밀크래커", member)
+                                    .getId()));
 
     List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
 

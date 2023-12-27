@@ -37,9 +37,9 @@ public class MealLogQueryServiceTest {
     Member member = Member.builder().email("test123@test.com").build();
     List<MealData> mealData =
             List.of(
-                    MealDataFixture.MEAL.get(1L, member),
-                    MealDataFixture.MEAL.get(2L, member),
-                    MealDataFixture.MEAL.get(3L, member));
+                    MealDataFixture.TOTAL_AMOUNT.get(1L, member),
+                    MealDataFixture.TOTAL_AMOUNT.get(2L, member),
+                    MealDataFixture.TOTAL_AMOUNT.get(3L, member));
 
     @Test
     @DisplayName("해당 날짜의 MealLog 목록 조회")
