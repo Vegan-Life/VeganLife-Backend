@@ -102,4 +102,13 @@ public class MealLogServiceTest {
         then(mealLogQueryService).should(times(1)).searchById(1L);
         mealData.forEach(m -> then(mealDataQueryService).should(times(1)).search(m.getId()));
     }
+
+    @Test
+    @DisplayName("식사 기록 삭제")
+    void mealLogRemoveTest() {
+        // when
+        mealLogService.remove(1L);
+        // then
+        then(mealLogRepository).should(times(1)).deleteById(1L);
+    }
 }
