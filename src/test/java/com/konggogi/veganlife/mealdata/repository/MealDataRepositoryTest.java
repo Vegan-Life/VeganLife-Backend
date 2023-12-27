@@ -7,6 +7,7 @@ import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,5 +64,14 @@ public class MealDataRepositoryTest {
         // then
         assertThat(result1.isEmpty()).isEqualTo(false);
         assertThat(result2.isEmpty()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("MealData 저장")
+    void saveTest() {
+        MealData mealData = MealDataFixture.MEAL.get(member);
+        mealDataRepository.save(mealData);
+
+        assertThat(mealData.getId()).matches(Objects::nonNull);
     }
 }
