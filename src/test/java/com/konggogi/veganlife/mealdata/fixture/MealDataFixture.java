@@ -8,12 +8,22 @@ import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.member.domain.Member;
 
 public enum MealDataFixture {
-    MEAL("디폴트 음식", MealDataType.MEAL, 100, 100, 10D, 1D, 1D, 1D, IntakeUnit.G, OwnerType.ALL),
+    MEAL(
+            "디폴트 음식",
+            MealDataType.TOTAL_AMOUNT,
+            100,
+            100,
+            10D,
+            1D,
+            1D,
+            1D,
+            IntakeUnit.G,
+            OwnerType.ALL),
     PROCESSED(
             "디폴트 가공식품",
-            MealDataType.PROCESSED,
+            MealDataType.AMOUNT_PER_SERVE,
             100,
-            100,
+            50,
             10D,
             1D,
             1D,
