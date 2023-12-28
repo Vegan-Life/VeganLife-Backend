@@ -21,6 +21,7 @@ public class MealImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "meal_image_id")
     private Long id;
 
     @Column(nullable = false)
