@@ -3,6 +3,7 @@ package com.konggogi.veganlife.mealdata.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.konggogi.veganlife.mealdata.domain.MealData;
+import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @DataJpaTest
@@ -33,30 +35,37 @@ public class MealDataRepositoryTest {
     @DisplayName("name에 키워드를 포함하는 레코드 조회")
     void findMealDataByNameContainingTest() {
         // given
-        List<String> valid = List.of("통밀빵", "통밀크래커");
-        List<String> invalid = List.of("가지볶음");
-        mealDataRepository.saveAll(
-                valid.stream()
-                        .map(name -> MealDataFixture.MEAL.getWithName(name, member))
-                        .toList());
-        mealDataRepository.saveAll(
-                invalid.stream()
-                        .map(name -> MealDataFixture.MEAL.getWithName(name, member))
-                        .toList());
-        String keyword = "통";
-        Pageable pageable = Pageable.ofSize(12);
+        List<MealData> valid =
+                List.of(
+                        MealDataFixture.TOTAL_AMOUNT.getWithNameAndOwnerType(
+                                "통밀빵", OwnerType.ALL, member),
+                        MealDataFixture.TOTAL_AMOUNT.getWithNameAndOwnerType(
+                                "통밀크래커", OwnerType.ALL, member));
+        List<MealData> invalid =
+                List.of(
+                        MealDataFixture.TOTAL_AMOUNT.getWithNameAndOwnerType(
+                                "가지볶음", OwnerType.ALL, member),
+                        MealDataFixture.TOTAL_AMOUNT.getWithNameAndOwnerType(
+                                "통크", OwnerType.MEMBER, member));
+        mealDataRepository.saveAll(valid);
+        mealDataRepository.saveAll(invalid);
         // when
-        List<MealData> result = mealDataRepository.findByNameContaining(keyword, pageable);
+        Page<MealData> result =
+                mealDataRepository.findByNameContainingAndOwnerType(
+                        "통", OwnerType.ALL, Pageable.ofSize(20));
         // then
-        assertThat(result.size()).isEqualTo(valid.size());
-        assertThat(result.stream().map(MealData::getName)).allMatch(s -> s.contains(keyword));
+        assertThat(result.getNumberOfElements()).isEqualTo(valid.size());
+        assertThat(result.getTotalElements()).isEqualTo(valid.size());
+        assertThat(result.map(MealData::getName)).allMatch(name -> name.contains("통"));
+        assertThat(result.map(MealData::getOwnerType))
+                .allMatch(ownerType -> ownerType.equals(OwnerType.ALL));
     }
 
     @Test
     @DisplayName("ID에 해당하는 MealData 레코드 조회")
     void findByIdTest() {
         // given
-        MealData mealData = MealDataFixture.MEAL.get(member);
+        MealData mealData = MealDataFixture.TOTAL_AMOUNT.get(member);
         mealDataRepository.save(mealData);
         // when
         Optional<MealData> result1 = mealDataRepository.findById(mealData.getId());
@@ -69,7 +78,7 @@ public class MealDataRepositoryTest {
     @Test
     @DisplayName("MealData 저장")
     void saveTest() {
-        MealData mealData = MealDataFixture.MEAL.get(member);
+        MealData mealData = MealDataFixture.TOTAL_AMOUNT.get(member);
         mealDataRepository.save(mealData);
 
         assertThat(mealData.getId()).matches(Objects::nonNull);

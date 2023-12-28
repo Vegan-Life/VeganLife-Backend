@@ -41,9 +41,9 @@ public class MealLogRepositoryTest {
     Member member = Member.builder().email("test123@test.com").build();
     List<MealData> mealData =
             List.of(
-                    MealDataFixture.MEAL.get(member),
-                    MealDataFixture.MEAL.get(member),
-                    MealDataFixture.MEAL.get(member));
+                    MealDataFixture.TOTAL_AMOUNT.get(member),
+                    MealDataFixture.TOTAL_AMOUNT.get(member),
+                    MealDataFixture.TOTAL_AMOUNT.get(member));
 
     @BeforeEach
     void setup() {

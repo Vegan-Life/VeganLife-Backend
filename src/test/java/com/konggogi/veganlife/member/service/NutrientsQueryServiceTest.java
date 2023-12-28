@@ -39,7 +39,9 @@ class NutrientsQueryServiceTest {
     @InjectMocks NutrientsQueryService nutrientsQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getMember();
     private final List<MealData> mealData =
-            List.of(MealDataFixture.MEAL.get(member), MealDataFixture.MEAL.get(member));
+            List.of(
+                    MealDataFixture.TOTAL_AMOUNT.get(member),
+                    MealDataFixture.TOTAL_AMOUNT.get(member));
     private List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
     private List<MealImage> mealImages =
             IntStream.range(0, 2).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();

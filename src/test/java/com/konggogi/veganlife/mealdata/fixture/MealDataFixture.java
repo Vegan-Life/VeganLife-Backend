@@ -8,7 +8,7 @@ import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.member.domain.Member;
 
 public enum MealDataFixture {
-    MEAL(
+    TOTAL_AMOUNT(
             "디폴트 음식",
             MealDataType.TOTAL_AMOUNT,
             100,
@@ -19,7 +19,7 @@ public enum MealDataFixture {
             1D,
             IntakeUnit.G,
             OwnerType.ALL),
-    PROCESSED(
+    AMOUNT_PER_SERVE(
             "디폴트 가공식품",
             MealDataType.AMOUNT_PER_SERVE,
             100,
@@ -121,6 +121,23 @@ public enum MealDataFixture {
 
         return MealData.builder()
                 .id(id)
+                .name(name)
+                .type(type)
+                .amount(amount)
+                .amountPerServe(amountPerServe)
+                .caloriePerUnit(caloriePerUnit)
+                .proteinPerUnit(proteinPerUnit)
+                .fatPerUnit(fatPerUnit)
+                .carbsPerUnit(carbsPerUnit)
+                .intakeUnit(intakeUnit)
+                .ownerType(ownerType)
+                .member(member)
+                .build();
+    }
+
+    public MealData getWithNameAndOwnerType(String name, OwnerType ownerType, Member member) {
+
+        return MealData.builder()
                 .name(name)
                 .type(type)
                 .amount(amount)
