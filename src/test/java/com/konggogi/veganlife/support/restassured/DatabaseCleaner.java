@@ -30,16 +30,14 @@ public class DatabaseCleaner {
 
     private void truncate() {
         // 제약조건 무효화
-        entityManager
-                .createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE")
-                .executeUpdate();
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         // truncate 명령 실행
-        tableNames.forEach(tableName -> entityManager
-                .createNativeQuery(String.format("TRUNCATE TABLE %s", tableName))
-                .executeUpdate());
+        tableNames.forEach(
+                tableName ->
+                        entityManager
+                                .createNativeQuery(String.format("TRUNCATE TABLE %s", tableName))
+                                .executeUpdate());
         // 제약조건 무효화 해제
-        entityManager
-                .createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE")
-                .executeUpdate();
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 }
