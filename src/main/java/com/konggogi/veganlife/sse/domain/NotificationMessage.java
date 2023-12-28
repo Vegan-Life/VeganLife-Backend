@@ -1,15 +1,15 @@
 package com.konggogi.veganlife.sse.domain;
 
-
-import lombok.Getter;
-
-@Getter
-public enum NotificationMessage {
+public enum NotificationMessage implements MessageFormatter {
     // sse
     SSE_CONNECTION("SSE 연결이 완료되었습니다."),
-
     // intake
-    OVER_INTAKE("오늘의 칼로리 섭취량이 %dKcal 초과되었습니다.");
+    OVER_INTAKE("오늘의 칼로리 섭취량이 %dKcal 초과되었습니다.") {
+        @Override
+        public String getMessage(int calorie) {
+            return String.format(this.getMessage(), calorie);
+        }
+    };
 
     private final String message;
 
@@ -17,10 +17,8 @@ public enum NotificationMessage {
         this.message = message;
     }
 
-    public String setCalorie(int calorie) {
-        if (this == OVER_INTAKE) {
-            return String.format(this.message, calorie);
-        }
+    @Override
+    public String getMessage() {
         return this.message;
     }
 }
