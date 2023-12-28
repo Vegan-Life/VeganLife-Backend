@@ -37,6 +37,15 @@ public class DatabaseCleaner {
                         entityManager
                                 .createNativeQuery(String.format("TRUNCATE TABLE %s", tableName))
                                 .executeUpdate());
+        // PK 초기화
+        tableNames.forEach(
+                tableName ->
+                        entityManager
+                                .createNativeQuery(
+                                        String.format(
+                                                "ALTER TABLE %s ALTER COLUMN %s RESTART WITH 1",
+                                                tableName, tableName.toLowerCase() + "_id"))
+                                .executeUpdate());
         // 제약조건 무효화 해제
         entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
