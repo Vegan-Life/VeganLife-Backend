@@ -71,8 +71,8 @@ dependencies {
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    compileOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    compileOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // spring actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -83,6 +83,9 @@ dependencies {
 
     // thymeleaf (for restdocs)
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // rest assured
+    testImplementation 'io.rest-assured:rest-assured:5.3.2'
 }
 
 test {
