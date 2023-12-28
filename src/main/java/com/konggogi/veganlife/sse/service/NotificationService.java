@@ -14,10 +14,10 @@ import com.konggogi.veganlife.sse.repository.NotificationRepository;
 import com.konggogi.veganlife.sse.service.dto.NotificationData;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@RestController
+@Service
 @RequiredArgsConstructor
 public class NotificationService {
     private static final Long DEFAULT_TIMEOUT = 60 * 1000L;
