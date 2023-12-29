@@ -3,6 +3,7 @@ package com.konggogi.veganlife.meallog.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
 import com.konggogi.veganlife.mealdata.domain.MealData;
@@ -27,6 +28,7 @@ import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.service.IntakeNotifyService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -45,6 +47,7 @@ public class MealLogServiceTest {
     @Mock MealDataQueryService mealDataQueryService;
     @Mock MealLogQueryService mealLogQueryService;
     @Mock MealLogRepository mealLogRepository;
+    @Mock IntakeNotifyService intakeNotifyService;
     @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
     @Spy MealMapper mealMapper = new MealMapperImpl();
     @Spy MealImageMapper mealImageMapper = new MealImageMapperImpl();
@@ -75,6 +78,7 @@ public class MealLogServiceTest {
         MealLogAddRequest mealLogAddRequest =
                 new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
         given(memberQueryService.search(1L)).willReturn(member);
+        doNothing().when(intakeNotifyService).notifyIfOverIntake(1L);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
         // when
         mealLogService.add(mealLogAddRequest, member.getId());
@@ -95,6 +99,7 @@ public class MealLogServiceTest {
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
         given(mealLogQueryService.searchById(1L)).willReturn(mealLog);
+        doNothing().when(intakeNotifyService).notifyIfOverIntake(1L);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
         // when
         mealLogService.modify(1L, mealLogModifyRequest);
