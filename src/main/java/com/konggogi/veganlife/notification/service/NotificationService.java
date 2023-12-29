@@ -2,6 +2,7 @@ package com.konggogi.veganlife.notification.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.notification.domain.Notification;
@@ -14,12 +15,14 @@ import com.konggogi.veganlife.notification.repository.NotificationRepository;
 import com.konggogi.veganlife.notification.service.dto.NotificationData;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class NotificationService {
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60 * 2;
@@ -47,7 +50,7 @@ public class NotificationService {
     private void sendToClient(Long memberId, Object data) {
         emitterRepository
                 .findById(memberId)
-                .ifPresent(
+                .ifPresentOrElse(
                         emitter -> {
                             try {
                                 emitter.send(createSseEvent(memberId, data));
@@ -55,6 +58,9 @@ public class NotificationService {
                                 emitterRepository.deleteById(memberId);
                                 throw new SseConnectionException(ErrorCode.SSE_CONNECTION_ERROR);
                             }
+                        },
+                        () -> {
+                            throw new NotFoundEntityException(ErrorCode.NOT_FOUND_EMITTER);
                         });
     }
 
