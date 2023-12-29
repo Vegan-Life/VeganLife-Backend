@@ -1,11 +1,13 @@
 package com.konggogi.veganlife.notification.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
@@ -74,11 +76,10 @@ class NotificationServiceTest {
         // given
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
         // when, then
-        assertThatNoException()
-                .isThrownBy(
-                        () ->
-                                notificationService.sendNotification(
-                                        member, notification.getType(), notification.getMessage()));
+        assertDoesNotThrow(
+                () ->
+                        notificationService.sendNotification(
+                                member, notification.getType(), notification.getMessage()));
         then(emitterRepository).should().findById(anyLong());
     }
 
