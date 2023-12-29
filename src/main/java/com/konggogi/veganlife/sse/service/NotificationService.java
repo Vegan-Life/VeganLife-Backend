@@ -15,12 +15,14 @@ import com.konggogi.veganlife.sse.service.dto.NotificationData;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationService {
-    private static final Long DEFAULT_TIMEOUT = 60 * 1000L;
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60 * 2;
     private static final Long RECONNECTION_TIME = 1000L;
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
