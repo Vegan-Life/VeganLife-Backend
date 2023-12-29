@@ -1,17 +1,17 @@
-package com.konggogi.veganlife.sse.service;
+package com.konggogi.veganlife.notification.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.sse.domain.Notification;
-import com.konggogi.veganlife.sse.domain.NotificationMessage;
-import com.konggogi.veganlife.sse.domain.NotificationType;
-import com.konggogi.veganlife.sse.domain.mapper.NotificationMapper;
-import com.konggogi.veganlife.sse.exception.SseConnectionException;
-import com.konggogi.veganlife.sse.repository.EmitterRepository;
-import com.konggogi.veganlife.sse.repository.NotificationRepository;
-import com.konggogi.veganlife.sse.service.dto.NotificationData;
+import com.konggogi.veganlife.notification.domain.Notification;
+import com.konggogi.veganlife.notification.domain.NotificationMessage;
+import com.konggogi.veganlife.notification.domain.NotificationType;
+import com.konggogi.veganlife.notification.domain.mapper.NotificationMapper;
+import com.konggogi.veganlife.notification.exception.SseConnectionException;
+import com.konggogi.veganlife.notification.repository.EmitterRepository;
+import com.konggogi.veganlife.notification.repository.NotificationRepository;
+import com.konggogi.veganlife.notification.service.dto.NotificationData;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.sse.repository;
+package com.konggogi.veganlife.notification.repository;
 
 
 import java.util.Optional;

@@ -1,8 +1,8 @@
-package com.konggogi.veganlife.sse.controller;
+package com.konggogi.veganlife.notification.controller;
 
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.sse.service.NotificationService;
+import com.konggogi.veganlife.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

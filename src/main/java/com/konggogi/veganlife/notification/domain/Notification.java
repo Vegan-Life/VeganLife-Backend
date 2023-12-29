@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.sse.domain;
+package com.konggogi.veganlife.notification.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;

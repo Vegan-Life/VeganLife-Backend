@@ -3,10 +3,10 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import com.konggogi.veganlife.sse.domain.NotificationMessage;
-import com.konggogi.veganlife.sse.domain.NotificationType;
-import com.konggogi.veganlife.sse.repository.NotificationRepository;
-import com.konggogi.veganlife.sse.service.NotificationService;
+import com.konggogi.veganlife.notification.domain.NotificationMessage;
+import com.konggogi.veganlife.notification.domain.NotificationType;
+import com.konggogi.veganlife.notification.repository.NotificationRepository;
+import com.konggogi.veganlife.notification.service.NotificationService;
 import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
