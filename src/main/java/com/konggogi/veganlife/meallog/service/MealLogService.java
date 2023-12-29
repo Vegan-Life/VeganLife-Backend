@@ -13,6 +13,7 @@ import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.member.service.IntakeNotifyService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class MealLogService {
 
     private final MemberQueryService memberQueryService;
     private final MealDataQueryService mealDataQueryService;
-
     private final MealLogQueryService mealLogQueryService;
+    private final IntakeNotifyService intakeNotifyService;
     private final MealLogRepository mealLogRepository;
 
     private final MealLogMapper mealLogMapper;
@@ -35,19 +36,19 @@ public class MealLogService {
     private final MealImageMapper mealImageMapper;
 
     public void add(MealLogAddRequest request, Long memberId) {
-
         MealLog mealLog =
                 mealLogMapper.toEntity(request.mealType(), memberQueryService.search(memberId));
         addMeals(request.meals(), mealLog);
         addMealImages(request.imageUrls(), mealLog);
         mealLogRepository.save(mealLog);
+        intakeNotifyService.notifyIfOverIntake(memberId);
     }
 
     public void modify(Long mealLogId, MealLogModifyRequest request) {
-
         MealLog mealLog = mealLogQueryService.searchById(mealLogId);
         modifyMeals(request.meals(), mealLog);
         modifyMealImages(request.imageUrls(), mealLog);
+        intakeNotifyService.notifyIfOverIntake(mealLog.getMember().getId());
     }
 
     public void remove(Long mealLogId) {
