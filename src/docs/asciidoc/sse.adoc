@@ -1,0 +1,39 @@
+= SSE API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== SSE 연결 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/sse-subscribe/request-headers.adoc[]
+
+==== Body
+
+include::{snippets}/sse-subscribe/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/sse-subscribe/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/sse-subscribe-not-found-member/http-response.adoc[]
+
+include::{snippets}/sse-subscribe-not-found-emitter/http-response.adoc[]
+
+==== 504 SERVICE UNAVAILABLE
+
+include::{snippets}/sse-subscribe-connection-fail/http-response.adoc[]

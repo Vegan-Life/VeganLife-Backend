@@ -6,7 +6,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
-import com.konggogi.veganlife.sse.exception.SseConnectionException;
+import com.konggogi.veganlife.notification.exception.SseConnectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

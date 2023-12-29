@@ -1,8 +1,8 @@
-package com.konggogi.veganlife.sse.repository;
+package com.konggogi.veganlife.notification.repository;
 
 
-import com.konggogi.veganlife.sse.domain.Notification;
-import com.konggogi.veganlife.sse.domain.NotificationType;
+import com.konggogi.veganlife.notification.domain.Notification;
+import com.konggogi.veganlife.notification.domain.NotificationType;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

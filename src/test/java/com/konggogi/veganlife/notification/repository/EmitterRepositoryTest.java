@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.sse.repository;
+package com.konggogi.veganlife.notification.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;

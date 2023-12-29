@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.sse.exception;
+package com.konggogi.veganlife.notification.exception;
 
 
 import com.konggogi.veganlife.global.exception.ApiException;

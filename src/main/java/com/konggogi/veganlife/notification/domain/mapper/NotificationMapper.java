@@ -1,10 +1,10 @@
-package com.konggogi.veganlife.sse.domain.mapper;
+package com.konggogi.veganlife.notification.domain.mapper;
 
 
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.sse.domain.Notification;
-import com.konggogi.veganlife.sse.domain.NotificationType;
-import com.konggogi.veganlife.sse.service.dto.NotificationData;
+import com.konggogi.veganlife.notification.domain.Notification;
+import com.konggogi.veganlife.notification.domain.NotificationType;
+import com.konggogi.veganlife.notification.service.dto.NotificationData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

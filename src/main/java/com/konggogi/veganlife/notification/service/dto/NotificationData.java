@@ -1,7 +1,7 @@
-package com.konggogi.veganlife.sse.service.dto;
+package com.konggogi.veganlife.notification.service.dto;
 
 
-import com.konggogi.veganlife.sse.domain.NotificationType;
+import com.konggogi.veganlife.notification.domain.NotificationType;
 import java.time.LocalDateTime;
 
 public record NotificationData(NotificationType type, String message, LocalDateTime createdAt) {}
