@@ -40,7 +40,8 @@ public enum ErrorCode {
     ALREADY_UNLIKED("POST_LIKE_002", "좋아요가 되어 있지 않은 게시글입니다."),
 
     // sse
-    SSE_CONNECTION_ERROR("SSE_001", "SSE 연결이 실패했습니다. 재연결이 필요합니다.");
+    SSE_CONNECTION_ERROR("SSE_001", "SSE 연결이 실패했습니다. 재연결이 필요합니다."),
+    NOT_FOUND_EMITTER("SSE_002", "SseEmitter를 찾을 수 없습니다.");
 
     private final String code;
     private final String description;
