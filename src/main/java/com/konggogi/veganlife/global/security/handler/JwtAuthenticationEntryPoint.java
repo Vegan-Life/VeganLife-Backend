@@ -27,6 +27,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException)
             throws IOException, ServletException {
         ErrorCode errorCode = (ErrorCode) request.getAttribute(JwtUtils.EXCEPTION_ATTRIBUTE);
+        if (errorCode == null) {
+            log.error(
+                    "[Exception] - JwtAuthenticationEntryPoint.commence - uri: {} - {}",
+                    request.getRequestURI(),
+                    ErrorCode.INTERNAL_SERVER_ERROR);
+            setErrorResponse(response);
+            return;
+        }
         log.error(
                 "[Exception] - JwtAuthenticationEntryPoint.commence - uri: {} - {}",
                 request.getRequestURI(),
@@ -40,6 +48,15 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
         ErrorResponse errorResponse = ErrorResponse.from(errorCode);
+        String result = new ObjectMapper().writeValueAsString(errorResponse);
+        response.getWriter().write(result);
+    }
+
+    private void setErrorResponse(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR);
         String result = new ObjectMapper().writeValueAsString(errorResponse);
         response.getWriter().write(result);
     }
