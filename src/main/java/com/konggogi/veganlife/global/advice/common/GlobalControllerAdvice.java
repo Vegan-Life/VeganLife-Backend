@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -72,5 +73,17 @@ public class GlobalControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.from(exception.getErrorCode()));
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<Void> handleAsyncRequestTimeoutException(
+            HandlerMethod handlerMethod, AsyncRequestTimeoutException exception) {
+
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod),
+                HttpStatus.REQUEST_TIMEOUT,
+                exception);
+
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
     }
 }
