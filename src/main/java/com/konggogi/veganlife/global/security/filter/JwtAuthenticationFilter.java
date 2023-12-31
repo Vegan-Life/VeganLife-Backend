@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +21,16 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return false;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -32,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String extractToken = request.getHeader(JwtUtils.AUTH_TOKEN_HEADER);
         jwtUtils.extractBearerToken(extractToken)
-                .ifPresent(
+                .ifPresentOrElse(
                         jwt -> {
                             try {
                                 jwtUtils.validateToken(jwt);
@@ -41,7 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 request.setAttribute(
                                         JwtUtils.EXCEPTION_ATTRIBUTE, e.getErrorCode());
                             }
-                        });
+                        },
+                        () ->
+                                request.setAttribute(
+                                        JwtUtils.EXCEPTION_ATTRIBUTE,
+                                        ErrorCode.NOT_FOUND_AUTHORIZATION_HEADER));
         filterChain.doFilter(request, response);
     }
 

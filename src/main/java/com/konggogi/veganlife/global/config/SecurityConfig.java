@@ -3,7 +3,7 @@ package com.konggogi.veganlife.global.config;
 
 import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
 import com.konggogi.veganlife.global.security.handler.JwtAuthenticationEntryPoint;
-import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -63,8 +63,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("*")); // TODO Url 변경
+        config.setAllowedOrigins(List.of("*")); // TODO Url 변경
         config.addAllowedMethod("*");
+        config.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

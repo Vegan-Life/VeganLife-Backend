@@ -13,7 +13,7 @@ public class AopUtils {
     }
 
     public static MethodSignature extractMethodSignature(HandlerMethod handlerMethod) {
-        String className = handlerMethod.getClass().getSimpleName();
+        String className = handlerMethod.getBeanType().getSimpleName();
         String methodName = handlerMethod.getMethod().getName();
         return new MethodSignature(className, methodName);
     }
