@@ -33,13 +33,7 @@ public class CommentService {
                 .ifPresent(
                         parentId -> {
                             Comment parentComment = commentQueryService.search(parentId);
-                            parentComment
-                                    .getParent()
-                                    .ifPresent(
-                                            parent -> {
-                                                throw new IllegalCommentException(
-                                                        ErrorCode.IS_NOT_PARENT_COMMENT);
-                                            });
+                            validateParentComment(parentComment);
                             parentComment.addSubComment(comment);
                         });
         post.addComment(comment);
@@ -48,5 +42,14 @@ public class CommentService {
 
     private Optional<Long> getParentCommentId(CommentAddRequest commentAddRequest) {
         return Optional.ofNullable(commentAddRequest.parentId());
+    }
+
+    private void validateParentComment(Comment parentComment) {
+        parentComment
+                .getParent()
+                .ifPresent(
+                        parent -> {
+                            throw new IllegalCommentException(ErrorCode.IS_NOT_PARENT_COMMENT);
+                        });
     }
 }
