@@ -49,7 +49,6 @@ public class SecurityConfig {
                                                 new AntPathRequestMatcher(
                                                         "/api/v1/members/oauth/*/login"),
                                                 new AntPathRequestMatcher("/actuator/health"),
-                                                new AntPathRequestMatcher("/api/v1/members"),
                                                 new AntPathRequestMatcher("/api/v1/auth/reissue"))
                                         .permitAll()
                                         .anyRequest()
