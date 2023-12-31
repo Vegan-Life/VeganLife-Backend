@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 
 @RestControllerAdvice
-public class PostAdvisor {
+public class PostControllerAdvice {
     @ExceptionHandler(IllegalLikeStatusException.class)
     public ResponseEntity<ErrorResponse> handleIllegalLikeStatusException(
             HandlerMethod handlerMethod, IllegalLikeStatusException exception) {
