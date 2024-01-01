@@ -18,6 +18,7 @@ import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.service.PostQueryService;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +32,8 @@ class LikeServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
     @Spy LikeMapper postLikeMapper;
+    @Mock LikeQueryService likeQueryService;
     @InjectMocks LikeService likeService;
-
     private final Member member = MemberFixture.DEFAULT_M.getMember();
     private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
 
@@ -43,7 +44,7 @@ class LikeServiceTest {
         PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
-        doNothing().when(postQueryService).validatePostLikeIsExist(anyLong(), anyLong());
+        given(likeQueryService.searchPostLike(anyLong(), anyLong())).willReturn(Optional.empty());
         given(postLikeMapper.toEntity(any(Member.class), any(Post.class))).willReturn(postLike);
         // when
         likeService.addPostLike(member.getId(), post.getId());
@@ -63,7 +64,7 @@ class LikeServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should(never()).search(anyLong());
-        then(postQueryService).should(never()).validatePostLikeIsExist(anyLong(), anyLong());
+        then(likeQueryService).should(never()).searchPostLike(anyLong(), anyLong());
     }
 
     @Test
@@ -79,25 +80,25 @@ class LikeServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
-        then(postQueryService).should(never()).validatePostLikeIsExist(anyLong(), anyLong());
+        then(likeQueryService).should(never()).searchPostLike(anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("이미 좋아요한 게시글 예외 발생")
     void addPostLikeAlreadyTest() {
         // given
+        PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED))
-                .when(postQueryService)
-                .validatePostLikeIsExist(anyLong(), anyLong());
+        given(likeQueryService.searchPostLike(anyLong(), anyLong()))
+                .willReturn(Optional.of(postLike));
         // when, then
         assertThatThrownBy(() -> likeService.addPostLike(member.getId(), post.getId()))
                 .isInstanceOf(IllegalLikeStatusException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_LIKED.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
-        then(postQueryService).should().validatePostLikeIsExist(anyLong(), anyLong());
+        then(likeQueryService).should().searchPostLike(anyLong(), anyLong());
     }
 
     @Test
@@ -107,8 +108,8 @@ class LikeServiceTest {
         PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
-        given(postQueryService.validatePostLikeIsNotExist(anyLong(), anyLong()))
-                .willReturn(postLike);
+        given(likeQueryService.searchPostLike(anyLong(), anyLong()))
+                .willReturn(Optional.of(postLike));
         // when
         likeService.removePostLike(member.getId(), post.getId());
         // then
@@ -127,7 +128,7 @@ class LikeServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should(never()).search(anyLong());
-        then(postQueryService).should(never()).validatePostLikeIsNotExist(anyLong(), anyLong());
+        then(likeQueryService).should(never()).searchPostLike(anyLong(), anyLong());
     }
 
     @Test
@@ -143,7 +144,7 @@ class LikeServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
-        then(postQueryService).should(never()).validatePostLikeIsNotExist(anyLong(), anyLong());
+        then(likeQueryService).should(never()).searchPostLike(anyLong(), anyLong());
     }
 
     @Test
@@ -152,14 +153,13 @@ class LikeServiceTest {
         // given
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
-        given(postQueryService.validatePostLikeIsNotExist(anyLong(), anyLong()))
-                .willThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED));
+        given(likeQueryService.searchPostLike(anyLong(), anyLong())).willReturn(Optional.empty());
         // when, then
         assertThatThrownBy(() -> likeService.removePostLike(member.getId(), post.getId()))
                 .isInstanceOf(IllegalLikeStatusException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_UNLIKED.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
-        then(postQueryService).should().validatePostLikeIsNotExist(anyLong(), anyLong());
+        then(likeQueryService).should().searchPostLike(anyLong(), anyLong());
     }
 }
