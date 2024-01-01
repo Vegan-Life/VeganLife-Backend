@@ -3,6 +3,8 @@ package com.konggogi.veganlife.config;
 
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapperImpl;
+import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
+import com.konggogi.veganlife.like.domain.mapper.LikeMapperImpl;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapperImpl;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
@@ -60,8 +62,8 @@ public class MapStructConfig {
     }
 
     @Bean
-    public PostLikeMapper postLikeMapper() {
-        return new PostLikeMapperImpl();
+    public LikeMapper likeMapper() {
+        return new LikeMapperImpl();
     }
 
     @Bean

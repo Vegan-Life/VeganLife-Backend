@@ -1,11 +1,12 @@
-package com.konggogi.veganlife.post.service;
+package com.konggogi.veganlife.like.service;
 
 
+import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
-import com.konggogi.veganlife.post.domain.mapper.PostLikeMapper;
+import com.konggogi.veganlife.post.service.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final MemberQueryService memberQueryService;
     private final PostQueryService postQueryService;
-    private final PostLikeMapper postLikeMapper;
+    private final LikeMapper postLikeMapper;
 
     public void addPostLike(Long memberId, Long postId) {
         Member member = memberQueryService.search(memberId);

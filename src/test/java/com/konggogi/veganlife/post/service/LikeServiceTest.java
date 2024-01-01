@@ -9,13 +9,14 @@ import static org.mockito.Mockito.*;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
+import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.service.LikeService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
-import com.konggogi.veganlife.post.domain.mapper.PostLikeMapper;
-import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class LikeServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
-    @Spy PostLikeMapper postLikeMapper;
+    @Spy LikeMapper postLikeMapper;
     @InjectMocks LikeService likeService;
 
     private final Member member = MemberFixture.DEFAULT_M.getMember();

@@ -2,11 +2,11 @@ package com.konggogi.veganlife.post.controller;
 
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
+import com.konggogi.veganlife.like.service.LikeService;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
-import com.konggogi.veganlife.post.service.LikeService;
 import com.konggogi.veganlife.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -3,6 +3,7 @@ package com.konggogi.veganlife.post.domain;
 
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.*;
 import java.util.ArrayList;
