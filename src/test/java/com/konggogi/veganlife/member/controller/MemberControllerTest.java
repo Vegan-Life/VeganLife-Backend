@@ -261,7 +261,7 @@ class MemberControllerTest extends RestDocsTest {
     void getMemberDailyNutrientsTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_F.getMember();
-        given(memberQueryService.search(member.getId())).willReturn(member);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/members/nutrients").headers(authorizationHeader()));
