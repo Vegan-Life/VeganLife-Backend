@@ -40,8 +40,8 @@ public enum ErrorCode {
     NOT_FOUND_POST("POST_001", "게시글을 찾을 수 없습니다."),
 
     // post-like
-    ALREADY_LIKED("POST_LIKE_001", "좋아요가 되어 있는 게시글입니다."),
-    ALREADY_UNLIKED("POST_LIKE_002", "좋아요가 되어 있지 않은 게시글입니다."),
+    ALREADY_POST_LIKED("POST_LIKE_001", "좋아요가 되어 있는 게시글입니다."),
+    ALREADY_POST_UNLIKED("POST_LIKE_002", "좋아요가 되어 있지 않은 게시글입니다."),
 
     // sse
     SSE_CONNECTION_ERROR("SSE_001", "SSE 연결이 실패했습니다. 재연결이 필요합니다."),
