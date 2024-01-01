@@ -49,7 +49,11 @@ public enum ErrorCode {
 
     // comment
     NOT_FOUND_COMMENT("COMMENT_001", "댓글을 찾을 수 없습니다."),
-    IS_NOT_PARENT_COMMENT("COMMENT_002", "최상위 댓글에만 댓글을 등록할 수 있습니다.");
+    IS_NOT_PARENT_COMMENT("COMMENT_002", "최상위 댓글에만 댓글을 등록할 수 있습니다."),
+
+    // comment-like
+    ALREADY_COMMENT_LIKED("COMMENT_LIKE_001", "좋아요가 되어 있는 댓글입니다."),
+    ALREADY_COMMENT_UNLIKED("COMMENT_LIKE_002", "좋아요가 되어 있지 않은 댓글입니다.");
 
     private final String code;
     private final String description;
