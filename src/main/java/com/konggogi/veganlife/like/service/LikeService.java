@@ -50,12 +50,20 @@ public class LikeService {
         comment.addCommentLike(commentLike);
     }
 
+    public void removeCommentLike(Long memberId, Long postId, Long commentId) {
+        memberQueryService.search(memberId);
+        postQueryService.search(postId);
+        Comment comment = commentQueryService.search(commentId);
+        CommentLike commentLike = validateCommentLikeIsNotExist(memberId, commentId);
+        comment.removeCommentLike(commentLike);
+    }
+
     private void validatePostLikeIsExist(Long memberId, Long postId) {
         likeQueryService
                 .searchPostLike(memberId, postId)
                 .ifPresent(
                         postLike -> {
-                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_POST_LIKED);
                         });
     }
 
@@ -64,16 +72,25 @@ public class LikeService {
                 .searchPostLike(memberId, postId)
                 .orElseThrow(
                         () -> {
-                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_POST_UNLIKED);
                         });
     }
 
-    public void validateCommentLikeIsExist(Long memberId, Long commentId) {
+    private void validateCommentLikeIsExist(Long memberId, Long commentId) {
         likeQueryService
                 .searchCommentLike(memberId, commentId)
                 .ifPresent(
                         postLike -> {
-                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_LIKED);
+                        });
+    }
+
+    private CommentLike validateCommentLikeIsNotExist(Long memberId, Long commentId) {
+        return likeQueryService
+                .searchCommentLike(memberId, commentId)
+                .orElseThrow(
+                        () -> {
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_UNLIKED);
                         });
     }
 }
