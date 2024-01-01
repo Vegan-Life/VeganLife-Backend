@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "post", ignore = true)
+    @Mapping(target = "parentComment", ignore = true)
     Comment toEntity(Member member, CommentAddRequest commentAddRequest);
 
     @Mapping(target = "commentId", source = "comment.id")

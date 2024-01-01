@@ -8,13 +8,13 @@ import static org.mockito.BDDMockito.then;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.repository.PostLikeRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
-import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
-import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

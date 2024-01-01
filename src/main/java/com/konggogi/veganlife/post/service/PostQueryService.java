@@ -3,10 +3,10 @@ package com.konggogi.veganlife.post.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.repository.PostLikeRepository;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
-import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
-import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

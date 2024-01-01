@@ -5,7 +5,7 @@ import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
-import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

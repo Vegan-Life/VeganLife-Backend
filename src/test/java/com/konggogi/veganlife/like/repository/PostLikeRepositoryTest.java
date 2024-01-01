@@ -1,13 +1,14 @@
-package com.konggogi.veganlife.post.repository;
+package com.konggogi.veganlife.like.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
 import com.konggogi.veganlife.post.fixture.PostFixture;
+import com.konggogi.veganlife.post.repository.PostRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +35,7 @@ class PostLikeRepositoryTest {
     }
 
     @Test
-    @DisplayName("회원 번호와 게시글 번호로 게시글 찾기")
+    @DisplayName("회원 번호와 게시글 번호로 좋아요 찾기")
     void findByMemberIdAndIdTest() {
         // when
         Optional<PostLike> foundPostLike =

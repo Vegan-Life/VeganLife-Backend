@@ -1,14 +1,14 @@
-package com.konggogi.veganlife.post.domain.mapper;
+package com.konggogi.veganlife.like.domain.mapper;
 
 
+import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface PostLikeMapper {
+public interface LikeMapper {
     @Mapping(target = "id", ignore = true)
     PostLike toEntity(Member member, Post post);
 }
