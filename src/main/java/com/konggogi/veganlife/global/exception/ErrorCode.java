@@ -45,7 +45,11 @@ public enum ErrorCode {
 
     // sse
     SSE_CONNECTION_ERROR("SSE_001", "SSE 연결이 실패했습니다. 재연결이 필요합니다."),
-    NOT_FOUND_EMITTER("SSE_002", "SseEmitter를 찾을 수 없습니다.");
+    NOT_FOUND_EMITTER("SSE_002", "SseEmitter를 찾을 수 없습니다."),
+
+    // comment
+    NOT_FOUND_COMMENT("COMMENT_001", "댓글을 찾을 수 없습니다."),
+    IS_NOT_PARENT_COMMENT("COMMENT_002", "최상위 댓글에만 댓글을 등록할 수 있습니다.");
 
     private final String code;
     private final String description;

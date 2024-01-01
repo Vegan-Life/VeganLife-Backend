@@ -1,6 +1,8 @@
 package com.konggogi.veganlife.config;
 
 
+import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
+import com.konggogi.veganlife.comment.domain.mapper.CommentMapperImpl;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapperImpl;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
@@ -70,5 +72,10 @@ public class MapStructConfig {
     @Bean
     public NotificationMapper notificationMapper() {
         return new NotificationMapperImpl();
+    }
+
+    @Bean
+    public CommentMapper commentMapper() {
+        return new CommentMapperImpl();
     }
 }

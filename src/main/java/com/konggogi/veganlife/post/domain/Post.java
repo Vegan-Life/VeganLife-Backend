@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.post.domain;
 
 
+import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.global.domain.TimeStamped;
 import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.*;
@@ -35,6 +36,9 @@ public class Post extends TimeStamped {
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<PostLike> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -60,6 +64,11 @@ public class Post extends TimeStamped {
     public void addPostLike(PostLike postLike) {
         likes.add(postLike);
         postLike.setPostAndMember(this, member);
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setPost(this);
     }
 
     public void removePostLike(PostLike postLike) {

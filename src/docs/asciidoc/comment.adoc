@@ -1,0 +1,49 @@
+= Comment API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 댓글 등록 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/add-comment/request-headers.adoc[]
+
+==== Body
+
+최상위 댓글 등록
+
+include::{snippets}/add-comment/http-request.adoc[]
+
+대댓글 등록
+
+include::{snippets}/add-sub-comment/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/add-comment/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/add-comment-not-found-member/http-response.adoc[]
+
+include::{snippets}/add-comment-not-found-post/http-response.adoc[]
+
+include::{snippets}/add-comment-not-found-comment/http-response.adoc[]
+
+==== 400 BAD REQUEST
+
+include::{snippets}/add-comment-illegal/http-response.adoc[]
+
+
