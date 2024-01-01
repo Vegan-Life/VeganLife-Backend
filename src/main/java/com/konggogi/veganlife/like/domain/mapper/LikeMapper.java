@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface LikeMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "member", source = "member")
     PostLike toPostLike(Member member);
 
     @Mapping(target = "id", ignore = true)
