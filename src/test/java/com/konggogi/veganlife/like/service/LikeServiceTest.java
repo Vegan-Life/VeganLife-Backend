@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.post.service;
+package com.konggogi.veganlife.like.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,12 +12,12 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
-import com.konggogi.veganlife.like.service.LikeService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
+import com.konggogi.veganlife.post.service.PostQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
