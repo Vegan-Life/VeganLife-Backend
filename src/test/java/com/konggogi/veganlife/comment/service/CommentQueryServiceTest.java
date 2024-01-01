@@ -48,8 +48,7 @@ class CommentQueryServiceTest {
     @DisplayName("없는 댓글 조회시 예외 발생")
     void searchNotFoundCommentTest() {
         // given
-        given(commentRepository.findById(anyLong()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
+        given(commentRepository.findById(anyLong())).willReturn(Optional.empty());
         // when, then
         assertThatThrownBy(() -> commentQueryService.search(comment.getId()))
                 .isInstanceOf(NotFoundEntityException.class)
