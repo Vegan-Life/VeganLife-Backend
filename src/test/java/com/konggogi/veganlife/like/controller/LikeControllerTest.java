@@ -91,7 +91,7 @@ class LikeControllerTest extends RestDocsTest {
     @DisplayName("게시글 좋아요 API - 이미 좋아요한 경우 예외 발생")
     void addPostLikeAlreadyTest() throws Exception {
         // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED))
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_LIKED))
                 .when(likeService)
                 .addPostLike(anyLong(), anyLong());
         // when
@@ -166,7 +166,7 @@ class LikeControllerTest extends RestDocsTest {
     @DisplayName("게시글 좋아요 취소 API - 좋아요 되어 있지 않은 경우 예외 발생")
     void removePostLikeAlreadyTest() throws Exception {
         // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED))
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_UNLIKED))
                 .when(likeService)
                 .removePostLike(anyLong(), anyLong());
         // when

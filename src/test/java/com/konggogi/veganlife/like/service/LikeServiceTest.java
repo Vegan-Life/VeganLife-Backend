@@ -95,7 +95,7 @@ class LikeServiceTest {
         // when, then
         assertThatThrownBy(() -> likeService.addPostLike(member.getId(), post.getId()))
                 .isInstanceOf(IllegalLikeStatusException.class)
-                .hasMessageContaining(ErrorCode.ALREADY_LIKED.getDescription());
+                .hasMessageContaining(ErrorCode.ALREADY_POST_LIKED.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
         then(likeQueryService).should().searchPostLike(anyLong(), anyLong());
@@ -157,7 +157,7 @@ class LikeServiceTest {
         // when, then
         assertThatThrownBy(() -> likeService.removePostLike(member.getId(), post.getId()))
                 .isInstanceOf(IllegalLikeStatusException.class)
-                .hasMessageContaining(ErrorCode.ALREADY_UNLIKED.getDescription());
+                .hasMessageContaining(ErrorCode.ALREADY_POST_UNLIKED.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
         then(likeQueryService).should().searchPostLike(anyLong(), anyLong());
