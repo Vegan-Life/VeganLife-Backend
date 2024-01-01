@@ -26,9 +26,7 @@ public class CommentService {
 
     public Comment add(Long memberId, Long postId, CommentAddRequest commentAddRequest) {
         Member member = memberQueryService.search(memberId);
-        Post post = postQueryService.search(postId);
         Comment comment = commentMapper.toEntity(member, commentAddRequest);
-
         getParentCommentId(commentAddRequest)
                 .ifPresent(
                         parentId -> {
@@ -36,6 +34,7 @@ public class CommentService {
                             validateParentComment(parentComment);
                             parentComment.addSubComment(comment);
                         });
+        Post post = postQueryService.search(postId);
         post.addComment(comment);
         return comment;
     }
