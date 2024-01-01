@@ -18,10 +18,10 @@ public class LikeQueryService {
     private final CommentLikeRepository commentLikeRepository;
 
     public Optional<PostLike> searchPostLike(Long memberId, Long postId) {
-        return postLikeRepository.findByMemberIdAndId(memberId, postId);
+        return postLikeRepository.findByMemberIdAndPostId(memberId, postId);
     }
 
     public Optional<CommentLike> searchCommentLike(Long memberId, Long commentId) {
-        return commentLikeRepository.findByMemberIdAndId(memberId, commentId);
+        return commentLikeRepository.findByMemberIdAndCommentId(memberId, commentId);
     }
 }
