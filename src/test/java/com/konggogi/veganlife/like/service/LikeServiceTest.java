@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class LikeServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
-    @Spy LikeMapper postLikeMapper;
+    @Spy LikeMapper likeMapper;
     @Mock LikeQueryService likeQueryService;
     @InjectMocks LikeService likeService;
     private final Member member = MemberFixture.DEFAULT_M.getMember();
@@ -45,7 +45,7 @@ class LikeServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(likeQueryService.searchPostLike(anyLong(), anyLong())).willReturn(Optional.empty());
-        given(postLikeMapper.toEntity(any(Member.class), any(Post.class))).willReturn(postLike);
+        given(likeMapper.toPostLike(any(Member.class))).willReturn(postLike);
         // when
         likeService.addPostLike(member.getId(), post.getId());
         // then
