@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 public interface LikeMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "member", source = "member")
-    PostLike toPostLike(Member member, Post post);
+    PostLike toPostLike(Member member);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "member", source = "member")

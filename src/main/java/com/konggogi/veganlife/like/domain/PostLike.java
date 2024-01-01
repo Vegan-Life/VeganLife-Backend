@@ -33,8 +33,7 @@ public class PostLike {
         this.member = member;
     }
 
-    public void setPostAndMember(Post post, Member member) {
+    public void setPost(Post post) {
         this.post = post;
-        this.member = member;
     }
 }

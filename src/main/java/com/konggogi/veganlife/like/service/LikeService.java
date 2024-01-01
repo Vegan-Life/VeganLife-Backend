@@ -30,7 +30,7 @@ public class LikeService {
         Member member = memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
         validatePostLikeIsExist(memberId, postId);
-        PostLike postLike = likeMapper.toPostLike(member, post);
+        PostLike postLike = likeMapper.toPostLike(member);
         post.addPostLike(postLike);
     }
 

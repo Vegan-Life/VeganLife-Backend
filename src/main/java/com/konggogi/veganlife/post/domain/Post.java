@@ -64,7 +64,7 @@ public class Post extends TimeStamped {
 
     public void addPostLike(PostLike postLike) {
         likes.add(postLike);
-        postLike.setPostAndMember(this, member);
+        postLike.setPost(this);
     }
 
     public void addComment(Comment comment) {
