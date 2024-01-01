@@ -3,6 +3,7 @@ package com.konggogi.veganlife.like.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.fixture.PostLikeFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -24,7 +25,7 @@ class PostLikeRepositoryTest {
 
     private final Post post = PostFixture.BAKERY.getPost();
     private final Member member = MemberFixture.DEFAULT_F.getMember();
-    private final PostLike postLike = PostLike.builder().post(post).member(member).build();
+    private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
 
     @BeforeEach
     void setup() {
@@ -35,7 +36,7 @@ class PostLikeRepositoryTest {
 
     @Test
     @DisplayName("회원 번호와 게시글 번호로 좋아요 찾기")
-    void findByMemberIdAndIdTest() {
+    void findByMemberIdAndPostIdTest() {
         // when
         Optional<PostLike> foundPostLike =
                 postLikeRepository.findByMemberIdAndPostId(member.getId(), post.getId());
