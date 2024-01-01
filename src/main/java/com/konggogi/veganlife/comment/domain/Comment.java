@@ -70,4 +70,9 @@ public class Comment extends TimeStamped {
     public Optional<Comment> getParent() {
         return Optional.ofNullable(parentComment);
     }
+
+    public void addCommentLike(CommentLike commentLike) {
+        likes.add(commentLike);
+        commentLike.setComment(this);
+    }
 }
