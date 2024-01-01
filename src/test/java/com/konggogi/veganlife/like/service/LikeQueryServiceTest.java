@@ -31,25 +31,25 @@ class LikeQueryServiceTest {
     @DisplayName("게시글 좋아요 여부 조회 - 존재하는 경우")
     void searchPostLikeExistTest() {
         // given
-        given(postLikeRepository.findByMemberIdAndId(anyLong(), anyLong()))
+        given(postLikeRepository.findByMemberIdAndPostId(anyLong(), anyLong()))
                 .willReturn(Optional.of(postLike));
         // when
         Optional<PostLike> foundPostLike = likeQueryService.searchPostLike(anyLong(), anyLong());
         // then
         assertThat(foundPostLike).isPresent();
-        then(postLikeRepository).should().findByMemberIdAndId(anyLong(), anyLong());
+        then(postLikeRepository).should().findByMemberIdAndPostId(anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("게시글 좋아요 여부 조회 - 존재하지 않는 경우")
     void searchPostLikeNotFoundTest() {
         // given
-        given(postLikeRepository.findByMemberIdAndId(anyLong(), anyLong()))
+        given(postLikeRepository.findByMemberIdAndPostId(anyLong(), anyLong()))
                 .willReturn(Optional.empty());
         // when
         Optional<PostLike> foundPostLike = likeQueryService.searchPostLike(anyLong(), anyLong());
         // then
         assertThat(foundPostLike).isEmpty();
-        then(postLikeRepository).should().findByMemberIdAndId(anyLong(), anyLong());
+        then(postLikeRepository).should().findByMemberIdAndPostId(anyLong(), anyLong());
     }
 }

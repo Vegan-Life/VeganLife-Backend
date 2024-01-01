@@ -24,13 +24,12 @@ class PostLikeRepositoryTest {
 
     private final Post post = PostFixture.BAKERY.getPost();
     private final Member member = MemberFixture.DEFAULT_F.getMember();
-    private PostLike postLike;
+    private final PostLike postLike = PostLike.builder().post(post).member(member).build();
 
     @BeforeEach
     void setup() {
         memberRepository.save(member);
         postRepository.save(post);
-        postLike = PostLike.builder().post(post).member(member).build();
         postLikeRepository.save(postLike);
     }
 
@@ -39,7 +38,7 @@ class PostLikeRepositoryTest {
     void findByMemberIdAndIdTest() {
         // when
         Optional<PostLike> foundPostLike =
-                postLikeRepository.findByMemberIdAndId(member.getId(), postLike.getId());
+                postLikeRepository.findByMemberIdAndPostId(member.getId(), post.getId());
         // then
         assertThat(foundPostLike).isPresent();
     }
