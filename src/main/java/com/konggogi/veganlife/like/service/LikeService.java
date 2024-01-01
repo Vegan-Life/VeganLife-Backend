@@ -1,7 +1,10 @@
 package com.konggogi.veganlife.like.service;
 
 
+import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.service.CommentQueryService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
@@ -19,14 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final MemberQueryService memberQueryService;
     private final PostQueryService postQueryService;
+    private final CommentQueryService commentQueryService;
     private final LikeQueryService likeQueryService;
-    private final LikeMapper postLikeMapper;
+    private final LikeMapper likeMapper;
 
     public void addPostLike(Long memberId, Long postId) {
         Member member = memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
         validatePostLikeIsExist(memberId, postId);
-        PostLike postLike = postLikeMapper.toEntity(member, post);
+        PostLike postLike = likeMapper.toPostLike(member, post);
         post.addPostLike(postLike);
     }
 
@@ -35,6 +39,15 @@ public class LikeService {
         Post post = postQueryService.search(postId);
         PostLike postLike = validatePostLikeIsNotExist(memberId, postId);
         post.removePostLike(postLike);
+    }
+
+    public void addCommentLike(Long memberId, Long postId, Long commentId) {
+        Member member = memberQueryService.search(memberId);
+        Post post = postQueryService.search(postId);
+        Comment comment = commentQueryService.search(commentId);
+        validateCommentLikeIsExist(memberId, commentId);
+        CommentLike commentLike = likeMapper.toCommentLike(member, post);
+        comment.addCommentLike(commentLike);
     }
 
     private void validatePostLikeIsExist(Long memberId, Long postId) {
@@ -52,6 +65,15 @@ public class LikeService {
                 .orElseThrow(
                         () -> {
                             throw new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED);
+                        });
+    }
+
+    public void validateCommentLikeIsExist(Long memberId, Long commentId) {
+        likeQueryService
+                .searchCommentLike(memberId, commentId)
+                .ifPresent(
+                        postLike -> {
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED);
                         });
     }
 }
