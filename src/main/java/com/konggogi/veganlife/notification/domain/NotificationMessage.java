@@ -18,6 +18,14 @@ public enum NotificationMessage implements MessageFormatter {
         public String getMessage(String commentAuthor, String postAuthor) {
             return String.format(this.getMessage(), commentAuthor, postAuthor);
         }
+    },
+
+    // comment-like
+    COMMENT_LIKE("%s님이 %s님의 댓글에 좋아요를 눌렀습니다!") {
+        @Override
+        public String getMessage(String commentLikeMember, String commentAuthor) {
+            return String.format(this.getMessage(), commentLikeMember, commentAuthor);
+        }
     };
 
     private final String message;

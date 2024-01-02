@@ -4,5 +4,6 @@ public enum NotificationType {
     SSE,
     INTAKE_OVER_30,
     INTAKE_OVER_60,
-    COMMENT
+    COMMENT,
+    COMMENT_LIKE
 }
