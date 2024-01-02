@@ -37,7 +37,7 @@ public class CommentService {
                         });
         Post post = postQueryService.search(postId);
         post.addComment(comment);
-        commentNotifyService.notifyAddCommentIfNotPostOwner(memberId, postId);
+        commentNotifyService.notifyAddCommentIfNotAuthor(memberId, postId);
         return comment;
     }
 

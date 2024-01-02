@@ -19,7 +19,7 @@ public class CommentNotifyService {
     private final PostQueryService postQueryService;
     private final NotificationService notificationService;
 
-    public void notifyAddCommentIfNotPostOwner(Long authorId, Long postId) {
+    public void notifyAddCommentIfNotAuthor(Long authorId, Long postId) {
         Member commentAuthor = memberQueryService.search(authorId);
         Member postAuthor = postQueryService.search(postId).getMember();
         if (commentAuthor.equals(postAuthor)) {
