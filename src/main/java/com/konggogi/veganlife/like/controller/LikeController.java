@@ -28,4 +28,22 @@ public class LikeController {
         likeService.removePostLike(userDetails.id(), postId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{postId}/comments/{commentId}/likes")
+    public ResponseEntity<Void> addCommentLike(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        likeService.addCommentLike(userDetails.id(), postId, commentId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}/likes")
+    public ResponseEntity<Void> removeCommentLike(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        likeService.removeCommentLike(userDetails.id(), postId, commentId);
+        return ResponseEntity.noContent().build();
+    }
 }

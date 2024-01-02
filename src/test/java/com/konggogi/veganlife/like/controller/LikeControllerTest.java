@@ -91,7 +91,7 @@ class LikeControllerTest extends RestDocsTest {
     @DisplayName("게시글 좋아요 API - 이미 좋아요한 경우 예외 발생")
     void addPostLikeAlreadyTest() throws Exception {
         // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_LIKED))
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_LIKED))
                 .when(likeService)
                 .addPostLike(anyLong(), anyLong());
         // when
@@ -166,7 +166,7 @@ class LikeControllerTest extends RestDocsTest {
     @DisplayName("게시글 좋아요 취소 API - 좋아요 되어 있지 않은 경우 예외 발생")
     void removePostLikeAlreadyTest() throws Exception {
         // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_UNLIKED))
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_UNLIKED))
                 .when(likeService)
                 .removePostLike(anyLong(), anyLong());
         // when
@@ -177,5 +177,206 @@ class LikeControllerTest extends RestDocsTest {
         perform.andExpect(status().isConflict());
 
         perform.andDo(print()).andDo(document("remove-post-like-already", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API")
+    void addCommentLikeTest() throws Exception {
+        // given
+        doNothing().when(likeService).addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "add-comment-like",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 회원 예외 발생")
+    void addCommentLikeNotFoundMemberTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 게시글 예외 발생")
+    void addCommentLikeNotFoundPostTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 댓글 예외 발생")
+    void addCommentLikeNotFoundCommentTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-comment", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 이미 좋아요한 경우 예외 발생")
+    void addCommentLikeAlreadyLikeTest() throws Exception {
+        // given
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_LIKED))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isConflict());
+
+        perform.andDo(print()).andDo(document("add-comment-like-already", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 API")
+    void removeCommentLikeTest() throws Exception {
+        // given
+        doNothing().when(likeService).removeCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "remove-comment-like",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 API - 없는 회원 예외 발생")
+    void removeCommentLikeNotFoundMemberTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(likeService)
+                .removeCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-like-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 API - 없는 게시글 예외 발생")
+    void removeCommentLikeNotFoundPostTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(likeService)
+                .removeCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-like-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 API - 없는 댓글 예외 발생")
+    void removeCommentLikeNotFoundCommentTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT))
+                .when(likeService)
+                .removeCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-like-not-found-comment", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 API - 이미 좋아요한 경우 예외 발생")
+    void removeCommentLikeAlreadyLikeTest() throws Exception {
+        // given
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_UNLIKED))
+                .when(likeService)
+                .removeCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isConflict());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-like-already", getDocumentResponse()));
     }
 }

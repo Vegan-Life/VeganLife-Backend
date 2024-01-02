@@ -2,6 +2,7 @@ package com.konggogi.veganlife.comment.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
 import jakarta.persistence.*;
@@ -33,13 +34,16 @@ public class Comment extends TimeStamped {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    // If comment is null, parent comment
+    // If parentComment is null, parent comment
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Comment> subComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<CommentLike> likes = new ArrayList<>();
 
     @Builder
     public Comment(Long id, String content, Member member, Post post, Comment parentComment) {
@@ -65,5 +69,14 @@ public class Comment extends TimeStamped {
 
     public Optional<Comment> getParent() {
         return Optional.ofNullable(parentComment);
+    }
+
+    public void addCommentLike(CommentLike commentLike) {
+        likes.add(commentLike);
+        commentLike.setComment(this);
+    }
+
+    public void removeCommentLike(CommentLike commentLike) {
+        likes.remove(commentLike);
     }
 }
