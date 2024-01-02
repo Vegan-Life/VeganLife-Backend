@@ -8,4 +8,8 @@ public interface MessageFormatter {
     default String getMessage(int data) {
         return getMessage();
     }
+
+    default String getMessage(String data, String subData) {
+        return getMessage();
+    }
 }

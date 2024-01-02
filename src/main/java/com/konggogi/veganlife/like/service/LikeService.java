@@ -24,6 +24,7 @@ public class LikeService {
     private final PostQueryService postQueryService;
     private final CommentQueryService commentQueryService;
     private final LikeQueryService likeQueryService;
+    private final LikeNotifyService likeNotifyService;
     private final LikeMapper likeMapper;
 
     public void addPostLike(Long memberId, Long postId) {
@@ -48,6 +49,7 @@ public class LikeService {
         validateCommentLikeIsExist(memberId, commentId);
         CommentLike commentLike = likeMapper.toCommentLike(member, post);
         comment.addCommentLike(commentLike);
+        likeNotifyService.notifyAddCommentLikeIfNotAuthor(memberId, commentId);
     }
 
     public void removeCommentLike(Long memberId, Long postId, Long commentId) {

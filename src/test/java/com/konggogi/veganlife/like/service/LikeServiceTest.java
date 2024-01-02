@@ -39,6 +39,7 @@ class LikeServiceTest {
     @Mock PostQueryService postQueryService;
     @Mock CommentQueryService commentQueryService;
     @Mock LikeQueryService likeQueryService;
+    @Mock LikeNotifyService likeNotifyService;
     @Spy LikeMapper likeMapper;
     @InjectMocks LikeService likeService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -180,6 +181,7 @@ class LikeServiceTest {
         given(likeQueryService.searchCommentLike(anyLong(), anyLong()))
                 .willReturn(Optional.empty());
         given(likeMapper.toCommentLike(any(Member.class), any(Post.class))).willReturn(commentLike);
+        doNothing().when(likeNotifyService).notifyAddCommentLikeIfNotAuthor(anyLong(), anyLong());
         // when
         likeService.addCommentLike(member.getId(), post.getId(), comment.getId());
         // then
