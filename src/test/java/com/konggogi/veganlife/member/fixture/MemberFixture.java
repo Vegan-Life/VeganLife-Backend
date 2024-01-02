@@ -7,8 +7,9 @@ import com.konggogi.veganlife.member.domain.VegetarianType;
 
 public enum MemberFixture {
     DEFAULT_F(
-            "테스트유저",
-            "image1.jpg",
+            "testF@test.com",
+            "비건라이프",
+            "image.jpg",
             2000,
             Gender.F,
             VegetarianType.VEGAN,
@@ -19,8 +20,19 @@ public enum MemberFixture {
             40,
             1821),
     DEFAULT_M(
-            "테스트유저", "image1.jpg", 1997, Gender.M, VegetarianType.OVO, 185, 85, 340, 204, 60, 2721);
-    private Long id = 1L;
+            "testM@test.com",
+            "비건라이프",
+            "image.jpg",
+            1997,
+            Gender.M,
+            VegetarianType.OVO,
+            185,
+            85,
+            340,
+            204,
+            60,
+            2721);
+    private final String email;
     private final String nickname;
     private final String profileImageUrl;
     private final Integer birthYear;
@@ -34,6 +46,7 @@ public enum MemberFixture {
     private final Integer AMR;
 
     MemberFixture(
+            String email,
             String nickname,
             String profileImageUrl,
             Integer birthYear,
@@ -45,6 +58,7 @@ public enum MemberFixture {
             Integer dailyProtein,
             Integer dailyFat,
             Integer AMR) {
+        this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.birthYear = birthYear;
@@ -58,18 +72,8 @@ public enum MemberFixture {
         this.AMR = AMR;
     }
 
-    public Member getMember() {
-        Member.MemberBuilder builder = createCommonMemberBuilder();
-        return builder.dailyCarbs(dailyCarbs)
-                .dailyProtein(dailyProtein)
-                .dailyFat(dailyFat)
-                .AMR(AMR)
-                .build();
-    }
-
-    public Member getMemberWithName(String nickname) {
-        Member.MemberBuilder builder = createCommonMemberBuilder();
-        return builder.nickname(nickname)
+    public Member get() {
+        return createCommonMemberBuilder()
                 .dailyCarbs(dailyCarbs)
                 .dailyProtein(dailyProtein)
                 .dailyFat(dailyFat)
@@ -77,22 +81,26 @@ public enum MemberFixture {
                 .build();
     }
 
-    public Member getMemberWithoutInfo() {
-        Long id = this.id++;
-        String email = "test" + id + "@test.com";
+    public Member getWithId(Long id) {
+        return createCommonMemberBuilder()
+                .id(id)
+                .dailyCarbs(dailyCarbs)
+                .dailyProtein(dailyProtein)
+                .dailyFat(dailyFat)
+                .AMR(AMR)
+                .build();
+    }
+
+    public Member getOnlyEmailWithId(Long id) {
         return Member.builder().id(id).email(email).build();
     }
 
-    public Member getMemberWithoutNutrientInfo() {
+    public Member getWithoutNutrientInfo() {
         return createCommonMemberBuilder().build();
     }
 
     private Member.MemberBuilder createCommonMemberBuilder() {
-        Long id = this.id++;
-        String nickname = this.nickname + id;
-        String email = "test" + id + "@test.com";
         return Member.builder()
-                .id(id)
                 .email(email)
                 .nickname(nickname)
                 .profileImageUrl(profileImageUrl)
