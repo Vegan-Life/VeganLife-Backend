@@ -178,4 +178,104 @@ class LikeControllerTest extends RestDocsTest {
 
         perform.andDo(print()).andDo(document("remove-post-like-already", getDocumentResponse()));
     }
+
+    @Test
+    @DisplayName("댓글 좋아요 API")
+    void addCommentLikeTest() throws Exception {
+        // given
+        doNothing().when(likeService).addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "add-comment-like",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 회원 예외 발생")
+    void addCommentLikeNotFoundMemberTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 게시글 예외 발생")
+    void addCommentLikeNotFoundPostTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 없는 댓글 예외 발생")
+    void addCommentLikeNotFoundCommentTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("add-comment-like-not-found-comment", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 API - 이미 좋아요한 경우 예외 발생")
+    void addCommentLikeAlreadyLikeTest() throws Exception {
+        // given
+        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_LIKED))
+                .when(likeService)
+                .addCommentLike(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/posts/{postId}/comments/{commentId}/likes", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isConflict());
+
+        perform.andDo(print()).andDo(document("add-comment-like-already", getDocumentResponse()));
+    }
 }
