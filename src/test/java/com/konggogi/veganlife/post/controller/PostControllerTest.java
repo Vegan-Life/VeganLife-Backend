@@ -36,7 +36,7 @@ class PostControllerTest extends RestDocsTest {
     @DisplayName("게시글 등록 API")
     void addPostTest() throws Exception {
         // given
-        Post post = PostFixture.BAKERY.getPostAllInfoWithId(1L);
+        Post post = PostFixture.BAKERY.getWithId(1L);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
         PostAddRequest request =
@@ -67,7 +67,7 @@ class PostControllerTest extends RestDocsTest {
     @DisplayName("게시글 등록 API - 없는 회원 예외 발생")
     void addPostNotMemberTest() throws Exception {
         // given
-        Post post = PostFixture.BAKERY.getPostAllInfoWithId(1L);
+        Post post = PostFixture.BAKERY.getWithId(1L);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
         PostAddRequest request =

@@ -47,7 +47,7 @@ class PostServiceTest {
     @DisplayName("게시글 등록")
     void addTest() {
         // given
-        Post post = PostFixture.BAKERY.getPost();
+        Post post = PostFixture.BAKERY.get();
         Long memberId = member.getId();
         PostAddRequest request = createPostAddRequest();
         given(memberQueryService.search(memberId)).willReturn(member);

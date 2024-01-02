@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PostQueryServiceTest {
     @Mock PostRepository postRepository;
     @InjectMocks PostQueryService postQueryService;
-    private final Post post = PostFixture.CHALLENGE.getPost();
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
 
     @Test
     @DisplayName("게시글 번호로 게시글 조회")

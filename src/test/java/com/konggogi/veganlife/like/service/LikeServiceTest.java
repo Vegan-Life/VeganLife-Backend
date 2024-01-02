@@ -42,7 +42,7 @@ class LikeServiceTest {
     @Spy LikeMapper likeMapper;
     @InjectMocks LikeService likeService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-    private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
     private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
     private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);

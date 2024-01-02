@@ -36,7 +36,7 @@ class CommentServiceTest {
     @Spy CommentMapper commentMapper;
     @InjectMocks CommentService commentService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-    private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
     private final Comment subComment =
             CommentFixture.DEFAULT.getSubCommentWithId(2L, member, post, comment);

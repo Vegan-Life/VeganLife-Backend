@@ -31,7 +31,7 @@ class LikeQueryServiceTest {
     @Mock CommentLikeRepository commentLikeRepository;
     @InjectMocks LikeQueryService likeQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-    private final Post post = PostFixture.CHALLENGE.getPost();
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
     private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
     private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
     private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);
