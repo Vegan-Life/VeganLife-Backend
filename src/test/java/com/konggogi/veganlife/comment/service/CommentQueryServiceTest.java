@@ -2,7 +2,6 @@ package com.konggogi.veganlife.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -28,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CommentQueryServiceTest {
     @Mock CommentRepository commentRepository;
     @InjectMocks CommentQueryService commentQueryService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getPost();
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
 

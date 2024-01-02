@@ -15,11 +15,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
 
-    private Member member;
+    private final Member member = MemberFixture.DEFAULT_F.get();
 
     @BeforeEach
     void setup() {
-        member = MemberFixture.DEFAULT_F.getMember();
         memberRepository.save(member);
     }
 

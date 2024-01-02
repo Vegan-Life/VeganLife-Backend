@@ -24,7 +24,7 @@ class PostLikeRepositoryTest {
     @Autowired PostRepository postRepository;
 
     private final Post post = PostFixture.BAKERY.getPost();
-    private final Member member = MemberFixture.DEFAULT_F.getMember();
+    private final Member member = MemberFixture.DEFAULT_F.get();
     private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
 
     @BeforeEach

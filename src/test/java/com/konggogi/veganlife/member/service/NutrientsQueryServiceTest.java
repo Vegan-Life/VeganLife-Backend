@@ -37,7 +37,7 @@ class NutrientsQueryServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock MealLogRepository mealLogRepository;
     @InjectMocks NutrientsQueryService nutrientsQueryService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final List<MealData> mealData =
             List.of(
                     MealDataFixture.TOTAL_AMOUNT.get(member),

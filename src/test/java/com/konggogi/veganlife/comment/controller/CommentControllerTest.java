@@ -36,7 +36,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(CommentController.class)
 class CommentControllerTest extends RestDocsTest {
     @MockBean CommentService commentService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
     private final Comment subComment =

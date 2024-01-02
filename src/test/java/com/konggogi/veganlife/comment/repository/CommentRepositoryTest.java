@@ -22,7 +22,7 @@ class CommentRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired PostRepository postRepository;
     @Autowired CommentRepository commentRepository;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getPost();
     private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
 

@@ -35,7 +35,7 @@ class MemberServiceTest {
     @Mock RefreshTokenRepository refreshTokenRepository;
     @Mock MemberQueryService memberQueryService;
     @InjectMocks MemberService memberService;
-    private final Member member = MemberFixture.DEFAULT_F.getMemberWithoutInfo();
+    private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
     @Test
     @DisplayName("이미 가입한 회원인 경우 기존 Member 반환")
@@ -102,7 +102,7 @@ class MemberServiceTest {
     void modifyMemberInfoFailTest() {
         // given
         Long memberId = member.getId();
-        Member existingMember = MemberFixture.DEFAULT_F.getMember();
+        Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
         String nickname = existingMember.getNickname();
         MemberInfoRequest request =
                 new MemberInfoRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
@@ -176,7 +176,7 @@ class MemberServiceTest {
     void modifyMemberProfileDuplicatedNicknameTest() {
         // given
         Long memberId = member.getId();
-        Member existingMember = MemberFixture.DEFAULT_F.getMember();
+        Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
         MemberProfileRequest profileRequest =
                 new MemberProfileRequest(
                         existingMember.getNickname(),

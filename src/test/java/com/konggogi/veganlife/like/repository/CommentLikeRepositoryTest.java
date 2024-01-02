@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.like.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
@@ -29,7 +28,7 @@ class CommentLikeRepositoryTest {
     @Autowired CommentLikeRepository commentLikeRepository;
 
     private final Post post = PostFixture.BAKERY.getPost();
-    private final Member member = MemberFixture.DEFAULT_F.getMember();
+    private final Member member = MemberFixture.DEFAULT_F.get();
     private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
     private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);
 

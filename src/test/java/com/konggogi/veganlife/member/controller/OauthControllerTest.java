@@ -42,7 +42,7 @@ class OauthControllerTest extends RestDocsTest {
     @DisplayName("소셜 로그인 API")
     void loginTest() throws Exception {
         // given
-        Member member = MemberFixture.DEFAULT_F.getMemberWithoutInfo();
+        Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
         String email = member.getEmail();
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";

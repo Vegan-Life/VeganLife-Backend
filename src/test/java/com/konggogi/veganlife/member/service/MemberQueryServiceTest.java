@@ -35,7 +35,7 @@ class MemberQueryServiceTest {
     @Mock private JwtProvider jwtProvider;
     @Mock private RefreshTokenRepository refreshTokenRepository;
     @InjectMocks MemberQueryService memberQueryService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("회원 번호로 조회")

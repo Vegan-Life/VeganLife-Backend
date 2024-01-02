@@ -35,7 +35,7 @@ class CommentServiceTest {
     @Mock CommentQueryService commentQueryService;
     @Spy CommentMapper commentMapper;
     @InjectMocks CommentService commentService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
     private final Comment subComment =

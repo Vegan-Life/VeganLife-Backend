@@ -40,7 +40,7 @@ class NotificationServiceTest {
     @Mock SseEmitter sseEmitter;
     @InjectMocks NotificationService notificationService;
 
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Notification notification = NotificationFixture.SSE.get(member);
 
     @Test

@@ -40,7 +40,7 @@ class PostServiceTest {
     @Spy PostImageMapper postImageMapper = new PostImageMapperImpl();
     @Mock TagRepository tagRepository;
     @InjectMocks PostService postService;
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Tag tag = TagFixture.DEFAULT.getTag();
 
     @Test
