@@ -4,6 +4,7 @@ package com.konggogi.veganlife.global.advice.common;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
+import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
 import org.springframework.http.HttpStatus;
@@ -85,5 +86,13 @@ public class GlobalControllerAdvice {
                 exception);
 
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+    }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            InvalidJwtException exception) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.from(exception.getErrorCode()));
     }
 }

@@ -12,7 +12,7 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
-import com.konggogi.veganlife.global.util.JwtUtils;
+import com.konggogi.veganlife.global.security.jwt.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;

@@ -1,7 +1,7 @@
-package com.konggogi.veganlife.global.security.jwt;
+package com.konggogi.veganlife.member.domain;
 
 
-import com.konggogi.veganlife.global.util.JwtUtils;
+import com.konggogi.veganlife.global.security.jwt.JwtProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +33,7 @@ public class RefreshToken {
     }
 
     public boolean isSameToken(String token) {
-        int prefixLength = JwtUtils.BEARER_PREFIX.length();
+        int prefixLength = JwtProperties.BEARER_PREFIX.length();
         return this.token.substring(prefixLength).equals(token);
     }
 }

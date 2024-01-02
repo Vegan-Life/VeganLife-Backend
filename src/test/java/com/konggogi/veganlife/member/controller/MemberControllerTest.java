@@ -15,8 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.SignupRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -51,9 +51,9 @@ class MemberControllerTest extends RestDocsTest {
         // given
         String nickname = "테스트유저";
         Member member = MemberFixture.DEFAULT_M.getMemberWithName(nickname);
-        MemberInfoRequest request =
-                new MemberInfoRequest(nickname, Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
+        SignupRequest request =
+                new SignupRequest(nickname, Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        given(memberService.modifyMemberInfo(anyLong(), any(SignupRequest.class)))
                 .willReturn(member);
         // when
         ResultActions perform =
@@ -79,9 +79,9 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("회원 정보 수정 API - 중복 닉네임 예외 발생")
     void modifyMemberInfoDuplicatedNicknameTest() throws Exception {
         // given
-        MemberInfoRequest request =
-                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
+        SignupRequest request =
+                new SignupRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        given(memberService.modifyMemberInfo(anyLong(), any(SignupRequest.class)))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =

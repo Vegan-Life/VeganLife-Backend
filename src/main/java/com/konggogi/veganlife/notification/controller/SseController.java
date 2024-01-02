@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.notification.controller;
 
 
-import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
+import com.konggogi.veganlife.global.security.user.JwtUserPrincipal;
 import com.konggogi.veganlife.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,7 +18,7 @@ public class SseController {
 
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
         SseEmitter emitter = notificationService.subscribe(userDetails.id());
         return ResponseEntity.ok(emitter);
     }

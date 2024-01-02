@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.mealdata.controller;
 
 
-import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
+import com.konggogi.veganlife.global.security.user.JwtUserPrincipal;
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
@@ -53,7 +53,7 @@ public class MealDataController {
     @PostMapping
     public ResponseEntity<Void> addMealData(
             @Valid @RequestBody MealDataAddRequest request,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
 
         mealDataService.add(request, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();

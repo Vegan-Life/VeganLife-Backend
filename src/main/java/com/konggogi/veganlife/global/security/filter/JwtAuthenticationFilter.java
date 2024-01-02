@@ -1,23 +1,22 @@
 package com.konggogi.veganlife.global.security.filter;
 
 
+import com.konggogi.veganlife.global.exception.ApiAuthenticationException;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
-import com.konggogi.veganlife.global.security.user.UserDetailsServiceImpl;
-import com.konggogi.veganlife.global.util.JwtUtils;
+import com.konggogi.veganlife.global.security.jwt.JwtPreAuthenticationToken;
+import com.konggogi.veganlife.global.security.jwt.JwtProperties;
+import com.konggogi.veganlife.global.security.jwt.JwtUtils;
+import com.konggogi.veganlife.global.security.provider.JwtAuthenticationProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,63 +24,33 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtUtils jwtUtils;
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
 
-    protected boolean shouldNotFilterAsyncDispatch() {
-        return false;
-    }
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String extractToken = request.getHeader(JwtUtils.AUTH_TOKEN_HEADER);
-        jwtUtils.extractBearerToken(extractToken)
-                .ifPresentOrElse(
-                        jwt -> {
-                            try {
-                                jwtUtils.validateToken(jwt);
-                                setAuthentication(request, jwt);
-                            } catch (InvalidJwtException e) {
-                                request.setAttribute(
-                                        JwtUtils.EXCEPTION_ATTRIBUTE, e.getErrorCode());
-                            }
-                        },
-                        () ->
-                                request.setAttribute(
-                                        JwtUtils.EXCEPTION_ATTRIBUTE,
-                                        ErrorCode.NOT_FOUND_AUTHORIZATION_HEADER));
+        String bearerToken = request.getHeader(JwtProperties.AUTH_TOKEN_HEADER);
+
+        try {
+            JwtPreAuthenticationToken jwtToken = getJwtToken(bearerToken);
+            /** 추출한 JwtToken을 가지고 인증을 시도한다. */
+            Authentication authentication = jwtAuthenticationProvider.authenticate(jwtToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (ApiAuthenticationException e) {
+            request.setAttribute(JwtProperties.EXCEPTION_ATTRIBUTE, e);
+        }
         filterChain.doFilter(request, response);
     }
 
-    private String getUserEmailFromJwt(String token) {
-        return jwtUtils.extractUserEmail(token)
-                .orElseThrow(() -> new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
-    }
+    private JwtPreAuthenticationToken getJwtToken(String bearerToken) {
 
-    private void setAuthentication(HttpServletRequest request, String jwt) {
-        getAuthentication()
-                .ifPresentOrElse(
-                        (auth) -> {},
-                        () -> {
-                            String email = getUserEmailFromJwt(jwt);
-                            UserDetails userDetails =
-                                    userDetailsServiceImpl.loadUserByUsername(email);
-                            setAuthenticationInSecurityContext(request, userDetails);
-                        });
-    }
-
-    private Optional<Authentication> getAuthentication() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
-    }
-
-    private void setAuthenticationInSecurityContext(
-            HttpServletRequest request, UserDetails userDetails) {
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        return JwtUtils.extractJwtToken(bearerToken)
+                .map(JwtPreAuthenticationToken::new)
+                .orElseThrow(
+                        () ->
+                                new InvalidJwtException(
+                                        ErrorCode.NOT_FOUND_AUTHORIZATION_CREDENTIALS));
     }
 }

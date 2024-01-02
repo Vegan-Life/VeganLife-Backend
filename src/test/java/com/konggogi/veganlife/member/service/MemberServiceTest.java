@@ -11,11 +11,11 @@ import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.SignupRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.RefreshToken;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
@@ -81,8 +81,8 @@ class MemberServiceTest {
     void modifyMemberInfoTest() {
         // given
         Long memberId = member.getId();
-        MemberInfoRequest request =
-                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        SignupRequest request =
+                new SignupRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(memberId)).willReturn(member);
         // when
@@ -104,8 +104,8 @@ class MemberServiceTest {
         Long memberId = member.getId();
         Member existingMember = MemberFixture.DEFAULT_F.getMember();
         String nickname = existingMember.getNickname();
-        MemberInfoRequest request =
-                new MemberInfoRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
+        SignupRequest request =
+                new SignupRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
         given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
         // when, then
         assertThatThrownBy(() -> memberService.modifyMemberInfo(memberId, request))

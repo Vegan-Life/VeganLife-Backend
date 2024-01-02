@@ -2,6 +2,7 @@ package com.konggogi.veganlife.member.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -18,6 +19,13 @@ public class Member extends TimeStamped {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OauthProvider oauthProvider;
+
+    @Column(nullable = false)
+    private String oauthUserId;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -26,11 +34,14 @@ public class Member extends TimeStamped {
 
     private String profileImageUrl;
 
+    @Column(nullable = false)
     private Integer birthYear;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private VegetarianType vegetarianType;
 
@@ -38,8 +49,10 @@ public class Member extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
     private Integer height;
 
+    @Column(nullable = false)
     private Integer weight;
 
     private Integer dailyCarbs;
@@ -47,12 +60,11 @@ public class Member extends TimeStamped {
     private Integer dailyFat;
     private Integer AMR; // 활동 대사량
 
-    @Column(nullable = false)
-    private boolean hasAdditionalInfo;
-
     @Builder
     public Member(
             Long id,
+            OauthProvider oauthProvider,
+            String oauthUserId,
             String email,
             String nickname,
             String profileImageUrl,
@@ -66,6 +78,8 @@ public class Member extends TimeStamped {
             Integer dailyFat,
             Integer AMR) {
         this.id = id;
+        this.oauthProvider = oauthProvider;
+        this.oauthUserId = oauthUserId;
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -79,22 +93,6 @@ public class Member extends TimeStamped {
         this.dailyFat = dailyFat;
         this.AMR = AMR;
         this.role = Role.USER;
-        this.hasAdditionalInfo = false;
-    }
-
-    public int calcAge() {
-        LocalDate now = LocalDate.now();
-        int currentYear = now.getYear();
-        return (currentYear - birthYear);
-    }
-
-    private int calcBMR() {
-        int age = calcAge();
-        if (gender == Gender.F) {
-            return (int) Math.round((655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)));
-        } else {
-            return (int) Math.round((66 + (13.7 * weight) + (5 * height) - (6.8 * age)));
-        }
     }
 
     public void updateDailyIntake() {
@@ -103,23 +101,6 @@ public class Member extends TimeStamped {
         dailyCarbs = (int) ((AMR * (50.0 / 100)) / 4);
         dailyProtein = (int) ((AMR * (30.0 / 100)) / 4);
         dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
-    }
-
-    public void updateMemberInfo(
-            String nickname,
-            Gender gender,
-            VegetarianType vegetarianType,
-            Integer birthYear,
-            Integer height,
-            Integer weight) {
-        this.nickname = nickname;
-        this.gender = gender;
-        this.vegetarianType = vegetarianType;
-        this.birthYear = birthYear;
-        this.height = height;
-        this.weight = weight;
-        this.hasAdditionalInfo = true;
-        updateDailyIntake();
     }
 
     public void modifyMemberProfile(
@@ -138,5 +119,20 @@ public class Member extends TimeStamped {
         this.height = height;
         this.weight = weight;
         updateDailyIntake();
+    }
+
+    private int calcAge() {
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+        return (currentYear - birthYear);
+    }
+
+    private int calcBMR() {
+        int age = calcAge();
+        if (gender == Gender.F) {
+            return (int) Math.round((655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)));
+        } else {
+            return (int) Math.round((66 + (13.7 * weight) + (5 * height) - (6.8 * age)));
+        }
     }
 }

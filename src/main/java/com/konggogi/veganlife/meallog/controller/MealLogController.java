@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.meallog.controller;
 
 
-import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
+import com.konggogi.veganlife.global.security.user.JwtUserPrincipal;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
@@ -38,7 +38,7 @@ public class MealLogController {
     @PostMapping
     public ResponseEntity<Void> addMealLog(
             @Valid @RequestBody MealLogAddRequest request,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
 
         mealLogService.add(request, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -46,7 +46,7 @@ public class MealLogController {
 
     @GetMapping
     public ResponseEntity<List<MealLogListResponse>> getMealLogList(
-            @RequestParam LocalDate date, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @RequestParam LocalDate date, @AuthenticationPrincipal JwtUserPrincipal userDetails) {
 
         return ResponseEntity.ok(
                 mealLogQueryService.searchByDate(date, userDetails.id()).stream()

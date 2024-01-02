@@ -2,13 +2,15 @@ package com.konggogi.veganlife.member.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.SignupRequest;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.RefreshToken;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import com.konggogi.veganlife.member.service.dto.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,33 +22,16 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberQueryService memberQueryService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberMapper memberMapper;
 
-    public Member addMember(String email) {
-        return memberRepository
-                .findByEmail(email)
-                .orElseGet(
-                        () -> {
-                            Member member = Member.builder().email(email).build();
-                            return memberRepository.save(member);
-                        });
+    public Member addMember(UserInfo userInfo, SignupRequest request) {
+        validateNickname(request.nickname());
+        return memberRepository.save(memberMapper.toEntity(userInfo, request));
     }
 
     public void removeMember(Long memberId) {
         Member member = memberQueryService.search(memberId);
         memberRepository.delete(member);
-    }
-
-    public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
-        validateNickname(infoRequest.nickname());
-        Member member = memberQueryService.search(memberId);
-        member.updateMemberInfo(
-                infoRequest.nickname(),
-                infoRequest.gender(),
-                infoRequest.vegetarianType(),
-                infoRequest.birthYear(),
-                infoRequest.height(),
-                infoRequest.weight());
-        return member;
     }
 
     public void saveRefreshToken(Long memberId, String token) {

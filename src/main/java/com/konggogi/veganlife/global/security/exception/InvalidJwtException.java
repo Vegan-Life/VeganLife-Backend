@@ -1,10 +1,10 @@
 package com.konggogi.veganlife.global.security.exception;
 
 
-import com.konggogi.veganlife.global.exception.ApiException;
+import com.konggogi.veganlife.global.exception.ApiAuthenticationException;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 
-public class InvalidJwtException extends ApiException {
+public class InvalidJwtException extends ApiAuthenticationException {
     public InvalidJwtException(ErrorCode errorCode) {
         super(errorCode);
     }

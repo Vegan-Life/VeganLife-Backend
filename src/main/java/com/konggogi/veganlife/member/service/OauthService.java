@@ -3,10 +3,10 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenException;
-import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
+import com.konggogi.veganlife.member.service.dto.UserInfo;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +26,11 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String NAVER_USER_INFO_URI;
 
-    public Member createMemberFromToken(OauthProvider provider, String token) {
+    public UserInfo getUserInfo(OauthProvider provider, String token) {
         Map<String, Object> userAttributes = getUserAttributesByToken(provider, token);
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
-        String email = oauthUserInfo.getEmail();
-        return Member.builder().email(email).build();
+        return oauthUserInfo.getUserInfo();
     }
 
     private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {

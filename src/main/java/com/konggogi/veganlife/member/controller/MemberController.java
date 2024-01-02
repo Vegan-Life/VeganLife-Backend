@@ -1,8 +1,7 @@
 package com.konggogi.veganlife.member.controller;
 
 
-import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.global.security.user.JwtUserPrincipal;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.controller.dto.response.*;
 import com.konggogi.veganlife.member.domain.Member;
@@ -32,30 +31,23 @@ public class MemberController {
     private final MemberMapper memberMapper;
     private final NutrientsMapper nutrientsMapper;
 
-    @PostMapping()
-    public ResponseEntity<MemberInfoResponse> modifyMemberInfo(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody @Valid MemberInfoRequest memberInfoRequest) {
-        Member member = memberService.modifyMemberInfo(userDetails.id(), memberInfoRequest);
-        return ResponseEntity.ok(memberMapper.toMemberInfoResponse(member));
-    }
-
     @DeleteMapping()
-    public ResponseEntity<Void> removeMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Void> removeMember(
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
         memberService.removeMember(userDetails.id());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/profile")
     public ResponseEntity<MemberProfileResponse> getMemberDetails(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
         Member member = memberQueryService.search(userDetails.id());
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 
     @PutMapping("/profile")
     public ResponseEntity<MemberProfileResponse> modifyMemberProfile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal JwtUserPrincipal userDetails,
             @RequestBody @Valid MemberProfileRequest memberProfileRequest) {
         Member member = memberService.modifyMemberProfile(userDetails.id(), memberProfileRequest);
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
@@ -63,14 +55,14 @@ public class MemberController {
 
     @GetMapping("/nutrients")
     public ResponseEntity<RecommendNutrientsResponse> getRecommendNutrients(
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @AuthenticationPrincipal JwtUserPrincipal userDetails) {
         Member member = memberQueryService.search(userDetails.id());
         return ResponseEntity.ok(memberMapper.toRecommendNutrientsResponse(member));
     }
 
     @GetMapping("/nutrients/today")
     public ResponseEntity<TodayIntakeResponse> getTodayIntake(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal JwtUserPrincipal userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         IntakeNutrients intakeNutrients =
                 nutrientsQueryService.searchDailyIntakeNutrients(userDetails.id(), date);
@@ -79,7 +71,7 @@ public class MemberController {
 
     @GetMapping("/nutrients/week")
     public ResponseEntity<CalorieIntakeResponse> getWeeklyIntakeCalorie(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal JwtUserPrincipal userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         List<CaloriesOfMealType> mealCalories =
@@ -92,7 +84,7 @@ public class MemberController {
 
     @GetMapping("/nutrients/month")
     public ResponseEntity<CalorieIntakeResponse> getMonthlyIntakeCalorie(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal JwtUserPrincipal userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
         List<CaloriesOfMealType> mealCalories =
@@ -104,7 +96,7 @@ public class MemberController {
 
     @GetMapping("/nutrients/year")
     public ResponseEntity<CalorieIntakeResponse> getYearlyIntakeCalorie(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal JwtUserPrincipal userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
         List<CaloriesOfMealType> mealCalories =

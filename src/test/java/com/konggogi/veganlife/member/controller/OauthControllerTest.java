@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
-import com.konggogi.veganlife.member.controller.dto.request.OauthRequest;
+import com.konggogi.veganlife.member.controller.dto.request.OauthLoginRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
@@ -32,7 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-@WebMvcTest(OauthController.class)
+@WebMvcTest(AuthController.class)
 class OauthControllerTest extends RestDocsTest {
     @MockBean OauthService oauthService;
     @MockBean MemberService memberService;
@@ -46,7 +46,7 @@ class OauthControllerTest extends RestDocsTest {
         String email = member.getEmail();
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
-        OauthRequest oauthRequest = new OauthRequest("oauthAccessToken");
+        OauthLoginRequest oauthRequest = new OauthLoginRequest("oauthAccessToken");
         given(oauthService.createMemberFromToken(any(OauthProvider.class), anyString()))
                 .willReturn(member);
         given(memberService.addMember(email)).willReturn(member);
@@ -82,7 +82,7 @@ class OauthControllerTest extends RestDocsTest {
     @DisplayName("소셜 로그인 API - 지원하지 않는 provider 예외 발생")
     void loginUnsupportedProviderTest() throws Exception {
         // given
-        OauthRequest oauthRequest = new OauthRequest("oauthAccessToken");
+        OauthLoginRequest oauthRequest = new OauthLoginRequest("oauthAccessToken");
         given(oauthService.createMemberFromToken(any(OauthProvider.class), anyString()))
                 .willThrow(new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER));
 
