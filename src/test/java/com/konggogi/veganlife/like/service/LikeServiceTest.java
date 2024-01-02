@@ -187,45 +187,6 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 좋아요 없는 회원 예외 발생")
-    void addCommentLikeNotFoundMemberTest() {
-        // given
-        given(memberQueryService.search(anyLong()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                likeService.addCommentLike(
-                                        member.getId(), post.getId(), comment.getId()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-        then(memberQueryService).should().search(anyLong());
-        then(postQueryService).should(never()).search(anyLong());
-        then(commentQueryService).should(never()).search(anyLong());
-        then(likeQueryService).should(never()).searchCommentLike(anyLong(), anyLong());
-    }
-
-    @Test
-    @DisplayName("댓글 좋아요 없는 게시글 예외 발생")
-    void addCommentLikeNotFoundPostTest() {
-        // given
-        given(memberQueryService.search(anyLong())).willReturn(member);
-        given(postQueryService.search(anyLong()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                likeService.addCommentLike(
-                                        member.getId(), post.getId(), comment.getId()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
-        then(memberQueryService).should().search(anyLong());
-        then(postQueryService).should().search(anyLong());
-        then(commentQueryService).should(never()).search(anyLong());
-        then(likeQueryService).should(never()).searchCommentLike(anyLong(), anyLong());
-    }
-
-    @Test
     @DisplayName("댓글 좋아요 없는 댓글 예외 발생")
     void addCommentLikeNotFoundCommentTest() {
         // given
@@ -262,6 +223,43 @@ class LikeServiceTest {
                                         member.getId(), post.getId(), comment.getId()))
                 .isInstanceOf(IllegalLikeStatusException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_COMMENT_LIKED.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(commentQueryService).should().search(anyLong());
+        then(likeQueryService).should().searchCommentLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소")
+    void removeCommentLikeTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        given(likeQueryService.searchCommentLike(anyLong(), anyLong()))
+                .willReturn(Optional.of(commentLike));
+        // when
+        likeService.removeCommentLike(member.getId(), post.getId(), comment.getId());
+        // then
+        assertThat(comment.getLikes()).doesNotContain(commentLike);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 이미 좋아요 취소한 경우 예외 발생")
+    void removeCommentLikeNotFoundMemberTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        given(likeQueryService.searchCommentLike(anyLong(), anyLong()))
+                .willReturn(Optional.empty());
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                likeService.removeCommentLike(
+                                        member.getId(), post.getId(), comment.getId()))
+                .isInstanceOf(IllegalLikeStatusException.class)
+                .hasMessageContaining(ErrorCode.ALREADY_COMMENT_UNLIKED.getDescription());
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
         then(commentQueryService).should().search(anyLong());
