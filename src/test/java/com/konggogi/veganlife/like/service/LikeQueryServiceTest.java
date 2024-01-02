@@ -5,7 +5,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.like.fixture.CommentLikeFixture;
+import com.konggogi.veganlife.like.fixture.PostLikeFixture;
+import com.konggogi.veganlife.like.repository.CommentLikeRepository;
 import com.konggogi.veganlife.like.repository.PostLikeRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
@@ -22,10 +28,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class LikeQueryServiceTest {
     @Mock PostLikeRepository postLikeRepository;
+    @Mock CommentLikeRepository commentLikeRepository;
     @InjectMocks LikeQueryService likeQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getMember();
     private final Post post = PostFixture.CHALLENGE.getPost();
-    private final PostLike postLike = PostLike.builder().post(post).member(member).build();
+    private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
+    private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
+    private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);
 
     @Test
     @DisplayName("게시글 좋아요 여부 조회 - 존재하는 경우")
@@ -51,5 +60,33 @@ class LikeQueryServiceTest {
         // then
         assertThat(foundPostLike).isEmpty();
         then(postLikeRepository).should().findByMemberIdAndPostId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 여부 조회 - 존재하는 경우")
+    void searchCommentLikeExistTest() {
+        // given
+        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
+                .willReturn(Optional.of(commentLike));
+        // when
+        Optional<CommentLike> foundCommentLike =
+                likeQueryService.searchCommentLike(anyLong(), anyLong());
+        // then
+        assertThat(foundCommentLike).isPresent();
+        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 여부 조회 - 존재하지 않는 경우")
+    void searchCommentLikeNotFoundTest() {
+        // given
+        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
+                .willReturn(Optional.empty());
+        // when
+        Optional<CommentLike> foundCommentLike =
+                likeQueryService.searchCommentLike(anyLong(), anyLong());
+        // then
+        assertThat(foundCommentLike).isEmpty();
+        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
     }
 }
