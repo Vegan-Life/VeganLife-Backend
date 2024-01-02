@@ -33,7 +33,7 @@ class IntakeNotifyServiceTest {
     @Mock NotificationRepository notificationRepository;
     @InjectMocks IntakeNotifyService intakeNotifyService;
 
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("권장 섭취량 대비 금일 섭취 칼로리 30% 초과시 알림")

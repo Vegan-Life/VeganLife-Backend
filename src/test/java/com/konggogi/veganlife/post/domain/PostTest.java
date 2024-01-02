@@ -12,7 +12,7 @@ class PostTest {
     @DisplayName("게시글에 태그 추가")
     void addPostTagTest() {
         // given
-        Post post = PostFixture.BAKERY.getPost();
+        Post post = PostFixture.BAKERY.get();
         Tag tag = TagFixture.STORE.getTag();
         PostTag postTag = PostTag.builder().tag(tag).build();
         // when
@@ -25,7 +25,7 @@ class PostTest {
     @DisplayName("게시글에 이미지 추가")
     void addPostImageTest() {
         // given
-        Post post = PostFixture.BAKERY.getPost();
+        Post post = PostFixture.BAKERY.get();
         String url = "imageUrl.jpg";
         PostImage postImage = PostImage.builder().imageUrl(url).build();
         // when

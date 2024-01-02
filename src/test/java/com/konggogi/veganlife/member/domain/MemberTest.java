@@ -12,7 +12,7 @@ class MemberTest {
     @DisplayName("출생연도 나이 계산")
     void calcAgeTest() {
         // given
-        Member member = MemberFixture.DEFAULT_M.getMember();
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         int currentYear = LocalDate.now().getYear();
         int expectedAge = currentYear - member.getBirthYear();
         // when
@@ -25,7 +25,7 @@ class MemberTest {
     @DisplayName("일일 섭취량 업데이트")
     void updateDailyIntakeTest() {
         // given
-        Member member = MemberFixture.DEFAULT_M.getMemberWithoutNutrientInfo();
+        Member member = MemberFixture.DEFAULT_M.getWithoutNutrientInfo();
         int age = LocalDate.now().getYear() - member.getBirthYear();
         int weight = member.getWeight();
         int height = member.getHeight();
@@ -47,7 +47,7 @@ class MemberTest {
     @DisplayName("회원 정보 업데이트")
     void updateMemberInfoTest() {
         // given
-        Member member = MemberFixture.DEFAULT_M.getMemberWithoutInfo();
+        Member member = MemberFixture.DEFAULT_M.getOnlyEmailWithId(1L);
         String nickname = "닉네임";
         Gender gender = Gender.F;
         VegetarianType vegetarianType = VegetarianType.LACTO_OVO;
@@ -74,7 +74,7 @@ class MemberTest {
     @DisplayName("회원 프로필 수정")
     void modifyMemberProfileTest() {
         // given
-        Member member = MemberFixture.DEFAULT_M.getMember();
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         String nickname = "닉네임";
         String profileImageUrl = "imageUrl";
         Gender gender = Gender.F;

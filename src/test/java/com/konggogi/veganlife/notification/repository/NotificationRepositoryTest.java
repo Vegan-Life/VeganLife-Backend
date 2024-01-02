@@ -23,7 +23,7 @@ class NotificationRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired NotificationRepository notificationRepository;
 
-    private final Member member = MemberFixture.DEFAULT_M.getMember();
+    private final Member member = MemberFixture.DEFAULT_M.get();
     private final LocalDate date = LocalDate.of(2023, 12, 20);
     private final Notification notification = NotificationFixture.SSE.getWithDate(member, date);
 

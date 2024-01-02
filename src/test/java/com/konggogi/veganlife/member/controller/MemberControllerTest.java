@@ -49,10 +49,10 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("회원 정보 수정 API")
     void modifyMemberInfoTest() throws Exception {
         // given
-        String nickname = "테스트유저";
-        Member member = MemberFixture.DEFAULT_M.getMemberWithName(nickname);
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         MemberInfoRequest request =
-                new MemberInfoRequest(nickname, Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+                new MemberInfoRequest(
+                        member.getNickname(), Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
                 .willReturn(member);
         // when
@@ -135,7 +135,7 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("회원 프로필 조회 API")
     void getMemberDetailsTest() throws Exception {
         // given
-        Member member = MemberFixture.DEFAULT_F.getMember();
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         given(memberQueryService.search(anyLong())).willReturn(member);
         // when
         ResultActions perform =
@@ -180,7 +180,7 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("회원 프로필 수정 API")
     void modifyMemberProfileTest() throws Exception {
         // given
-        Member member = MemberFixture.DEFAULT_F.getMember();
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         MemberProfileRequest request =
                 new MemberProfileRequest(
                         member.getNickname(),
@@ -260,7 +260,7 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("권장 섭취량 조회 API")
     void getMemberDailyNutrientsTest() throws Exception {
         // given
-        Member member = MemberFixture.DEFAULT_F.getMember();
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         given(memberQueryService.search(anyLong())).willReturn(member);
         // when
         ResultActions perform =
