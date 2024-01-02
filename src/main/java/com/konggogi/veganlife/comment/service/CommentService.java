@@ -22,6 +22,7 @@ public class CommentService {
     private final MemberQueryService memberQueryService;
     private final PostQueryService postQueryService;
     private final CommentQueryService commentQueryService;
+    private final CommentNotifyService commentNotifyService;
     private final CommentMapper commentMapper;
 
     public Comment add(Long memberId, Long postId, CommentAddRequest commentAddRequest) {
@@ -36,6 +37,7 @@ public class CommentService {
                         });
         Post post = postQueryService.search(postId);
         post.addComment(comment);
+        commentNotifyService.notifyAddCommentIfNotPostOwner(memberId, postId);
         return comment;
     }
 
