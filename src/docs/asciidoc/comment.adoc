@@ -18,6 +18,10 @@ endif::[]
 
 include::{snippets}/add-comment/request-headers.adoc[]
 
+==== Path Variable
+
+include::{snippets}/add-comment/path-parameters.adoc[]
+
 ==== Body
 
 최상위 댓글 등록
