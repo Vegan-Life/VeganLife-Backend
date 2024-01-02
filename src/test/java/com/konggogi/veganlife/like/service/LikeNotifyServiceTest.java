@@ -31,7 +31,7 @@ class LikeNotifyServiceTest {
     @InjectMocks LikeNotifyService likeNotifyService;
     private final Member commentAuthor = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Member commentLikeMember = MemberFixture.DEFAULT_F.getWithId(2L);
-    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L, commentAuthor);
     private final Comment comment =
             CommentFixture.DEFAULT.getTopCommentWithId(1L, commentAuthor, post);
 

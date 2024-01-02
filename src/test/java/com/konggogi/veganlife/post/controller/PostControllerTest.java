@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
@@ -31,12 +33,13 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(PostController.class)
 class PostControllerTest extends RestDocsTest {
     @MockBean PostService postService;
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("게시글 등록 API")
     void addPostTest() throws Exception {
         // given
-        Post post = PostFixture.BAKERY.getWithId(1L);
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
         PostAddRequest request =
@@ -67,7 +70,7 @@ class PostControllerTest extends RestDocsTest {
     @DisplayName("게시글 등록 API - 없는 회원 예외 발생")
     void addPostNotMemberTest() throws Exception {
         // given
-        Post post = PostFixture.BAKERY.getWithId(1L);
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
         PostAddRequest request =

@@ -28,7 +28,7 @@ class CommentQueryServiceTest {
     @Mock CommentRepository commentRepository;
     @InjectMocks CommentQueryService commentQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
 
     @Test
