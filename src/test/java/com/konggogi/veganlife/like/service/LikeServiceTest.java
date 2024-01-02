@@ -7,11 +7,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
+import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.service.CommentQueryService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.fixture.CommentLikeFixture;
+import com.konggogi.veganlife.like.fixture.PostLikeFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -31,17 +37,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class LikeServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
-    @Spy LikeMapper likeMapper;
+    @Mock CommentQueryService commentQueryService;
     @Mock LikeQueryService likeQueryService;
+    @Spy LikeMapper likeMapper;
     @InjectMocks LikeService likeService;
     private final Member member = MemberFixture.DEFAULT_M.getMember();
     private final Post post = PostFixture.CHALLENGE.getPostAllInfoWithId(1L);
+    private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
+    private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
+    private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);
 
     @Test
     @DisplayName("게시글 좋아요")
     void addPostLikeTest() {
         // given
-        PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(likeQueryService.searchPostLike(anyLong(), anyLong())).willReturn(Optional.empty());
@@ -87,7 +96,6 @@ class LikeServiceTest {
     @DisplayName("이미 좋아요한 게시글 예외 발생")
     void addPostLikeAlreadyTest() {
         // given
-        PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(likeQueryService.searchPostLike(anyLong(), anyLong()))
@@ -105,7 +113,6 @@ class LikeServiceTest {
     @DisplayName("게시글 좋아요 취소")
     void removePostLikeTest() {
         // given
-        PostLike postLike = PostLike.builder().post(post).member(member).build();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(likeQueryService.searchPostLike(anyLong(), anyLong()))
@@ -161,5 +168,103 @@ class LikeServiceTest {
         then(memberQueryService).should().search(anyLong());
         then(postQueryService).should().search(anyLong());
         then(likeQueryService).should().searchPostLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요")
+    void addCommentLikeTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        given(likeQueryService.searchCommentLike(anyLong(), anyLong()))
+                .willReturn(Optional.empty());
+        given(likeMapper.toCommentLike(any(Member.class), any(Post.class))).willReturn(commentLike);
+        // when
+        likeService.addCommentLike(member.getId(), post.getId(), comment.getId());
+        // then
+        assertThat(comment.getLikes()).contains(commentLike);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 없는 회원 예외 발생")
+    void addCommentLikeNotFoundMemberTest() {
+        // given
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                likeService.addCommentLike(
+                                        member.getId(), post.getId(), comment.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should(never()).search(anyLong());
+        then(commentQueryService).should(never()).search(anyLong());
+        then(likeQueryService).should(never()).searchCommentLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 없는 게시글 예외 발생")
+    void addCommentLikeNotFoundPostTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                likeService.addCommentLike(
+                                        member.getId(), post.getId(), comment.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(commentQueryService).should(never()).search(anyLong());
+        then(likeQueryService).should(never()).searchCommentLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 없는 댓글 예외 발생")
+    void addCommentLikeNotFoundCommentTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                likeService.addCommentLike(
+                                        member.getId(), post.getId(), comment.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_COMMENT.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(commentQueryService).should().search(anyLong());
+        then(likeQueryService).should(never()).searchCommentLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 이미 좋아요한 경우 예외 발생")
+    void addCommentLikeAlreadyLikeTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        given(likeQueryService.searchCommentLike(anyLong(), anyLong()))
+                .willReturn(Optional.of(commentLike));
+        // when, then
+        assertThatThrownBy(
+                        () ->
+                                likeService.addCommentLike(
+                                        member.getId(), post.getId(), comment.getId()))
+                .isInstanceOf(IllegalLikeStatusException.class)
+                .hasMessageContaining(ErrorCode.ALREADY_COMMENT_LIKED.getDescription());
+        then(memberQueryService).should().search(anyLong());
+        then(postQueryService).should().search(anyLong());
+        then(commentQueryService).should().search(anyLong());
+        then(likeQueryService).should().searchCommentLike(anyLong(), anyLong());
     }
 }
