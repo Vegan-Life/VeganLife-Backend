@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
@@ -33,6 +34,7 @@ class CommentServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
     @Mock CommentQueryService commentQueryService;
+    @Mock CommentNotifyService commentNotifyService;
     @Spy CommentMapper commentMapper;
     @InjectMocks CommentService commentService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -49,6 +51,7 @@ class CommentServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(commentMapper.toEntity(member, commentAddRequest)).willReturn(comment);
         given(postQueryService.search(anyLong())).willReturn(post);
+        doNothing().when(commentNotifyService).notifyAddCommentIfNotAuthor(anyLong(), anyLong());
         // when
         Comment savedComment = commentService.add(member.getId(), post.getId(), commentAddRequest);
         // then
@@ -66,6 +69,7 @@ class CommentServiceTest {
         given(commentMapper.toEntity(member, commentAddRequest)).willReturn(subComment);
         given(commentQueryService.search(anyLong())).willReturn(comment);
         given(postQueryService.search(anyLong())).willReturn(post);
+        doNothing().when(commentNotifyService).notifyAddCommentIfNotAuthor(anyLong(), anyLong());
         // when
         Comment savedComment = commentService.add(member.getId(), post.getId(), commentAddRequest);
         // then
