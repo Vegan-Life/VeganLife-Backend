@@ -9,7 +9,7 @@ public enum MemberFixture {
     DEFAULT_F(
             "testF@test.com",
             "비건라이프",
-            "image.jpg",
+            "https:/s3/images/image.png",
             2000,
             Gender.F,
             VegetarianType.VEGAN,
@@ -22,7 +22,7 @@ public enum MemberFixture {
     DEFAULT_M(
             "testM@test.com",
             "비건라이프",
-            "image.jpg",
+            "https:/s3/images/image.png",
             1997,
             Gender.M,
             VegetarianType.OVO,
