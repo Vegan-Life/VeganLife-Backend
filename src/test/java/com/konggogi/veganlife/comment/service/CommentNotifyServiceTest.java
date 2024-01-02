@@ -12,6 +12,7 @@ import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.notification.domain.NotificationType;
 import com.konggogi.veganlife.notification.service.NotificationService;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ class CommentNotifyServiceTest {
 
     private final Member postAuthor = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Member commentAuthor = MemberFixture.DEFAULT_F.getWithId(2L);
-    private final Post post = Post.builder().id(1L).member(postAuthor).build();
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L, postAuthor);
 
     @Test
     @DisplayName("댓글 등록 알림")

@@ -3,6 +3,7 @@ package com.konggogi.veganlife.post.fixture;
 
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
@@ -28,23 +29,24 @@ public enum PostFixture {
         return Post.builder().title(title).content(content).build();
     }
 
-    public Post getWithId(Long id) {
-        Post post = Post.builder().id(id).title(title).content(content).build();
+    public Post getWithId(Long id, Member member) {
+        Post post = Post.builder().id(id).title(title).content(content).member(member).build();
         Tag tag = TagFixture.DEFAULT.getTagWithName(tagName);
         PostTag postTag = PostTag.builder().tag(tag).build();
         post.addPostTag(postTag);
         post.addPostImage(PostImageFixture.DEFAULT.getPostImage());
-        return setCreatedAtOfPost(post);
+        return setCreatedAt(post);
     }
 
-    public Post getPostAllInfoWithId(Long id, List<PostLike> postLikes, List<Comment> comments) {
-        Post post = getWithId(id);
+    public Post getPostAllInfoWithId(
+            Long id, Member member, List<PostLike> postLikes, List<Comment> comments) {
+        Post post = getWithId(id, member);
         postLikes.forEach(post::addPostLike);
         comments.forEach(post::addComment);
         return post;
     }
 
-    private Post setCreatedAtOfPost(Post post) {
+    private Post setCreatedAt(Post post) {
         Field createdAtField = ReflectionUtils.findField(Post.class, "createdAt");
         ReflectionUtils.makeAccessible(createdAtField);
         ReflectionUtils.setField(createdAtField, post, LocalDateTime.now());

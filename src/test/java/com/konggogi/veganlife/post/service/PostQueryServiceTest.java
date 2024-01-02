@@ -8,6 +8,8 @@ import static org.mockito.BDDMockito.then;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
@@ -23,7 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PostQueryServiceTest {
     @Mock PostRepository postRepository;
     @InjectMocks PostQueryService postQueryService;
-    private final Post post = PostFixture.CHALLENGE.getWithId(1L);
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
+    private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
 
     @Test
     @DisplayName("게시글 번호로 게시글 조회")
