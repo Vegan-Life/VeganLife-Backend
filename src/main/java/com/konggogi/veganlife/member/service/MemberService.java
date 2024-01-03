@@ -97,6 +97,7 @@ public class MemberService {
     }
 
     private void removeRelatedData(Long memberId) {
+        refreshTokenRepository.deleteAllByMemberId(memberId);
         postService.removeMemberFromPost(memberId);
         commentService.removeMemberFromComment(memberId);
         likeService.removeMemberFromLike(memberId);
