@@ -11,6 +11,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findById(Long commentId);
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Comment c SET c.member = NULL WHERE c.member.id = :memberId")
+    @Query("update Comment c set c.member = null where c.member.id = :memberId")
     void setMemberToNull(Long memberId);
 }
