@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     Optional<PostLike> findByMemberIdAndPostId(Long memberId, Long postId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE PostLike p SET p.member = NULL WHERE p.member.id = :memberId")
     void setMemberToNull(Long memberId);
 }
