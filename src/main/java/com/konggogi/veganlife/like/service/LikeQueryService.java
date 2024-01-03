@@ -24,4 +24,8 @@ public class LikeQueryService {
     public Optional<CommentLike> searchCommentLike(Long memberId, Long commentId) {
         return commentLikeRepository.findByMemberIdAndCommentId(memberId, commentId);
     }
+
+    public boolean isCommentLike(Long memberId, Long commentId) {
+        return searchCommentLike(memberId, commentId).isPresent();
+    }
 }
