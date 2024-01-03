@@ -22,4 +22,6 @@ public interface MealLogRepository extends JpaRepository<MealLog, Long> {
             " select distinct m from MealLog m join fetch m.meals"
                     + " where cast(m.createdAt as localdate) = :date and m.member.id = :memberId")
     List<MealLog> findAllByDate(LocalDate date, Long memberId);
+
+    void deleteAllByMemberId(Long memberId);
 }

@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.mealdata.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -14,6 +15,7 @@ import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapperImpl;
 import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,7 @@ public class MealDataServiceTest {
     @Spy MealDataMapper mealDataMapper = new MealDataMapperImpl();
     @InjectMocks MealDataService mealDataService;
 
-    Member member = Member.builder().email("test123@test.com").build();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("식품 데이터를 등록")
@@ -51,5 +53,13 @@ public class MealDataServiceTest {
         assertThat(mealData.getCarbsPerUnit()).isEqualTo((double) 30 / 100);
         assertThat(mealData.getProteinPerUnit()).isEqualTo((double) 5 / 100);
         assertThat(mealData.getFatPerUnit()).isEqualTo((double) 3 / 100);
+    }
+
+    @Test
+    @DisplayName("회원 Id로 MealData 모두 삭제")
+    void removeAllTest() {
+        // when, then
+        assertDoesNotThrow(() -> mealDataService.removeAll(member.getId()));
+        then(mealDataRepository).should().deleteAllByMemberId(anyLong());
     }
 }

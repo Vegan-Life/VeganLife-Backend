@@ -57,6 +57,10 @@ public class MealLogService {
         mealLogRepository.deleteById(mealLogId);
     }
 
+    public void removeAll(Long memberId) {
+        mealLogRepository.deleteAllByMemberId(memberId);
+    }
+
     private void addMeals(List<MealAddRequest> requests, MealLog mealLog) {
         List<Meal> meals =
                 requests.stream()

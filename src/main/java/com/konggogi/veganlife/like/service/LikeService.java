@@ -8,6 +8,8 @@ import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
+import com.konggogi.veganlife.like.repository.CommentLikeRepository;
+import com.konggogi.veganlife.like.repository.PostLikeRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
@@ -25,6 +27,8 @@ public class LikeService {
     private final CommentQueryService commentQueryService;
     private final LikeQueryService likeQueryService;
     private final LikeNotifyService likeNotifyService;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final LikeMapper likeMapper;
 
     public void addPostLike(Long memberId, Long postId) {
@@ -58,6 +62,11 @@ public class LikeService {
         Comment comment = commentQueryService.search(commentId);
         CommentLike commentLike = validateCommentLikeIsNotExist(memberId, commentId);
         comment.removeCommentLike(commentLike);
+    }
+
+    public void removeMemberFromLike(Long memberId) {
+        postLikeRepository.setMemberToNull(memberId);
+        commentLikeRepository.setMemberToNull(memberId);
     }
 
     private void validatePostLikeIsExist(Long memberId, Long postId) {

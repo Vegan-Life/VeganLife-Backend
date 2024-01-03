@@ -17,7 +17,7 @@ public class Tag extends TimeStamped {
     @Column(name = "tag_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String name;
 
     @Builder

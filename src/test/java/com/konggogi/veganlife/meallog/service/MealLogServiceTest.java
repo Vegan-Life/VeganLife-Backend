@@ -1,6 +1,8 @@
 package com.konggogi.veganlife.meallog.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -17,12 +19,7 @@ import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
-import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
-import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapperImpl;
-import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
-import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
-import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
-import com.konggogi.veganlife.meallog.domain.mapper.MealMapperImpl;
+import com.konggogi.veganlife.meallog.domain.mapper.*;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
@@ -115,5 +112,13 @@ public class MealLogServiceTest {
         mealLogService.remove(1L);
         // then
         then(mealLogRepository).should(times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("회원 Id로 MealLog 모두 삭제")
+    void removeAllTest() {
+        // when, then
+        assertDoesNotThrow(() -> mealLogService.removeAll(member.getId()));
+        then(mealLogRepository).should().deleteAllByMemberId(anyLong());
     }
 }

@@ -2,6 +2,7 @@ package com.konggogi.veganlife.like.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -18,6 +19,8 @@ import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.like.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.like.fixture.CommentLikeFixture;
 import com.konggogi.veganlife.like.fixture.PostLikeFixture;
+import com.konggogi.veganlife.like.repository.CommentLikeRepository;
+import com.konggogi.veganlife.like.repository.PostLikeRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -40,6 +43,8 @@ class LikeServiceTest {
     @Mock CommentQueryService commentQueryService;
     @Mock LikeQueryService likeQueryService;
     @Mock LikeNotifyService likeNotifyService;
+    @Mock PostLikeRepository postLikeRepository;
+    @Mock CommentLikeRepository commentLikeRepository;
     @Spy LikeMapper likeMapper;
     @InjectMocks LikeService likeService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -266,5 +271,14 @@ class LikeServiceTest {
         then(postQueryService).should().search(anyLong());
         then(commentQueryService).should().search(anyLong());
         then(likeQueryService).should().searchCommentLike(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 Id로 좋아요의 Member null로 변환")
+    void removeMemberFromCommentTest() {
+        // when, then
+        assertDoesNotThrow(() -> likeService.removeMemberFromLike(member.getId()));
+        then(postLikeRepository).should().setMemberToNull(anyLong());
+        then(commentLikeRepository).should().setMemberToNull(anyLong());
     }
 }

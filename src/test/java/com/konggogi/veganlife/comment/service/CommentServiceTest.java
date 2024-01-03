@@ -2,6 +2,7 @@ package com.konggogi.veganlife.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -13,6 +14,7 @@ import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.repository.CommentRepository;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
@@ -35,6 +37,7 @@ class CommentServiceTest {
     @Mock PostQueryService postQueryService;
     @Mock CommentQueryService commentQueryService;
     @Mock CommentNotifyService commentNotifyService;
+    @Mock CommentRepository commentRepository;
     @Spy CommentMapper commentMapper;
     @InjectMocks CommentService commentService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -145,5 +148,13 @@ class CommentServiceTest {
                 .hasMessageContaining(ErrorCode.IS_NOT_PARENT_COMMENT.getDescription());
         then(commentQueryService).should().search(anyLong());
         then(postQueryService).should(never()).search(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 Id로 댓글의 Member null로 변환")
+    void removeMemberFromCommentTest() {
+        // when, then
+        assertDoesNotThrow(() -> commentService.removeMemberFromComment(member.getId()));
+        then(commentRepository).should().setMemberToNull(anyLong());
     }
 }

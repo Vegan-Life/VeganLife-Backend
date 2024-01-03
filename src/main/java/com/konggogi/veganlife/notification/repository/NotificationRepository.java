@@ -13,4 +13,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query(
             "select n from Notification n where n.member.id = :memberId and cast(n.createdAt as localdate) = :date and n.type = :type")
     Optional<Notification> findByDateAndType(Long memberId, LocalDate date, NotificationType type);
+
+    void deleteAllByMemberId(Long memberId);
 }

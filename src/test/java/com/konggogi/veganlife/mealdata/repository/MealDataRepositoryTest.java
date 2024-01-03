@@ -6,6 +6,7 @@ import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class MealDataRepositoryTest {
     @Autowired private MealDataRepository mealDataRepository;
     @Autowired private MemberRepository memberRepository;
 
-    Member member = Member.builder().email("test123@test.com").build();
+    private final Member member = MemberFixture.DEFAULT_M.get();
 
     @BeforeEach
     void setup() {
@@ -78,9 +79,28 @@ public class MealDataRepositoryTest {
     @Test
     @DisplayName("MealData 저장")
     void saveTest() {
+        // given
         MealData mealData = MealDataFixture.TOTAL_AMOUNT.get(member);
+        // when
         mealDataRepository.save(mealData);
-
+        // then
         assertThat(mealData.getId()).matches(Objects::nonNull);
+    }
+
+    @Test
+    @DisplayName("회원의 MealData 모두 삭제")
+    void deleteAllByMemberIdTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        MealData mealData = MealDataFixture.TOTAL_AMOUNT.get(member);
+        MealData otherMealData = MealDataFixture.TOTAL_AMOUNT.get(otherMember);
+        mealDataRepository.save(mealData);
+        mealDataRepository.save(otherMealData);
+        // when
+        mealDataRepository.deleteAllByMemberId(member.getId());
+        // then
+        assertThat(mealDataRepository.findById(otherMealData.getId())).isPresent();
+        assertThat(mealDataRepository.findById(mealData.getId())).isEmpty();
     }
 }

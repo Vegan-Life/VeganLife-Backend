@@ -22,7 +22,7 @@ class CommentRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired PostRepository postRepository;
     @Autowired CommentRepository commentRepository;
-    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
+    private final Member member = MemberFixture.DEFAULT_M.get();
     private final Post post = PostFixture.CHALLENGE.get();
     private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
 
@@ -42,5 +42,22 @@ class CommentRepositoryTest {
         Optional<Comment> foundComment = commentRepository.findById(commentId);
         // then
         assertThat(foundComment).isPresent();
+    }
+
+    @Test
+    @DisplayName("회원이 작성한 댓글의 Member를 null로 변경")
+    void setMemberToNullTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        Post otherPost = PostFixture.CHALLENGE.get();
+        postRepository.save(otherPost);
+        Comment otherComment = CommentFixture.DEFAULT.getTopComment(otherMember, otherPost);
+        commentRepository.save(otherComment);
+        // when
+        commentRepository.setMemberToNull(member.getId());
+        // then
+        assertThat(commentRepository.findById(comment.getId()).get().getMember()).isNull();
+        assertThat(commentRepository.findById(otherComment.getId()).get().getMember()).isNotNull();
     }
 }

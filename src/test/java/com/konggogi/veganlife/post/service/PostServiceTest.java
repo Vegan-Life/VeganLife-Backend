@@ -2,6 +2,8 @@ package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -79,6 +81,14 @@ class PostServiceTest {
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberQueryService).should().search(memberId);
+    }
+
+    @Test
+    @DisplayName("회원 Id로 Post의 Member null로 변환")
+    void removeMemberFromPostTest() {
+        // when, then
+        assertDoesNotThrow(() -> postService.removeMemberFromPost(member.getId()));
+        then(postRepository).should().setMemberToNull(anyLong());
     }
 
     private PostAddRequest createPostAddRequest() {

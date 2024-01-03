@@ -35,6 +35,10 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public void removeMemberFromPost(Long memberId) {
+        postRepository.setMemberToNull(memberId);
+    }
+
     private void addTags(Post post, List<String> tagNames) {
         tagNames.stream()
                 .distinct()
