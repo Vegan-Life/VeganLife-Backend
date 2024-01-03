@@ -20,7 +20,8 @@ public enum ErrorCode {
     NOT_FOUND_USER_INFO_TOKEN("AUTH_006", "JWT 사용자 정보를 가져올 수 없습니다."),
     NOT_FOUND_REFRESH_TOKEN("AUTH_007", "RefreshToken이 존재하지 않습니다."),
     MISMATCH_REFRESH_TOKEN("AUTH_008", "RefreshToken이 일치하지 않습니다."),
-    NOT_FOUND_AUTHORIZATION_HEADER("AUTH_009", "Authorization 헤더가 존재하지 않습니다."),
+    AUTHENTICATION_REQUIRED("AUTH_009", "인증이 필요한 URI입니다."),
+    ACCESS_DENIED("AUTH_010", "Resource에 접근할 수 있는 권한이 없습니다."),
 
     // oauth
     UNSUPPORTED_PROVIDER("OAUTH_001", "지원되지 않는 provider입니다."),
