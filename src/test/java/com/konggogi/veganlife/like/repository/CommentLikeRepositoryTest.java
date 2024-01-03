@@ -49,4 +49,25 @@ class CommentLikeRepositoryTest {
         // then
         assertThat(foundCommentLike).isPresent();
     }
+
+    @Test
+    @DisplayName("회원의 댓글 좋아요 Member를 null로 변경")
+    void setMemberToNullTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_M.get();
+        memberRepository.save(otherMember);
+        Post otherPost = PostFixture.CHALLENGE.get();
+        postRepository.save(otherPost);
+        Comment otherComment = CommentFixture.DEFAULT.getTopComment(otherMember, otherPost);
+        commentRepository.save(otherComment);
+        CommentLike otherCommentLike =
+                CommentLikeFixture.DEFAULT.get(otherMember, otherPost, otherComment);
+        commentLikeRepository.save(otherCommentLike);
+        // when
+        commentLikeRepository.setMemberToNull(member.getId());
+        // then
+        assertThat(commentLikeRepository.findById(commentLike.getId()).get().getMember()).isNull();
+        assertThat(commentLikeRepository.findById(otherCommentLike.getId()).get().getMember())
+                .isNotNull();
+    }
 }
