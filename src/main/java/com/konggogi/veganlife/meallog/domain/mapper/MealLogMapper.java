@@ -6,6 +6,8 @@ import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListRespons
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.service.dto.MealLogDetailsDto;
+import com.konggogi.veganlife.meallog.service.dto.MealLogListDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import org.mapstruct.Mapper;
@@ -18,19 +20,23 @@ public interface MealLogMapper {
     @Mapping(target = "id", ignore = true)
     MealLog toEntity(MealType mealType, Member member);
 
-    @Mapping(source = "mealLog", target = "thumbnailUrl", qualifiedByName = "getThumbnailUrl")
-    @Mapping(source = "mealLog", target = "totalCalorie", qualifiedByName = "getTotalCalorie")
-    MealLogListResponse toMealLogListResponse(MealLog mealLog);
+    @Mapping(source = "mealLogDto", target = "thumbnailUrl", qualifiedByName = "getThumbnailUrl")
+    @Mapping(source = "mealLogDto", target = "totalCalorie", qualifiedByName = "getTotalCalorie")
+    MealLogListResponse toMealLogListResponse(MealLogListDto mealLogDto);
 
     @Mapping(
-            source = "mealLog.mealImages",
+            source = "mealLogDetailsDto.mealImages",
             target = "imageUrls",
             qualifiedByName = "mealImageToImageUrl")
     @Mapping(
-            source = "mealLog",
+            source = "mealLogDetailsDto",
             target = "totalIntakeNutrients",
             qualifiedByName = "getTotalIntakeNutrients")
-    MealLogDetailsResponse toMealLogDetailsResponse(MealLog mealLog);
+    MealLogDetailsResponse toMealLogDetailsResponse(MealLogDetailsDto mealLogDetailsDto);
+
+    MealLogListDto toMealLogListDto(MealLog mealLog);
+
+    MealLogDetailsDto toMealDetailsDto(MealLog mealLog);
 
     @Named("mealImageToImageUrl")
     static String mealImageToImageUrl(MealImage mealImage) {
@@ -39,20 +45,20 @@ public interface MealLogMapper {
     }
 
     @Named("getThumbnailUrl")
-    static String getThumbnailUrl(MealLog mealLog) {
+    static String getThumbnailUrl(MealLogListDto mealLogDto) {
 
-        return mealLog.getThumbnailUrl();
+        return mealLogDto.getThumbnailUrl();
     }
 
     @Named("getTotalCalorie")
-    static Integer getTotalCalorie(MealLog mealLog) {
+    static Integer getTotalCalorie(MealLogListDto mealLogDto) {
 
-        return mealLog.getTotalCalorie();
+        return mealLogDto.getTotalCalorie();
     }
 
     @Named("getTotalIntakeNutrients")
-    static IntakeNutrients getTotalIntakeNutrients(MealLog mealLog) {
+    static IntakeNutrients getTotalIntakeNutrients(MealLogDetailsDto mealLogDetailsDto) {
 
-        return mealLog.getTotalIntakeNutrients();
+        return mealLogDetailsDto.getTotalIntakeNutrients();
     }
 }
