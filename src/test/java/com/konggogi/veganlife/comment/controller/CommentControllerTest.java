@@ -18,6 +18,7 @@ import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.service.CommentSearchService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
@@ -36,6 +37,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(CommentController.class)
 class CommentControllerTest extends RestDocsTest {
     @MockBean CommentService commentService;
+    @MockBean CommentSearchService commentSearchService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
