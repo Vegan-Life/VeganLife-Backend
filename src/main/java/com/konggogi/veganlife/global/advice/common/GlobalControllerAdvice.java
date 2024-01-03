@@ -8,6 +8,7 @@ import com.konggogi.veganlife.global.util.AopUtils;
 import com.konggogi.veganlife.global.util.LoggingUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -85,5 +86,17 @@ public class GlobalControllerAdvice {
                 exception);
 
         return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Void> handleAsyncRequestTimeoutException(
+            HandlerMethod handlerMethod, HttpMessageNotReadableException exception) {
+
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod),
+                HttpStatus.METHOD_NOT_ALLOWED,
+                exception);
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 }

@@ -29,15 +29,16 @@ import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyReques
 import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
-import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
-import com.konggogi.veganlife.meallog.service.MealLogQueryService;
+import com.konggogi.veganlife.meallog.service.MealLogSearchService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
+import com.konggogi.veganlife.meallog.service.dto.MealLogDetailsDto;
+import com.konggogi.veganlife.meallog.service.dto.MealLogListDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
@@ -54,7 +55,7 @@ import org.springframework.test.web.servlet.ResultActions;
 public class MealLogControllerTest extends RestDocsTest {
 
     @MockBean MealLogService mealLogService;
-    @MockBean MealLogQueryService mealLogQueryService;
+    @MockBean MealLogSearchService mealLogSearchService;
     @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
 
     Member member = Member.builder().id(1L).email("test123@test.com").build();
@@ -185,13 +186,16 @@ public class MealLogControllerTest extends RestDocsTest {
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        List<MealLog> mealLogs =
+        List<MealLogListDto> mealLogs =
                 List.of(
-                        MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member),
-                        MealLogFixture.LUNCH.get(2L, meals, mealImages, member),
-                        MealLogFixture.DINNER_SNACK.get(3L, meals, mealImages, member));
+                        mealLogMapper.toMealLogListDto(
+                                MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member)),
+                        mealLogMapper.toMealLogListDto(
+                                MealLogFixture.LUNCH.get(2L, meals, mealImages, member)),
+                        mealLogMapper.toMealLogListDto(
+                                MealLogFixture.DINNER_SNACK.get(3L, meals, mealImages, member)));
 
-        given(mealLogQueryService.searchByDate(date, member.getId())).willReturn(mealLogs);
+        given(mealLogSearchService.searchByDate(date, member.getId())).willReturn(mealLogs);
 
         ResultActions perform =
                 mockMvc.perform(
@@ -221,9 +225,11 @@ public class MealLogControllerTest extends RestDocsTest {
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member);
+        MealLogDetailsDto mealLog =
+                mealLogMapper.toMealDetailsDto(
+                        MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member));
 
-        given(mealLogQueryService.searchById(1L)).willReturn(mealLog);
+        given(mealLogSearchService.searchById(1L)).willReturn(mealLog);
 
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/meal-log/{id}", 1L).headers(authorizationHeader()));
@@ -252,7 +258,7 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 상세 조회 API - MealLog Not Found")
     void getMealLogDetailsNotFoundTest() throws Exception {
 
-        given(mealLogQueryService.searchById(1L))
+        given(mealLogSearchService.searchById(1L))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
 
         ResultActions perform =

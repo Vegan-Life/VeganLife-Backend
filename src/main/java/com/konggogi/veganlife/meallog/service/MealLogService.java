@@ -48,6 +48,7 @@ public class MealLogService {
         MealLog mealLog = mealLogQueryService.searchById(mealLogId);
         modifyMeals(request.meals(), mealLog);
         modifyMealImages(request.imageUrls(), mealLog);
+        mealLogRepository.flush();
         intakeNotifyService.notifyIfOverIntake(mealLog.getMember().getId());
     }
 

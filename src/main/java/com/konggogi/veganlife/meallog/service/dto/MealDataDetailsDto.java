@@ -1,10 +1,10 @@
-package com.konggogi.veganlife.mealdata.controller.dto.response;
+package com.konggogi.veganlife.meallog.service.dto;
 
 
 import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 
-public record MealDataDetailsResponse(
+public record MealDataDetailsDto(
         Long id,
         String name,
         MealDataType type,
