@@ -48,7 +48,7 @@ class CommentSearchServiceTest {
         // given
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
-        given(commentQueryService.search(anyLong())).willReturn(comment);
+        given(commentQueryService.searchWithMember(anyLong())).willReturn(comment);
         given(likeQueryService.isCommentLike(anyLong(), anyLong())).willReturn(true);
         // when
         CommentDetailsDto result =
@@ -56,7 +56,7 @@ class CommentSearchServiceTest {
                         member.getId(), post.getId(), comment.getId());
         // then
         assertThat(result.id()).isEqualTo(comment.getId());
-        assertThat(result.author()).isEqualTo(member.getNickname());
+        assertThat(result.author()).isEqualTo(member);
         assertThat(result.content()).isEqualTo(comment.getContent());
         assertThat(result.isLike()).isTrue();
         assertThat(result.likeCount()).isEqualTo(1);
