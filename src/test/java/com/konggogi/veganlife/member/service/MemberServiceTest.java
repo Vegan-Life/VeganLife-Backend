@@ -6,12 +6,15 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 
+import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.like.service.LikeService;
+import com.konggogi.veganlife.mealdata.service.MealDataService;
+import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Gender;
@@ -21,6 +24,8 @@ import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import com.konggogi.veganlife.notification.service.NotificationService;
+import com.konggogi.veganlife.post.service.PostService;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +39,12 @@ class MemberServiceTest {
     @Mock MemberRepository memberRepository;
     @Mock RefreshTokenRepository refreshTokenRepository;
     @Mock MemberQueryService memberQueryService;
+    @Mock NotificationService notificationService;
+    @Mock LikeService likeService;
+    @Mock PostService postService;
+    @Mock CommentService commentService;
+    @Mock MealDataService mealDataService;
+    @Mock MealLogService mealLogService;
     @InjectMocks MemberService memberService;
     private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
@@ -70,6 +81,13 @@ class MemberServiceTest {
         // given
         Long memberId = member.getId();
         given(memberQueryService.search(memberId)).willReturn(member);
+        doNothing().when(refreshTokenRepository).deleteAllByMemberId(anyLong());
+        doNothing().when(postService).removeMemberFromPost(anyLong());
+        doNothing().when(commentService).removeMemberFromComment(anyLong());
+        doNothing().when(likeService).removeMemberFromLike(anyLong());
+        doNothing().when(notificationService).removeAll(anyLong());
+        doNothing().when(mealDataService).removeAll(anyLong());
+        doNothing().when(mealLogService).removeAll(anyLong());
         // when
         memberService.removeMember(memberId);
         // then
