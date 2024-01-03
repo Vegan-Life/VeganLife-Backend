@@ -13,4 +13,6 @@ public interface MealDataRepository extends JpaRepository<MealData, Long> {
 
     Page<MealData> findByNameContainingAndOwnerType(
             String keyword, OwnerType ownerType, Pageable pageable);
+
+    void deleteAllByMemberId(Long memberId);
 }
