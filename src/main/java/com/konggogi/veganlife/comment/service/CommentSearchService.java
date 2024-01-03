@@ -26,7 +26,7 @@ public class CommentSearchService {
     public CommentDetailsDto searchDetailsById(Long memberId, Long postId, Long commentId) {
         memberQueryService.search(memberId);
         postQueryService.search(postId);
-        Comment foundComment = commentQueryService.search(commentId);
+        Comment foundComment = commentQueryService.searchWithMember(commentId);
 
         boolean isLike = likeQueryService.isCommentLike(memberId, commentId);
         List<SubCommentDetailsDto> subComments = getAllSubCommentDetails(memberId, foundComment);
