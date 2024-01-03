@@ -8,7 +8,7 @@ import com.konggogi.veganlife.member.domain.VegetarianType;
 public enum MemberFixture {
     DEFAULT_F(
             "testF@test.com",
-            "비건라이프",
+            "비건라이프F",
             "https:/s3/images/image.png",
             2000,
             Gender.F,
@@ -21,7 +21,7 @@ public enum MemberFixture {
             1821),
     DEFAULT_M(
             "testM@test.com",
-            "비건라이프",
+            "비건라이프M",
             "https:/s3/images/image.png",
             1997,
             Gender.M,
