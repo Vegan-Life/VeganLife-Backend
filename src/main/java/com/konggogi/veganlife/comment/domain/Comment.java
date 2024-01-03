@@ -79,8 +79,4 @@ public class Comment extends TimeStamped {
     public void removeCommentLike(CommentLike commentLike) {
         likes.remove(commentLike);
     }
-
-    public void removeMember() {
-        member = null;
-    }
 }
