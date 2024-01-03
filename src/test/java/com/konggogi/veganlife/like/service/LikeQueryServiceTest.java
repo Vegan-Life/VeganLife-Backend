@@ -32,9 +32,10 @@ class LikeQueryServiceTest {
     @InjectMocks LikeQueryService likeQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
-    private final Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
-    private final PostLike postLike = PostLikeFixture.DEFAULT.get(member, post);
-    private final CommentLike commentLike = CommentLikeFixture.DEFAULT.get(member, post, comment);
+    private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
+    private final PostLike postLike = PostLikeFixture.DEFAULT.getWithId(1L, member, post);
+    private final CommentLike commentLike =
+            CommentLikeFixture.DEFAULT.getWithId(1L, member, post, comment);
 
     @Test
     @DisplayName("게시글 좋아요 여부 조회 - 존재하는 경우")
@@ -87,6 +88,32 @@ class LikeQueryServiceTest {
                 likeQueryService.searchCommentLike(anyLong(), anyLong());
         // then
         assertThat(foundCommentLike).isEmpty();
+        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 여부 - 존재하는 경우")
+    void isCommentLikeTrueTest() {
+        // given
+        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
+                .willReturn(Optional.of(commentLike));
+        // when
+        boolean result = likeQueryService.isCommentLike(member.getId(), comment.getId());
+        // then
+        assertThat(result).isTrue();
+        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 여부 - 존재하지 않는 경우")
+    void isCommentLikeFalseTest() {
+        // given
+        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
+                .willReturn(Optional.empty());
+        // when
+        boolean result = likeQueryService.isCommentLike(member.getId(), comment.getId());
+        // then
+        assertThat(result).isFalse();
         then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
     }
 }
