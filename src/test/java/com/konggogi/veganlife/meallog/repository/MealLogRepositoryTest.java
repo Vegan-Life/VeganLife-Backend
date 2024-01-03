@@ -12,6 +12,7 @@ import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,7 @@ public class MealLogRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired MealDataRepository mealDataRepository;
 
-    Member member = Member.builder().email("test123@test.com").build();
+    private final Member member = MemberFixture.DEFAULT_M.get();
     List<MealData> mealData =
             List.of(
                     MealDataFixture.TOTAL_AMOUNT.get(member),
@@ -55,11 +57,7 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 저장 테스트")
     void mealLogSaveTest() {
         // given
-        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        List<MealImage> mealImages =
-                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        MealLog mealLog = createMealLog(member, mealData);
         // when
         MealLog result = mealLogRepository.save(mealLog);
         // then
@@ -95,7 +93,7 @@ public class MealLogRepositoryTest {
                         memberId, startDate, endDate);
 
         // then
-        assertThat(mealLogs).hasSize(1);
+        ListAssert<MealLog> mealLogListAssert = assertThat(mealLogs).hasSize(1);
         assertThat(mealLogs).extracting(MealLog::getMember).containsOnly(member);
     }
 
@@ -121,7 +119,7 @@ public class MealLogRepositoryTest {
         LocalDate date = LocalDate.of(2023, 12, 22);
         List<MealLog> mealLogs = mealLogRepository.findAllByDate(date, member.getId());
         // then
-        assertThat(mealLogs.size()).isEqualTo(1);
+        assertThat(mealLogs).hasSize(1);
         assertThat(mealLogs.get(0)).isEqualTo(mealLog1);
     }
 
@@ -129,10 +127,7 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 수정 테스트 - 연관된 자식 엔티티를 삭제하고 새로 삽입한다")
     void mealLogUpdateTest() {
         // given
-        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        List<MealImage> mealImages =
-                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        MealLog mealLog = createMealLog(member, mealData);
         mealLogRepository.saveAndFlush(mealLog);
         // when
         List<Meal> modifiedMeals = new ArrayList<>();
@@ -143,9 +138,9 @@ public class MealLogRepositoryTest {
         mealLog.updateMealImages(modifiedMealImages);
         mealLogRepository.flush();
         // then
-        assertThat(mealLog.getMeals().size()).isEqualTo(1);
+        assertThat(mealLog.getMeals()).hasSize(1);
         assertThat(mealLog.getMeals().get(0).getMealLog()).isEqualTo(mealLog);
-        assertThat(mealLog.getMealImages().size()).isEqualTo(1);
+        assertThat(mealLog.getMealImages()).hasSize(1);
         assertThat(mealLog.getMealImages().get(0).getMealLog()).isEqualTo(mealLog);
     }
 
@@ -168,7 +163,31 @@ public class MealLogRepositoryTest {
         List<Optional<MealImage>> foundMealImages =
                 mealImages.stream().map(m -> mealImageRepository.findById(m.getId())).toList();
         assertThat(found).isEmpty();
-        assertThat(foundMeals.stream().allMatch(Optional::isEmpty)).isEqualTo(true);
-        assertThat(foundMealImages.stream().allMatch(Optional::isEmpty)).isEqualTo(true);
+        assertThat(foundMeals.stream().allMatch(Optional::isEmpty)).isTrue();
+        assertThat(foundMealImages.stream().allMatch(Optional::isEmpty)).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원의 MealLog 모두 삭제")
+    void deleteAllByMemberIdTest() {
+        // given
+        MealLog mealLog = createMealLog(member, mealData);
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        MealLog otherMealLog = createMealLog(otherMember, mealData);
+        mealLogRepository.save(mealLog);
+        mealLogRepository.save(otherMealLog);
+        // when
+        mealLogRepository.deleteAllByMemberId(member.getId());
+        // then
+        assertThat(mealLogRepository.findById(otherMealLog.getId())).isPresent();
+        assertThat(mealLogRepository.findById(mealLog.getId())).isEmpty();
+    }
+
+    private MealLog createMealLog(Member member, List<MealData> mealData) {
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
+        return MealLogFixture.BREAKFAST.get(meals, mealImages, member);
     }
 }
