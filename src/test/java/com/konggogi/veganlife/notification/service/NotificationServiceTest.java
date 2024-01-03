@@ -113,4 +113,12 @@ class NotificationServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_EMITTER.getDescription());
         then(emitterRepository).should().findById(anyLong());
     }
+
+    @Test
+    @DisplayName("회원 Id로 Notification 모두 삭제")
+    void removeAllTest() {
+        // when, then
+        assertDoesNotThrow(() -> notificationService.removeAll(member.getId()));
+        then(notificationRepository).should().deleteAllByMemberId(anyLong());
+    }
 }
