@@ -11,7 +11,7 @@ public record MealDataDetailsResponse(
         Integer amount,
         Integer amountPerServe,
         Double caloriePerUnit,
+        Double carbsPerUnit,
         Double proteinPerUnit,
         Double fatPerUnit,
-        Double carbsPerUnit,
         IntakeUnit intakeUnit) {}
