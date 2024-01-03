@@ -23,7 +23,7 @@ public class Comment extends TimeStamped {
     @Column(name = "comment_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -78,5 +78,9 @@ public class Comment extends TimeStamped {
 
     public void removeCommentLike(CommentLike commentLike) {
         likes.remove(commentLike);
+    }
+
+    public void removeMember() {
+        member = null;
     }
 }
