@@ -26,13 +26,16 @@ public enum CommentFixture {
         return setCreatedAt(comment);
     }
 
-    public Comment getSubComment(Member member, Post post, Comment comment) {
-        return Comment.builder()
-                .member(member)
-                .post(post)
-                .parentComment(comment)
-                .content(content)
-                .build();
+    public Comment getSubComment(Member member, Post post, Comment parentComment) {
+        Comment comment =
+                Comment.builder()
+                        .member(member)
+                        .post(post)
+                        .parentComment(parentComment)
+                        .content(content)
+                        .build();
+        parentComment.addSubComment(comment);
+        return comment;
     }
 
     public Comment getSubCommentWithId(Long id, Member member, Post post, Comment parentComment) {
@@ -44,6 +47,7 @@ public enum CommentFixture {
                         .parentComment(parentComment)
                         .content(content)
                         .build();
+        parentComment.addSubComment(comment);
         return setCreatedAt(comment);
     }
 
