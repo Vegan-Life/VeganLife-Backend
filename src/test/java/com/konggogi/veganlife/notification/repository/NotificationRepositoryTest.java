@@ -44,4 +44,19 @@ class NotificationRepositoryTest {
         // then
         assertThat(foundNotification).isPresent();
     }
+
+    @Test
+    @DisplayName("회원의 Notification 모두 삭제")
+    void deleteAllByMemberIdTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        Notification otherNotification = NotificationFixture.SSE.get(otherMember);
+        notificationRepository.save(otherNotification);
+        // when
+        notificationRepository.deleteAllByMemberId(member.getId());
+        // then
+        assertThat(notificationRepository.findById(otherNotification.getId())).isPresent();
+        assertThat(notificationRepository.findById(notification.getId())).isEmpty();
+    }
 }
