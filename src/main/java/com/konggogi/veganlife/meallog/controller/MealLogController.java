@@ -7,7 +7,7 @@ import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyReques
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListResponse;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
-import com.konggogi.veganlife.meallog.service.MealLogQueryService;
+import com.konggogi.veganlife.meallog.service.MealLogSearchService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MealLogController {
 
     private final MealLogService mealLogService;
-    private final MealLogQueryService mealLogQueryService;
+    private final MealLogSearchService mealLogSearchService;
     private final MealLogMapper mealLogMapper;
 
     @PostMapping
@@ -49,7 +49,7 @@ public class MealLogController {
             @RequestParam LocalDate date, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return ResponseEntity.ok(
-                mealLogQueryService.searchByDate(date, userDetails.id()).stream()
+                mealLogSearchService.searchByDate(date, userDetails.id()).stream()
                         .map(mealLogMapper::toMealLogListResponse)
                         .toList());
     }
@@ -58,7 +58,7 @@ public class MealLogController {
     public ResponseEntity<MealLogDetailsResponse> getMealLogDetails(@PathVariable Long id) {
 
         return ResponseEntity.ok(
-                mealLogMapper.toMealLogDetailsResponse(mealLogQueryService.searchById(id)));
+                mealLogMapper.toMealLogDetailsResponse(mealLogSearchService.searchById(id)));
     }
 
     @PutMapping("/{id}")
