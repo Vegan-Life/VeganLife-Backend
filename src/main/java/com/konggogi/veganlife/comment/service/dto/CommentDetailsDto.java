@@ -1,13 +1,12 @@
 package com.konggogi.veganlife.comment.service.dto;
 
 
-import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.comment.domain.Comment;
 import java.util.List;
 
 public record CommentDetailsDto(
         Long id,
-        Member author,
-        String content,
+        Comment comment,
         boolean isLike,
         Integer likeCount,
         List<SubCommentDetailsDto> subComments) {}
