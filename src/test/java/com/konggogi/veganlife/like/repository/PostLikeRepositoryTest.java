@@ -43,4 +43,22 @@ class PostLikeRepositoryTest {
         // then
         assertThat(foundPostLike).isPresent();
     }
+
+    @Test
+    @DisplayName("회원의 게시글 좋아요 Member를 null로 변경")
+    void setMemberToNullTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_M.get();
+        memberRepository.save(otherMember);
+        Post otherPost = PostFixture.CHALLENGE.get();
+        postRepository.save(otherPost);
+        PostLike otherPostLike = PostLikeFixture.DEFAULT.get(otherMember, otherPost);
+        postLikeRepository.save(otherPostLike);
+        // when
+        postLikeRepository.setMemberToNull(member.getId());
+        // then
+        assertThat(postLikeRepository.findById(postLike.getId()).get().getMember()).isNull();
+        assertThat(postLikeRepository.findById(otherPostLike.getId()).get().getMember())
+                .isNotNull();
+    }
 }
