@@ -26,11 +26,12 @@ public interface CommentMapper {
     @Mapping(target = "likeCount", expression = "java(subComment.countLikes())")
     SubCommentDetailsDto toSubCommentDetailsDto(Comment subComment, boolean isLike);
 
-    @Mapping(target = "author", source = "comment.member.nickname")
+    @Mapping(target = "author", source = "comment.member")
     @Mapping(target = "subComments", source = "subComments")
     @Mapping(target = "likeCount", expression = "java(comment.countLikes())")
     CommentDetailsDto toCommentDetailsDto(
             Comment comment, List<SubCommentDetailsDto> subComments, boolean isLike);
 
+    @Mapping(target = "author", source = "commentDetailsDto.author.nickname")
     CommentDetailsResponse toCommentDetailsResponse(CommentDetailsDto commentDetailsDto);
 }

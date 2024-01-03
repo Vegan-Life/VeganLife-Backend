@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
+    @Query("select distinct c from Comment c join fetch c.member " + "where c.id = :commentId")
     Optional<Comment> findById(Long commentId);
 
     @Modifying(clearAutomatically = true)
