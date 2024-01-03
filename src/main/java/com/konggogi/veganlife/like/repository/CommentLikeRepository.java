@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
     Optional<CommentLike> findByMemberIdAndCommentId(Long memberId, Long commentId);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE CommentLike c SET c.member = NULL WHERE c.member.id = :memberId")
     void setMemberToNull(Long memberId);
 }
