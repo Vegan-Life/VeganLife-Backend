@@ -24,4 +24,8 @@ public class MealDataService {
         mealDataRepository.save(
                 mealDataMapper.toEntity(request, memberQueryService.search(memberId)));
     }
+
+    public void removeAll(Long memberId) {
+        mealDataRepository.deleteAllByMemberId(memberId);
+    }
 }

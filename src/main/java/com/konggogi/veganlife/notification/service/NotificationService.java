@@ -38,6 +38,10 @@ public class NotificationService {
         return emitter;
     }
 
+    public void removeAll(Long memberId) {
+        notificationRepository.deleteAllByMemberId(memberId);
+    }
+
     public void sendNotification(Member member, NotificationType type, String message) {
         Notification notification =
                 notificationRepository.save(notificationMapper.toEntity(member, type, message));
