@@ -7,8 +7,11 @@ import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
+import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,10 @@ public class PostSearchService {
         boolean isLike = postLikeQueryService.searchPostLike(memberId, postId).isPresent();
         List<CommentDetailsDto> commentDetails = getAllCommentDetails(memberId, post);
         return postMapper.toPostDetailsDto(post, commentDetails, isLike);
+    }
+
+    public Page<PostSimpleDto> searchAll(Pageable pageable) {
+        return postQueryService.findAll(pageable).map(postMapper::toPostSimpleDto);
     }
 
     private List<CommentDetailsDto> getAllCommentDetails(Long memberId, Post post) {
