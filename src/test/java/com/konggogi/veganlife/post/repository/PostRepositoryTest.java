@@ -12,6 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @DataJpaTest
 class PostRepositoryTest {
@@ -51,5 +54,16 @@ class PostRepositoryTest {
         // then
         assertThat(foundPost).isPresent();
         assertThat(foundPost.get().getMember()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("전체 게시글 조회")
+    void findAllTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        // when
+        Page<Post> posts = postRepository.findAll(pageable);
+        // then
+        assertThat(posts.getContent().get(0)).isEqualTo(post);
     }
 }
