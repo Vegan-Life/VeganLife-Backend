@@ -20,4 +20,10 @@ public class PostQueryService {
                 .findById(postId)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
     }
+
+    public Post searchWithMember(Long postId) {
+        return postRepository
+                .findByIdFetchJoinMember(postId)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
+    }
 }
