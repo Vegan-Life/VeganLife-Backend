@@ -2,11 +2,11 @@ package com.konggogi.veganlife.post.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostLike;
+import com.konggogi.veganlife.post.domain.mapper.PostLikeMapper;
 import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,13 @@ public class PostLikeService {
     private final PostQueryService postQueryService;
     private final PostLikeQueryService likeQueryService;
     private final PostLikeRepository postLikeRepository;
-    private final LikeMapper likeMapper;
+    private final PostLikeMapper postLikeMapper;
 
     public void addPostLike(Long memberId, Long postId) {
         Member member = memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
         validatePostLikeIsExist(memberId, postId);
-        PostLike postLike = likeMapper.toPostLike(member);
+        PostLike postLike = postLikeMapper.toPostLike(member);
         post.addPostLike(postLike);
     }
 
