@@ -6,6 +6,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.post.domain.Post;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,5 +41,15 @@ class PostRepositoryTest {
         // then
         assertThat(postRepository.findById(post.getId()).get().getMember()).isNull();
         assertThat(postRepository.findById(otherPost.getId()).get().getMember()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Post Id로 게시글 및 회원 조회")
+    void findByIdFetchJoinMemberTest() {
+        // when
+        Optional<Post> foundPost = postRepository.findByIdFetchJoinMember(post.getId());
+        // then
+        assertThat(foundPost).isPresent();
+        assertThat(foundPost.get().getMember()).isNotNull();
     }
 }
