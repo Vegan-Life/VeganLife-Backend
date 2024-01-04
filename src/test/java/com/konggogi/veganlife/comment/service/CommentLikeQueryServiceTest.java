@@ -59,30 +59,4 @@ class CommentLikeQueryServiceTest {
         assertThat(foundCommentLike).isEmpty();
         then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
     }
-
-    @Test
-    @DisplayName("댓글 좋아요 여부 - 존재하는 경우")
-    void isCommentLikeTrueTest() {
-        // given
-        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
-                .willReturn(Optional.of(commentLike));
-        // when
-        boolean result = commentLikeQueryService.isCommentLike(member.getId(), comment.getId());
-        // then
-        assertThat(result).isTrue();
-        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
-    }
-
-    @Test
-    @DisplayName("댓글 좋아요 여부 - 존재하지 않는 경우")
-    void isCommentLikeFalseTest() {
-        // given
-        given(commentLikeRepository.findByMemberIdAndCommentId(anyLong(), anyLong()))
-                .willReturn(Optional.empty());
-        // when
-        boolean result = commentLikeQueryService.isCommentLike(member.getId(), comment.getId());
-        // then
-        assertThat(result).isFalse();
-        then(commentLikeRepository).should().findByMemberIdAndCommentId(anyLong(), anyLong());
-    }
 }

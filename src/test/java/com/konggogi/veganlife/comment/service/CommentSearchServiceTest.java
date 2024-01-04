@@ -17,6 +17,7 @@ import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.service.PostQueryService;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,8 @@ class CommentSearchServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(commentQueryService.searchWithMember(anyLong())).willReturn(comment);
-        given(commentLikeQueryService.isCommentLike(anyLong(), anyLong())).willReturn(true);
+        given(commentLikeQueryService.searchCommentLike(anyLong(), anyLong()))
+                .willReturn(Optional.of(commentLike));
         // when
         CommentDetailsDto result =
                 commentSearchService.searchDetailsById(

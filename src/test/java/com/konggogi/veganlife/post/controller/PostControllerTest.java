@@ -27,6 +27,7 @@ import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
 import com.konggogi.veganlife.post.service.PostLikeService;
+import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.springframework.test.web.servlet.ResultActions;
 class PostControllerTest extends RestDocsTest {
     @MockBean PostService postService;
     @MockBean PostLikeService postLikeService;
+    @MockBean PostSearchService postSearchService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
