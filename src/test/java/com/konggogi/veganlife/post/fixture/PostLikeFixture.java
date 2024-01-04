@@ -1,9 +1,9 @@
-package com.konggogi.veganlife.like.fixture;
+package com.konggogi.veganlife.post.fixture;
 
 
-import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostLike;
 
 public enum PostLikeFixture {
     DEFAULT;

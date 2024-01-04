@@ -12,6 +12,7 @@ import static org.mockito.Mockito.never;
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
+import com.konggogi.veganlife.comment.domain.mapper.CommentMapperImpl;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
 import com.konggogi.veganlife.comment.repository.CommentRepository;
@@ -38,7 +39,7 @@ class CommentServiceTest {
     @Mock CommentQueryService commentQueryService;
     @Mock CommentNotifyService commentNotifyService;
     @Mock CommentRepository commentRepository;
-    @Spy CommentMapper commentMapper;
+    @Spy CommentMapper commentMapper = new CommentMapperImpl();
     @InjectMocks CommentService commentService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
@@ -104,7 +105,6 @@ class CommentServiceTest {
         // given
         CommentAddRequest commentAddRequest = new CommentAddRequest(null, comment.getContent());
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(commentMapper.toEntity(member, commentAddRequest)).willReturn(subComment);
         given(postQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
         // when, then
@@ -122,7 +122,6 @@ class CommentServiceTest {
         // given
         CommentAddRequest commentAddRequest = new CommentAddRequest(1L, comment.getContent());
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(commentMapper.toEntity(member, commentAddRequest)).willReturn(subComment);
         given(commentQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
         // when, then
@@ -139,7 +138,6 @@ class CommentServiceTest {
         // given
         CommentAddRequest commentAddRequest = new CommentAddRequest(2L, comment.getContent());
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(commentMapper.toEntity(member, commentAddRequest)).willReturn(subComment);
         given(commentQueryService.search(anyLong())).willReturn(subComment);
         // when, then
         assertThatThrownBy(

@@ -1,12 +1,11 @@
-package com.konggogi.veganlife.like.repository;
+package com.konggogi.veganlife.comment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
-import com.konggogi.veganlife.comment.repository.CommentRepository;
-import com.konggogi.veganlife.like.domain.CommentLike;
-import com.konggogi.veganlife.like.fixture.CommentLikeFixture;
+import com.konggogi.veganlife.comment.fixture.CommentLikeFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;

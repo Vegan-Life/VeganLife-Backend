@@ -1,15 +1,14 @@
-package com.konggogi.veganlife.like.repository;
+package com.konggogi.veganlife.post.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.konggogi.veganlife.like.domain.PostLike;
-import com.konggogi.veganlife.like.fixture.PostLikeFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostLike;
 import com.konggogi.veganlife.post.fixture.PostFixture;
-import com.konggogi.veganlife.post.repository.PostRepository;
+import com.konggogi.veganlife.post.fixture.PostLikeFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
