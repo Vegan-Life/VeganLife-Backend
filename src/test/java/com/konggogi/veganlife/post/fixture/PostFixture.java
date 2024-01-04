@@ -1,15 +1,12 @@
 package com.konggogi.veganlife.post.fixture;
 
 
-import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.PostLike;
 import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.util.ReflectionUtils;
 
 public enum PostFixture {
@@ -36,14 +33,6 @@ public enum PostFixture {
         post.addPostTag(postTag);
         post.addPostImage(PostImageFixture.DEFAULT.getPostImage());
         return setCreatedAt(post);
-    }
-
-    public Post getPostAllInfoWithId(
-            Long id, Member member, List<PostLike> postLikes, List<Comment> comments) {
-        Post post = getWithId(id, member);
-        postLikes.forEach(post::addPostLike);
-        comments.forEach(post::addComment);
-        return post;
     }
 
     private Post setCreatedAt(Post post) {

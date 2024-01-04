@@ -219,6 +219,7 @@ class CommentControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("$.content").value(detailsDto.comment().getContent()))
                 .andExpect(jsonPath("$.isLike").value(detailsDto.isLike()))
                 .andExpect(jsonPath("$.likeCount").value(detailsDto.likeCount()))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty())
                 .andExpect(jsonPath("$.subComments").isNotEmpty());
 
         perform.andDo(print())

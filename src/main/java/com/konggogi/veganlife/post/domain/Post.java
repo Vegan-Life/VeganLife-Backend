@@ -74,4 +74,12 @@ public class Post extends TimeStamped {
     public void removePostLike(PostLike postLike) {
         likes.remove(postLike);
     }
+
+    public int countLikes() {
+        return likes.size();
+    }
+
+    public int countComments() {
+        return comments.size();
+    }
 }

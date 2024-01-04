@@ -65,7 +65,7 @@ class CommentRepositoryTest {
     @DisplayName("Comment Id로 댓글 및 회원 조회")
     void findByIdFetchJoinMemberTest() {
         // when
-        Optional<Comment> foundComment = commentRepository.findById(comment.getId());
+        Optional<Comment> foundComment = commentRepository.findByIdFetchJoinMember(comment.getId());
         // then
         assertThat(foundComment).isPresent();
         assertThat(foundComment.get().getMember()).isNotNull();
