@@ -2,9 +2,9 @@ package com.konggogi.veganlife.post.fixture;
 
 
 import com.konggogi.veganlife.comment.domain.Comment;
-import com.konggogi.veganlife.like.domain.PostLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostLike;
 import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
 import java.lang.reflect.Field;

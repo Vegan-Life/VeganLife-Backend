@@ -1,7 +1,7 @@
-package com.konggogi.veganlife.like.repository;
+package com.konggogi.veganlife.comment.repository;
 
 
-import com.konggogi.veganlife.like.domain.CommentLike;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.like.exception;
+package com.konggogi.veganlife.post.exception;
 
 
 import com.konggogi.veganlife.global.exception.ApiException;

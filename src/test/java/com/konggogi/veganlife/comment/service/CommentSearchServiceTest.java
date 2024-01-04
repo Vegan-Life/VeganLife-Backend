@@ -5,13 +5,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapperImpl;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.fixture.CommentLikeFixture;
 import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
-import com.konggogi.veganlife.like.domain.CommentLike;
-import com.konggogi.veganlife.like.fixture.CommentLikeFixture;
-import com.konggogi.veganlife.like.service.LikeQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -31,7 +30,7 @@ class CommentSearchServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock PostQueryService postQueryService;
     @Mock CommentQueryService commentQueryService;
-    @Mock LikeQueryService likeQueryService;
+    @Mock CommentLikeQueryService commentLikeQueryService;
     @Spy CommentMapper commentMapper = new CommentMapperImpl();
     @InjectMocks CommentSearchService commentSearchService;
 
@@ -49,7 +48,7 @@ class CommentSearchServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(commentQueryService.searchWithMember(anyLong())).willReturn(comment);
-        given(likeQueryService.isCommentLike(anyLong(), anyLong())).willReturn(true);
+        given(commentLikeQueryService.isCommentLike(anyLong(), anyLong())).willReturn(true);
         // when
         CommentDetailsDto result =
                 commentSearchService.searchDetailsById(

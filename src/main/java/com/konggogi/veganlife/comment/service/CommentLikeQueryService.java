@@ -1,10 +1,8 @@
-package com.konggogi.veganlife.like.service;
+package com.konggogi.veganlife.comment.service;
 
 
-import com.konggogi.veganlife.like.domain.CommentLike;
-import com.konggogi.veganlife.like.domain.PostLike;
-import com.konggogi.veganlife.like.repository.CommentLikeRepository;
-import com.konggogi.veganlife.like.repository.PostLikeRepository;
+import com.konggogi.veganlife.comment.domain.CommentLike;
+import com.konggogi.veganlife.comment.repository.CommentLikeRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,13 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LikeQueryService {
-    private final PostLikeRepository postLikeRepository;
+public class CommentLikeQueryService {
     private final CommentLikeRepository commentLikeRepository;
-
-    public Optional<PostLike> searchPostLike(Long memberId, Long postId) {
-        return postLikeRepository.findByMemberIdAndPostId(memberId, postId);
-    }
 
     public Optional<CommentLike> searchCommentLike(Long memberId, Long commentId) {
         return commentLikeRepository.findByMemberIdAndCommentId(memberId, commentId);

@@ -1,7 +1,6 @@
-package com.konggogi.veganlife.like.service;
+package com.konggogi.veganlife.comment.service;
 
 
-import com.konggogi.veganlife.comment.service.CommentQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.notification.domain.NotificationMessage;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class LikeNotifyService {
+public class CommentLikeNotifyService {
     private final MemberQueryService memberQueryService;
     private final CommentQueryService commentQueryService;
     private final NotificationService notificationService;

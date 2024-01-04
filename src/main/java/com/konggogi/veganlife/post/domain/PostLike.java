@@ -1,8 +1,7 @@
-package com.konggogi.veganlife.like.domain;
+package com.konggogi.veganlife.post.domain;
 
 
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

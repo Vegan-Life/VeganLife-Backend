@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.like.service;
+package com.konggogi.veganlife.comment.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -8,7 +8,6 @@ import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
-import com.konggogi.veganlife.comment.service.CommentQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -24,11 +23,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class LikeNotifyServiceTest {
+class CommentLikeNotifyServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock CommentQueryService commentQueryService;
     @Mock NotificationService notificationService;
-    @InjectMocks LikeNotifyService likeNotifyService;
+    @InjectMocks CommentLikeNotifyService commentLikeNotifyService;
     private final Member commentAuthor = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Member commentLikeMember = MemberFixture.DEFAULT_F.getWithId(2L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, commentAuthor);
@@ -44,7 +43,7 @@ class LikeNotifyServiceTest {
         // when, then
         assertDoesNotThrow(
                 () ->
-                        likeNotifyService.notifyAddCommentLikeIfNotAuthor(
+                        commentLikeNotifyService.notifyAddCommentLikeIfNotAuthor(
                                 commentLikeMember.getId(), comment.getId()));
         then(notificationService)
                 .should()
@@ -58,7 +57,8 @@ class LikeNotifyServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(commentAuthor);
         given(commentQueryService.search(anyLong())).willReturn(comment);
         // when
-        likeNotifyService.notifyAddCommentLikeIfNotAuthor(commentAuthor.getId(), comment.getId());
+        commentLikeNotifyService.notifyAddCommentLikeIfNotAuthor(
+                commentAuthor.getId(), comment.getId());
         // then
         then(notificationService)
                 .should(never())

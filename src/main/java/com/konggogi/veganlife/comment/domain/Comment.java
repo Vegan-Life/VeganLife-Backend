@@ -2,7 +2,6 @@ package com.konggogi.veganlife.comment.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
-import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
 import jakarta.persistence.*;

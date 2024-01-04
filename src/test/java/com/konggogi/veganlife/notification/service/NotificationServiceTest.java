@@ -16,6 +16,7 @@ import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.notification.domain.Notification;
 import com.konggogi.veganlife.notification.domain.mapper.NotificationMapper;
+import com.konggogi.veganlife.notification.domain.mapper.NotificationMapperImpl;
 import com.konggogi.veganlife.notification.exception.SseConnectionException;
 import com.konggogi.veganlife.notification.fixture.NotificationFixture;
 import com.konggogi.veganlife.notification.repository.EmitterRepository;
@@ -36,7 +37,7 @@ class NotificationServiceTest {
     @Mock NotificationRepository notificationRepository;
     @Mock EmitterRepository emitterRepository;
     @Mock MemberQueryService memberQueryService;
-    @Spy NotificationMapper notificationMapper;
+    @Spy NotificationMapper notificationMapper = new NotificationMapperImpl();
     @Mock SseEmitter sseEmitter;
     @InjectMocks NotificationService notificationService;
 

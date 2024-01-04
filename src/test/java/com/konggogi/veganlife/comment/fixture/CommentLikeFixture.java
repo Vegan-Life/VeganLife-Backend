@@ -1,8 +1,8 @@
-package com.konggogi.veganlife.like.fixture;
+package com.konggogi.veganlife.comment.fixture;
 
 
 import com.konggogi.veganlife.comment.domain.Comment;
-import com.konggogi.veganlife.like.domain.CommentLike;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
 

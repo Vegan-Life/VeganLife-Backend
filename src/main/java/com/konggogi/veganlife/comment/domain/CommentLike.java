@@ -1,7 +1,6 @@
-package com.konggogi.veganlife.like.domain;
+package com.konggogi.veganlife.comment.domain;
 
 
-import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
 import jakarta.persistence.*;

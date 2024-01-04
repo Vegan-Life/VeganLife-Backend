@@ -31,9 +31,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class MemberQueryServiceTest {
     @Mock MemberRepository memberRepository;
-    @Mock private JwtUtils jwtUtils;
-    @Mock private JwtProvider jwtProvider;
-    @Mock private RefreshTokenRepository refreshTokenRepository;
+    @Mock JwtUtils jwtUtils;
+    @Mock JwtProvider jwtProvider;
+    @Mock RefreshTokenRepository refreshTokenRepository;
     @InjectMocks MemberQueryService memberQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
