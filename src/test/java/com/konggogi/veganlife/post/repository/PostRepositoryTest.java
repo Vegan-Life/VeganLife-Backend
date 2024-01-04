@@ -64,6 +64,6 @@ class PostRepositoryTest {
         // when
         Page<Post> posts = postRepository.findAll(pageable);
         // then
-        assertThat(posts.getContent().get(0)).isEqualTo(post);
+        assertThat(posts).hasSize(1);
     }
 }

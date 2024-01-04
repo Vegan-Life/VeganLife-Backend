@@ -2,6 +2,7 @@ package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -13,6 +14,7 @@ import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PostQueryServiceTest {
@@ -75,5 +81,21 @@ class PostQueryServiceTest {
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
         then(postRepository).should().findByIdFetchJoinMember(anyLong());
+    }
+
+    @Test
+    @DisplayName("전체 게시글 조회")
+    void searchAllTest() {
+        // given
+        Post otherPost = PostFixture.BAKERY.getWithId(2L, member);
+        List<Post> posts = List.of(post, otherPost);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postRepository.findAll(any(Pageable.class))).willReturn(foundPosts);
+        // when
+        Page<Post> result = postQueryService.searchAll(pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+        then(postRepository).should().findAll(any(Pageable.class));
     }
 }
