@@ -35,7 +35,7 @@ public class PostSearchService {
     }
 
     public Page<PostSimpleDto> searchAll(Pageable pageable) {
-        return postQueryService.findAll(pageable).map(postMapper::toPostSimpleDto);
+        return postQueryService.searchAll(pageable).map(postMapper::toPostSimpleDto);
     }
 
     private List<CommentDetailsDto> getAllCommentDetails(Long memberId, Post post) {

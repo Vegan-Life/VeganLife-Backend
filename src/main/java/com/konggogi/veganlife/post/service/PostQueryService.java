@@ -33,11 +33,11 @@ public class PostQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
     }
 
-    public Page<Post> findAll(Pageable pageable) {
+    public Page<Post> searchAll(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
 
-    public List<Tag> findPopularTags() {
+    public List<Tag> searchPopularTags() {
         return tagRepository.findPopularTags();
     }
 }

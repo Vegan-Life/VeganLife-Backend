@@ -54,7 +54,7 @@ public class PostController {
     @GetMapping()
     public ResponseEntity<PostAllResponse> getAllPost(Pageable pageable) {
         Page<PostSimpleDto> postSimpleDtos = postSearchService.searchAll(pageable);
-        List<Tag> popularTags = postQueryService.findPopularTags();
+        List<Tag> popularTags = postQueryService.searchPopularTags();
         return ResponseEntity.ok(postMapper.toPostAllResponse(postSimpleDtos, popularTags));
     }
 
