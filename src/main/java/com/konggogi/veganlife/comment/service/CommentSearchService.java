@@ -27,13 +27,13 @@ public class CommentSearchService {
         postQueryService.search(postId);
         Comment foundComment = commentQueryService.searchWithMember(commentId);
 
-        boolean isLike = commentLikeQueryService.isCommentLike(memberId, commentId);
+        boolean isLike = isCommentLike(memberId, commentId);
         List<SubCommentDetailsDto> subComments = getAllSubCommentDetails(memberId, foundComment);
         return commentMapper.toCommentDetailsDto(foundComment, subComments, isLike);
     }
 
     private SubCommentDetailsDto toSubCommentDetails(Long memberId, Comment subComment) {
-        boolean isLike = commentLikeQueryService.isCommentLike(memberId, subComment.getId());
+        boolean isLike = isCommentLike(memberId, subComment.getId());
         return commentMapper.toSubCommentDetailsDto(subComment, isLike);
     }
 
@@ -41,5 +41,9 @@ public class CommentSearchService {
         return comment.getSubComments().stream()
                 .map(subComment -> toSubCommentDetails(memberId, subComment))
                 .toList();
+    }
+
+    private boolean isCommentLike(Long memberId, Long commentId) {
+        return commentLikeQueryService.searchCommentLike(memberId, commentId).isPresent();
     }
 }
