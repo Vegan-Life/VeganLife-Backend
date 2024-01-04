@@ -2,6 +2,7 @@ package com.konggogi.veganlife.like.service;
 
 
 import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.service.CommentLikeNotifyService;
 import com.konggogi.veganlife.comment.service.CommentQueryService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.like.domain.CommentLike;
@@ -26,7 +27,7 @@ public class LikeService {
     private final PostQueryService postQueryService;
     private final CommentQueryService commentQueryService;
     private final LikeQueryService likeQueryService;
-    private final LikeNotifyService likeNotifyService;
+    private final CommentLikeNotifyService commentLikeNotifyService;
     private final PostLikeRepository postLikeRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final LikeMapper likeMapper;
@@ -53,7 +54,7 @@ public class LikeService {
         validateCommentLikeIsExist(memberId, commentId);
         CommentLike commentLike = likeMapper.toCommentLike(member, post);
         comment.addCommentLike(commentLike);
-        likeNotifyService.notifyAddCommentLikeIfNotAuthor(memberId, commentId);
+        commentLikeNotifyService.notifyAddCommentLikeIfNotAuthor(memberId, commentId);
     }
 
     public void removeCommentLike(Long memberId, Long postId, Long commentId) {
