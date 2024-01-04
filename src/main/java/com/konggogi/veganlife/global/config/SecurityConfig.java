@@ -3,6 +3,7 @@ package com.konggogi.veganlife.global.config;
 
 import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
 import com.konggogi.veganlife.global.security.handler.JwtAuthenticationEntryPoint;
+import com.konggogi.veganlife.global.security.handler.ResourceAccessDeniedHandler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -24,16 +25,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final ResourceAccessDeniedHandler resourceAccessDeniedHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web ->
                 web.ignoring()
                         .requestMatchers(PathRequest.toH2Console())
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/docs"));
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
@@ -41,13 +43,16 @@ public class SecurityConfig {
         return http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(
-                        config -> config.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                        config ->
+                                config.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                        .accessDeniedHandler(resourceAccessDeniedHandler))
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
                                         .requestMatchers(
                                                 new AntPathRequestMatcher(
                                                         "/api/v1/members/oauth/*/login"),
+                                                new AntPathRequestMatcher("/api/v1/docs"),
                                                 new AntPathRequestMatcher("/actuator/health"),
                                                 new AntPathRequestMatcher("/api/v1/auth/reissue"))
                                         .permitAll()
