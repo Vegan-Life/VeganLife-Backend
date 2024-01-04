@@ -23,7 +23,6 @@ public class RecipeController {
     public ResponseEntity<Page<RecipeListResponse>> getRecipeList(
             VegetarianType vegetarianType, Pageable pageable) {
 
-        Page<RecipeListResponse> page = recipeSearchService.searchAll(vegetarianType, pageable);
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(recipeSearchService.searchAll(vegetarianType, pageable));
     }
 }
