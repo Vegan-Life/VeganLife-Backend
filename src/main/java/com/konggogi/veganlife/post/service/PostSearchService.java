@@ -34,7 +34,7 @@ public class PostSearchService {
         return postMapper.toPostDetailsDto(post, commentDetails, isLike);
     }
 
-    public Page<PostSimpleDto> searchAll(Pageable pageable) {
+    public Page<PostSimpleDto> searchAllSimple(Pageable pageable) {
         return postQueryService.searchAll(pageable).map(postMapper::toPostSimpleDto);
     }
 
