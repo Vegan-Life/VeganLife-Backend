@@ -26,6 +26,10 @@ public enum PostFixture {
         return Post.builder().title(title).content(content).build();
     }
 
+    public Post get(Member member) {
+        return Post.builder().member(member).title(title).content(content).build();
+    }
+
     public Post getWithId(Long id, Member member) {
         Post post = Post.builder().id(id).title(title).content(content).member(member).build();
         Tag tag = TagFixture.DEFAULT.getTagWithName(tagName);
