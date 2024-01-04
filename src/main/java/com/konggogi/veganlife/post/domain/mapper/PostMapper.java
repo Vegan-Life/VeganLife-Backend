@@ -35,7 +35,9 @@ public interface PostMapper {
     @Mapping(target = "imageUrls", source = "postDetailsDto.imageUrls")
     @Mapping(target = "tags", source = "postDetailsDto.tags")
     @Mapping(target = "comments", source = "postDetailsDto.comments")
-    @Mapping(target = ".", source = "postDetailsDto.post")
+    @Mapping(target = "title", source = "postDetailsDto.post.title")
+    @Mapping(target = "content", source = "postDetailsDto.post.content")
+    @Mapping(target = "createdAt", source = "postDetailsDto.post.createdAt")
     PostDetailsResponse toPostDetailsResponse(PostDetailsDto postDetailsDto);
 
     @Named("postImageToString")
