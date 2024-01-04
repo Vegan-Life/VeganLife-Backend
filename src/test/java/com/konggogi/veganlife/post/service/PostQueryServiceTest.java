@@ -51,4 +51,29 @@ class PostQueryServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
         then(postRepository).should().findById(anyLong());
     }
+
+    @Test
+    @DisplayName("게시글 번호로 게시글, 회원 조회")
+    void searchWithMemberTest() {
+        // given
+        given(postRepository.findByIdFetchJoinMember(anyLong())).willReturn(Optional.of(post));
+        // when
+        Post foundPost = postQueryService.searchWithMember(anyLong());
+        // then
+        assertThat(foundPost).isEqualTo(post);
+        then(postRepository).should().findById(anyLong());
+        assertThat(foundPost.getMember()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("없는 게시글 번호로 게시글 조회시 예외 발생")
+    void searchWithMemberNotFoundPostTest() {
+        // given
+        given(postRepository.findByIdFetchJoinMember(anyLong())).willReturn(Optional.empty());
+        // when, then
+        assertThatThrownBy(() -> postQueryService.searchWithMember(anyLong()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
+        then(postRepository).should().findById(anyLong());
+    }
 }
