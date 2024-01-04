@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.post.service;
 
 
-import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.post.domain.PostLike;
 import com.konggogi.veganlife.post.repository.PostLikeRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

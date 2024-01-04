@@ -1,10 +1,10 @@
 package com.konggogi.veganlife.like.domain.mapper;
 
 
-import com.konggogi.veganlife.like.domain.CommentLike;
-import com.konggogi.veganlife.like.domain.PostLike;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostLike;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -2,9 +2,9 @@ package com.konggogi.veganlife.comment.service;
 
 
 import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.domain.CommentLike;
 import com.konggogi.veganlife.comment.repository.CommentLikeRepository;
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.like.domain.CommentLike;
 import com.konggogi.veganlife.like.domain.mapper.LikeMapper;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
