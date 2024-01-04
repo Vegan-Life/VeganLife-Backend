@@ -37,6 +37,7 @@ public enum CommentFixture {
                         .parentComment(parentComment)
                         .content(content)
                         .build();
+        post.addComment(comment);
         parentComment.addSubComment(comment);
         return comment;
     }
@@ -50,6 +51,7 @@ public enum CommentFixture {
                         .parentComment(parentComment)
                         .content(content)
                         .build();
+        post.addComment(comment);
         parentComment.addSubComment(comment);
         return setCreatedAt(comment);
     }

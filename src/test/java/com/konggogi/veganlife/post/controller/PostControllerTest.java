@@ -111,6 +111,7 @@ class PostControllerTest extends RestDocsTest {
         // given
         Post post = PostFixture.CHALLENGE.getWithId(1L, member);
         Comment comment1 = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
+        Comment subComment = CommentFixture.DEFAULT.getSubCommentWithId(3L, member, post, comment1);
         Comment comment2 = CommentFixture.DEFAULT.getTopCommentWithId(2L, member, post);
         List<String> imageUrls =
                 List.of(
@@ -144,6 +145,7 @@ class PostControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
                 .andExpect(jsonPath("$.isLike").value(postDetailsDto.isLike()))
                 .andExpect(jsonPath("$.likeCount").value(postDetailsDto.likeCount()))
+                .andExpect(jsonPath("$.commentCount").value(postDetailsDto.post().countComments()))
                 .andExpect(jsonPath("$.imageUrls").isNotEmpty())
                 .andExpect(jsonPath("$.tags").isNotEmpty())
                 .andExpect(jsonPath("$.comments").isNotEmpty());
