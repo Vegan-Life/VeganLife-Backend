@@ -1,8 +1,8 @@
 package com.konggogi.veganlife.comment.service;
 
 
+import com.konggogi.veganlife.comment.repository.CommentLikeRepository;
 import com.konggogi.veganlife.like.domain.CommentLike;
-import com.konggogi.veganlife.like.repository.CommentLikeRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

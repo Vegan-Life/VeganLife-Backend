@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.like.repository;
+package com.konggogi.veganlife.comment.repository;
 
 
 import com.konggogi.veganlife.like.domain.CommentLike;
