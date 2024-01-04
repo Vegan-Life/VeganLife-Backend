@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 public class JwtUtils {
     public static final String AUTH_TOKEN_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
-    public static final String EXCEPTION_ATTRIBUTE = "jwtExceptionCode";
+    public static final String JWT_EXCEPTION = "jwtException";
 
     @Value("${jwt.secret-key}")
     private String secretKey;
