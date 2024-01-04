@@ -17,12 +17,15 @@ public enum CommentFixture {
     }
 
     public Comment getTopComment(Member member, Post post) {
-        return Comment.builder().member(member).post(post).content(content).build();
+        Comment comment = Comment.builder().member(member).post(post).content(content).build();
+        post.addComment(comment);
+        return comment;
     }
 
     public Comment getTopCommentWithId(Long id, Member member, Post post) {
         Comment comment =
                 Comment.builder().id(id).member(member).post(post).content(content).build();
+        post.addComment(comment);
         return setCreatedAt(comment);
     }
 
