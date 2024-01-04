@@ -61,7 +61,7 @@ class PostQueryServiceTest {
         Post foundPost = postQueryService.searchWithMember(anyLong());
         // then
         assertThat(foundPost).isEqualTo(post);
-        then(postRepository).should().findById(anyLong());
+        then(postRepository).should().findByIdFetchJoinMember(anyLong());
         assertThat(foundPost.getMember()).isNotNull();
     }
 
@@ -74,6 +74,6 @@ class PostQueryServiceTest {
         assertThatThrownBy(() -> postQueryService.searchWithMember(anyLong()))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_POST.getDescription());
-        then(postRepository).should().findById(anyLong());
+        then(postRepository).should().findByIdFetchJoinMember(anyLong());
     }
 }
