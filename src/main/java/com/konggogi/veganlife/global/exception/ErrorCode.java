@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
     // global
-    INTERNAL_SERVER_ERROR("GLOBAL_999", "Handling 되지 않은 Server Error입니다."),
+    UNHANDLED_ERROR("GLOBAL_999", "Handling 되지 않은 Server Error입니다."),
 
     // validation
     INVALID_INPUT_VALUE("GLOBAL_001", "RequestBody Validation에 실패했습니다."),

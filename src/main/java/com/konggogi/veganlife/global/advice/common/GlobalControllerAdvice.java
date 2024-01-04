@@ -3,6 +3,7 @@ package com.konggogi.veganlife.global.advice.common;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.exception.UnhandledException;
 import com.konggogi.veganlife.global.exception.dto.response.ErrorResponse;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.util.AopUtils;
@@ -24,12 +25,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleApiException(Exception exception) {
+    @ExceptionHandler(UnhandledException.class)
+    public ResponseEntity<ErrorResponse> handleUnhandledException(UnhandledException exception) {
 
         LoggingUtils.exceptionLog(HttpStatus.INTERNAL_SERVER_ERROR, exception);
         return ResponseEntity.internalServerError()
-                .body(ErrorResponse.from(ErrorCode.INTERNAL_SERVER_ERROR));
+                .body(ErrorResponse.from(ErrorCode.UNHANDLED_ERROR));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
