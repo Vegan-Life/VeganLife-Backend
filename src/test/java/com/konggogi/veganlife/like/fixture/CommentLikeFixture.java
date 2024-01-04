@@ -12,10 +12,16 @@ public enum CommentLikeFixture {
     CommentLikeFixture() {}
 
     public CommentLike get(Member member, Post post, Comment comment) {
-        return CommentLike.builder().member(member).post(post).comment(comment).build();
+        CommentLike commentLike =
+                CommentLike.builder().member(member).post(post).comment(comment).build();
+        comment.addCommentLike(commentLike);
+        return commentLike;
     }
 
     public CommentLike getWithId(Long id, Member member, Post post, Comment comment) {
-        return CommentLike.builder().id(id).member(member).post(post).comment(comment).build();
+        CommentLike commentLike =
+                CommentLike.builder().id(id).member(member).post(post).comment(comment).build();
+        comment.addCommentLike(commentLike);
+        return commentLike;
     }
 }

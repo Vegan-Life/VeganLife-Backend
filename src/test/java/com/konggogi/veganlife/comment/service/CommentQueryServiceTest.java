@@ -54,4 +54,30 @@ class CommentQueryServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_COMMENT.getDescription());
         then(commentRepository).should().findById(anyLong());
     }
+
+    @Test
+    @DisplayName("댓글 조회시 회원도 함께 조회")
+    void searchWithMemberTest() {
+        // given
+        given(commentRepository.findByIdFetchJoinMember(anyLong()))
+                .willReturn(Optional.of(comment));
+        // when
+        Comment foundComment = commentQueryService.searchWithMember(comment.getId());
+        // then
+        assertThat(foundComment).isEqualTo(comment);
+        assertThat(foundComment.getMember()).isNotNull();
+        then(commentRepository).should().findByIdFetchJoinMember(anyLong());
+    }
+
+    @Test
+    @DisplayName("없는 댓글 조회시 예외 발생")
+    void searchWithMemberNotFoundCommentTest() {
+        // given
+        given(commentRepository.findByIdFetchJoinMember(anyLong())).willReturn(Optional.empty());
+        // when, then
+        assertThatThrownBy(() -> commentQueryService.searchWithMember(comment.getId()))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_COMMENT.getDescription());
+        then(commentRepository).should().findByIdFetchJoinMember(anyLong());
+    }
 }

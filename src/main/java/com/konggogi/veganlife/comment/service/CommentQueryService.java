@@ -20,4 +20,10 @@ public class CommentQueryService {
                 .findById(commentId)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
     }
+
+    public Comment searchWithMember(Long commentId) {
+        return commentRepository
+                .findByIdFetchJoinMember(commentId)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
+    }
 }

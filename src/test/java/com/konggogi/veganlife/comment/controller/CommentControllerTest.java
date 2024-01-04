@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -18,7 +19,10 @@ import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.service.CommentSearchService;
 import com.konggogi.veganlife.comment.service.CommentService;
+import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
+import com.konggogi.veganlife.comment.service.dto.SubCommentDetailsDto;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
@@ -26,6 +30,8 @@ import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,6 +42,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(CommentController.class)
 class CommentControllerTest extends RestDocsTest {
     @MockBean CommentService commentService;
+    @MockBean CommentSearchService commentSearchService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
     private final Comment comment = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
@@ -180,5 +187,98 @@ class CommentControllerTest extends RestDocsTest {
         perform.andExpect(status().isBadRequest());
 
         perform.andDo(print()).andDo(document("add-comment-illegal", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 상세 조회 API")
+    void getCommentDetailsTest() throws Exception {
+        // given
+        SubCommentDetailsDto subComment1 =
+                new SubCommentDetailsDto(2L, "콩고기M", "좋은 정보 감사합니다!", true, 11, LocalDateTime.now());
+        SubCommentDetailsDto subComment2 =
+                new SubCommentDetailsDto(3L, "콩고기F", "오오 꿀팁이네요ㅎㅎ", false, 3, LocalDateTime.now());
+        CommentDetailsDto detailsDto =
+                new CommentDetailsDto(1L, comment, true, 53, List.of(subComment1, subComment2));
+        given(commentSearchService.searchDetailsById(anyLong(), anyLong(), anyLong()))
+                .willReturn(detailsDto);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(detailsDto.id()))
+                .andExpect(
+                        jsonPath("$.author").value(detailsDto.comment().getMember().getNickname()))
+                .andExpect(jsonPath("$.content").value(detailsDto.comment().getContent()))
+                .andExpect(jsonPath("$.isLike").value(detailsDto.isLike()))
+                .andExpect(jsonPath("$.likeCount").value(detailsDto.likeCount()))
+                .andExpect(jsonPath("$.subComments").isNotEmpty());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "get-comment-details",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 상세 조회 API - 없는 회원 예외 발생")
+    void getCommentDetailsNotFoundMemberTest() throws Exception {
+        // given
+        given(commentSearchService.searchDetailsById(anyLong(), anyLong(), anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("get-comment-details-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 상세 조회 API - 없는 게시글 예외 발생")
+    void getCommentDetailsNotFoundPostTest() throws Exception {
+        // given
+        given(commentSearchService.searchDetailsById(anyLong(), anyLong(), anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("get-comment-details-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 상세 조회 API - 없는 댓글 예외 발생")
+    void getCommentDetailsNotFoundCommentTest() throws Exception {
+        // given
+        given(commentSearchService.searchDetailsById(anyLong(), anyLong(), anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("get-comment-details-not-found-comment", getDocumentResponse()));
     }
 }

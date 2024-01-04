@@ -60,4 +60,14 @@ class CommentRepositoryTest {
         assertThat(commentRepository.findById(comment.getId()).get().getMember()).isNull();
         assertThat(commentRepository.findById(otherComment.getId()).get().getMember()).isNotNull();
     }
+
+    @Test
+    @DisplayName("Comment Id로 댓글 및 회원 조회")
+    void findByIdFetchJoinMemberTest() {
+        // when
+        Optional<Comment> foundComment = commentRepository.findById(comment.getId());
+        // then
+        assertThat(foundComment).isPresent();
+        assertThat(foundComment.get().getMember()).isNotNull();
+    }
 }

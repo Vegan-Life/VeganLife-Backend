@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    Optional<Comment> findById(Long commentId);
+    @Query("select distinct c from Comment c join fetch c.member " + "where c.id = :commentId")
+    Optional<Comment> findByIdFetchJoinMember(Long commentId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE Comment c SET c.member = NULL WHERE c.member.id = :memberId")
+    @Query("update Comment c set c.member = null where c.member.id = :memberId")
     void setMemberToNull(Long memberId);
 }
