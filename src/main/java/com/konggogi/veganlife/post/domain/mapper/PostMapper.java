@@ -6,15 +6,19 @@ import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
+import com.konggogi.veganlife.post.controller.dto.response.PostAllResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
+import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
+import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring", uses = CommentMapper.class)
 public interface PostMapper {
@@ -42,6 +46,12 @@ public interface PostMapper {
     @Mapping(target = "createdAt", source = "postDetailsDto.post.createdAt")
     PostDetailsResponse toPostDetailsResponse(PostDetailsDto postDetailsDto);
 
+    @Mapping(target = "imageUrl", expression = "java(post.getThumbnailUrl())")
+    PostSimpleDto toPostSimpleDto(Post post);
+
+    @Mapping(target = "topTags", source = "tags", qualifiedByName = "tagsToString")
+    PostAllResponse toPostAllResponse(Page<PostSimpleDto> posts, List<Tag> tags);
+
     @Named("postImageToString")
     static String postImageToString(PostImage postImage) {
         return postImage.getImageUrl();
@@ -50,5 +60,10 @@ public interface PostMapper {
     @Named("postTagsToString")
     static String postTagsToString(PostTag postTag) {
         return postTag.getTag().getName();
+    }
+
+    @Named("tagsToString")
+    static String tagsToString(Tag tag) {
+        return tag.getName();
     }
 }
