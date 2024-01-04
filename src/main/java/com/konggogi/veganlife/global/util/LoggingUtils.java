@@ -32,6 +32,42 @@ public class LoggingUtils {
         log.debug("type: {} | value: {}", arg.getClass().getSimpleName(), arg);
     }
 
+    /** 필터 예외 */
+    public static void exceptionLog(HttpStatus httpStatus, ApiException e) {
+        String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
+        String exceptionName = setTextColor(ANSI_PURPLE, e.getErrorCode().getCode());
+        String status = setTextColor(ANSI_RED, httpStatus.toString());
+        String message = setTextColor(ANSI_RED, e.getErrorCode().getDescription());
+        String filterName =
+                setTextColor(
+                        ANSI_GREEN,
+                        String.valueOf(e.getStackTrace()[0].getClass().getSimpleName()));
+        String methodName =
+                setTextColor(ANSI_GREEN, String.valueOf(e.getStackTrace()[0].getMethodName()));
+        String lineNumber =
+                setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
+        printExceptionLog(
+                errorDate, filterName, methodName, lineNumber, exceptionName, status, message);
+    }
+
+    /** 필터 예외 */
+    public static void exceptionLog(HttpStatus httpStatus, Exception e) {
+        String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
+        String exceptionName = setTextColor(ANSI_PURPLE, e.getClass().getName());
+        String status = setTextColor(ANSI_RED, httpStatus.toString());
+        String message = setTextColor(ANSI_RED, e.getMessage());
+        String filterName =
+                setTextColor(
+                        ANSI_GREEN,
+                        String.valueOf(e.getStackTrace()[0].getClass().getSimpleName()));
+        String methodName =
+                setTextColor(ANSI_GREEN, String.valueOf(e.getStackTrace()[0].getMethodName()));
+        String lineNumber =
+                setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
+        printExceptionLog(
+                errorDate, filterName, methodName, lineNumber, exceptionName, status, message);
+    }
+
     /** 커스텀 예외 */
     public static void exceptionLog(
             MethodSignature signature, HttpStatus httpStatus, ApiException e) {
