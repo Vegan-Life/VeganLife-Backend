@@ -154,6 +154,7 @@ class PostControllerTest extends RestDocsTest {
                                 "get-post",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
                                 pathParameters(parameterWithName("postId").description("게시글 번호"))));
     }
 
