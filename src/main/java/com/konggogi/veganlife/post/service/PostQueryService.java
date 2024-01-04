@@ -9,6 +9,8 @@ import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,10 @@ public class PostQueryService {
         return postRepository
                 .findByIdFetchJoinMember(postId)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_POST));
+    }
+
+    public Page<Post> findAll(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
     public List<Tag> findPopularTags() {
