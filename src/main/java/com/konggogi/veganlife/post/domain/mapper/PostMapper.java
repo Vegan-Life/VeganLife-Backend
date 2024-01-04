@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.post.domain.mapper;
 
 
+import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
@@ -15,7 +16,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CommentMapper.class)
 public interface PostMapper {
     @Mapping(target = "id", ignore = true)
     Post toEntity(Member member, PostAddRequest postAddRequest);
