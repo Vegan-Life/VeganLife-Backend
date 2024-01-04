@@ -8,7 +8,8 @@ public enum VegetarianType {
     VEGAN,
     LACTO,
     OVO,
-    LACTO_OVO;
+    LACTO_OVO,
+    PESCO;
 
     @JsonCreator
     public static VegetarianType parsing(String input) {
