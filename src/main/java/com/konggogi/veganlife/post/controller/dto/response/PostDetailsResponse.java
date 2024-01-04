@@ -15,6 +15,7 @@ public record PostDetailsResponse(
         LocalDateTime createdAt,
         boolean isLike,
         Integer likeCount,
+        Integer commentCount,
         List<String> imageUrls,
         List<String> tags,
         List<CommentDetailsResponse> comments) {}

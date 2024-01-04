@@ -34,6 +34,7 @@ public interface PostMapper {
     @Mapping(target = "author", source = "postDetailsDto.post.member.nickname")
     @Mapping(target = "vegetarianType", source = "postDetailsDto.post.member.vegetarianType")
     @Mapping(target = "imageUrls", source = "postDetailsDto.imageUrls")
+    @Mapping(target = "commentCount", expression = "java(postDetailsDto.post().countComments())")
     @Mapping(target = "tags", source = "postDetailsDto.tags")
     @Mapping(target = "comments", source = "postDetailsDto.comments")
     @Mapping(target = "title", source = "postDetailsDto.post.title")
