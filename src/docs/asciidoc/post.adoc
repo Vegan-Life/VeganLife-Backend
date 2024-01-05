@@ -60,6 +60,30 @@ include::{snippets}/get-post-not-found-member/http-response.adoc[]
 
 include::{snippets}/get-post-not-found-post/http-response.adoc[]
 
+== 피드 전체 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/all-post/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/all-post/query-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/all-post/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+인기 태그 상위 최대 10개
+
+include::{snippets}/all-post/http-response.adoc[]
+
 == 피드 좋아요 API
 
 === Request
