@@ -50,6 +50,11 @@ public class PostService {
         post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
     }
 
+    public void remove(Long postId) {
+        Post post = postQueryService.search(postId);
+        postRepository.delete(post);
+    }
+
     private List<PostTag> mapToPostTag(List<String> tagNames) {
         return tagNames.stream().distinct().map(this::addTag).map(tagMapper::toPostTag).toList();
     }

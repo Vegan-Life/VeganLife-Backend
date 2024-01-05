@@ -67,6 +67,12 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> removePost(@PathVariable Long postId) {
+        postService.remove(postId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/tags")
     public ResponseEntity<PopularTagsResponse> getPopularTags() {
         List<Tag> topTags = postQueryService.searchPopularTags();

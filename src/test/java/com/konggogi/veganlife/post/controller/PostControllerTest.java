@@ -327,6 +327,45 @@ class PostControllerTest extends RestDocsTest {
     }
 
     @Test
+    @DisplayName("게시글 삭제 API")
+    void removePostTest() throws Exception {
+        // given
+        doNothing().when(postService).remove(anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}", 1L).headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "remove-post",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("postId").description("게시글 번호"))));
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 API - 없는 게시글 예외 발생")
+    void removePostNotFoundPostTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(postService)
+                .remove(anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}", 1L).headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("remove-post-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
     @DisplayName("인기 태그 조회 API")
     void getPopularTagsTest() throws Exception {
         // given
