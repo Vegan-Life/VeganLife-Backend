@@ -6,7 +6,7 @@ import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import org.springframework.util.ReflectionUtils;
 
 public enum PostFixture {
@@ -26,19 +26,28 @@ public enum PostFixture {
         return Post.builder().title(title).content(content).build();
     }
 
+    public Post get(Member member) {
+        return Post.builder().member(member).title(title).content(content).build();
+    }
+
     public Post getWithId(Long id, Member member) {
         Post post = Post.builder().id(id).title(title).content(content).member(member).build();
         Tag tag = TagFixture.DEFAULT.getTagWithName(tagName);
         PostTag postTag = PostTag.builder().tag(tag).build();
         post.addPostTag(postTag);
         post.addPostImage(PostImageFixture.DEFAULT.getPostImage());
-        return setCreatedAt(post);
+        return setCreatedAt(post, LocalDate.now());
     }
 
-    private Post setCreatedAt(Post post) {
+    public Post getWithDate(Long id, Member member, LocalDate date) {
+        Post post = getWithId(id, member);
+        return setCreatedAt(post, date);
+    }
+
+    private Post setCreatedAt(Post post, LocalDate date) {
         Field createdAtField = ReflectionUtils.findField(Post.class, "createdAt");
         ReflectionUtils.makeAccessible(createdAtField);
-        ReflectionUtils.setField(createdAtField, post, LocalDateTime.now());
+        ReflectionUtils.setField(createdAtField, post, date.atStartOfDay());
         return post;
     }
 }

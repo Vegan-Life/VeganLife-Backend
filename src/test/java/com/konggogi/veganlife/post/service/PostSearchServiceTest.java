@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -17,6 +18,8 @@ import com.konggogi.veganlife.post.domain.mapper.PostMapperImpl;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostLikeFixture;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
+import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PostSearchServiceTest {
@@ -58,5 +65,19 @@ class PostSearchServiceTest {
         assertThat(result.imageUrls()).hasSize(1);
         assertThat(result.tags()).hasSize(1);
         assertThat(result.comments()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("게시글 전체 조회")
+    void searchAllSimpleTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Post> posts = List.of(post);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postQueryService.searchAll(any(Pageable.class))).willReturn(foundPosts);
+        // when
+        Page<PostSimpleDto> result = postSearchService.searchAllSimple(pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
     }
 }
