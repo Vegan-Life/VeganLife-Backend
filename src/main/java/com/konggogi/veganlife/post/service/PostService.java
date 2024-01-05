@@ -5,6 +5,8 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.PostImage;
+import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.domain.mapper.PostImageMapper;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final MemberQueryService memberQueryService;
     private final PostRepository postRepository;
+    private final PostQueryService postQueryService;
     private final TagRepository tagRepository;
     private final PostMapper postMapper;
     private final TagMapper tagMapper;
@@ -30,8 +33,8 @@ public class PostService {
     public Post add(Long memberId, PostAddRequest postAddRequest) {
         Member member = memberQueryService.search(memberId);
         Post post = postMapper.toEntity(member, postAddRequest);
-        addTags(post, postAddRequest.tags());
-        addImages(post, postAddRequest.imageUrls());
+        mapToPostTag(postAddRequest.tags()).forEach(post::addPostTag);
+        mapToPostImage(postAddRequest.imageUrls()).forEach(post::addPostImage);
         return postRepository.save(post);
     }
 
@@ -39,23 +42,29 @@ public class PostService {
         postRepository.setMemberToNull(memberId);
     }
 
-    private void addTags(Post post, List<String> tagNames) {
-        tagNames.stream()
-                .distinct()
-                .map(
-                        tagName ->
-                                tagRepository
-                                        .findByName(tagName)
-                                        .orElseGet(
-                                                () -> {
-                                                    Tag tag = tagMapper.toEntity(tagName);
-                                                    return tagRepository.save(tag);
-                                                }))
-                .map(tagMapper::toPostTag)
-                .forEach(post::addPostTag);
+    public void modify(Long memberId, Long postId, PostAddRequest postAddRequest) {
+        memberQueryService.search(memberId);
+        Post post = postQueryService.search(postId);
+        List<PostImage> postImages = mapToPostImage(postAddRequest.imageUrls());
+        List<PostTag> tags = mapToPostTag(postAddRequest.tags());
+        post.update(postAddRequest.title(), postAddRequest.content(), postImages, tags);
     }
 
-    private void addImages(Post post, List<String> imageUrls) {
-        imageUrls.stream().map(postImageMapper::toEntity).forEach(post::addPostImage);
+    private List<PostTag> mapToPostTag(List<String> tagNames) {
+        return tagNames.stream().distinct().map(this::addTag).map(tagMapper::toPostTag).toList();
+    }
+
+    private Tag addTag(String tagName) {
+        return tagRepository
+                .findByName(tagName)
+                .orElseGet(
+                        () -> {
+                            Tag tag = tagMapper.toEntity(tagName);
+                            return tagRepository.save(tag);
+                        });
+    }
+
+    private List<PostImage> mapToPostImage(List<String> imageUrls) {
+        return imageUrls.stream().map(postImageMapper::toEntity).toList();
     }
 }
