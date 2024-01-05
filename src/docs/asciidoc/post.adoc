@@ -80,9 +80,27 @@ include::{snippets}/all-post/http-request.adoc[]
 
 ==== 200 OK
 
+include::{snippets}/all-post/http-response.adoc[]
+
+== 인기 태그 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/popular-tags/request-headers.adoc[]
+
+==== Body
+
+include::{snippets}/popular-tags/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
 인기 태그 상위 최대 10개
 
-include::{snippets}/all-post/http-response.adoc[]
+include::{snippets}/popular-tags/http-response.adoc[]
 
 == 피드 좋아요 API
 
