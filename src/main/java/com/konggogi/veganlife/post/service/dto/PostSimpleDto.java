@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.post.service.dto;
 
 
-import java.time.LocalDateTime;
+import com.konggogi.veganlife.post.domain.Post;
+import java.util.List;
 
-public record PostSimpleDto(
-        Long id, String title, String content, String imageUrl, LocalDateTime createdAt) {}
+public record PostSimpleDto(Post post, List<String> imageUrls) {}
