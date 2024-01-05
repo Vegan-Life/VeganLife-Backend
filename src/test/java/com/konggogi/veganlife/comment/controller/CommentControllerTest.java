@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
+import com.konggogi.veganlife.comment.controller.dto.request.CommentModifyRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
@@ -286,6 +287,102 @@ class CommentControllerTest extends RestDocsTest {
 
         perform.andDo(print())
                 .andDo(document("get-comment-details-not-found-comment", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 수정 API")
+    void modifyTest() throws Exception {
+        // given
+        CommentModifyRequest request = new CommentModifyRequest("댓글 수정해주세요");
+        doNothing()
+                .when(commentService)
+                .modify(anyLong(), anyLong(), anyLong(), any(CommentModifyRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "modify-comment",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 수정 API - 없는 회원 예외 발생")
+    void modifyNotFoundMemberTest() throws Exception {
+        // given
+        CommentModifyRequest request = new CommentModifyRequest("댓글 수정해주세요");
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(commentService)
+                .modify(anyLong(), anyLong(), anyLong(), any(CommentModifyRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("modify-comment-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 수정 API - 없는 게시글 예외 발생")
+    void modifyNotFoundPostTest() throws Exception {
+        // given
+        CommentModifyRequest request = new CommentModifyRequest("댓글 수정해주세요");
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(commentService)
+                .modify(anyLong(), anyLong(), anyLong(), any(CommentModifyRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("modify-comment-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 수정 API - 없는 댓글 예외 발생")
+    void modifyNotFoundCommentTest() throws Exception {
+        // given
+        CommentModifyRequest request = new CommentModifyRequest("댓글 수정해주세요");
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT))
+                .when(commentService)
+                .modify(anyLong(), anyLong(), anyLong(), any(CommentModifyRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("modify-comment-not-found-comment", getDocumentResponse()));
     }
 
     @Test
