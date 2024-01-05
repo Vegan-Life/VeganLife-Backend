@@ -35,7 +35,9 @@ public class PostSearchService {
     }
 
     public Page<PostSimpleDto> searchAllSimple(Pageable pageable) {
-        return postQueryService.searchAll(pageable).map(postMapper::toPostSimpleDto);
+        return postQueryService
+                .searchAll(pageable)
+                .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
     }
 
     private List<CommentDetailsDto> getAllCommentDetails(Long memberId, Post post) {
