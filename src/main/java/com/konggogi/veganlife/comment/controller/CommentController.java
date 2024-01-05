@@ -57,6 +57,15 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> removeComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        commentService.remove(userDetails.id(), postId, commentId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{postId}/comments/{commentId}/likes")
     public ResponseEntity<Void> addCommentLike(
             @PathVariable Long postId,
