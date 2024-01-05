@@ -58,6 +58,15 @@ public class PostController {
         return ResponseEntity.ok(postSimpleResponsePage);
     }
 
+    @PutMapping("/{postId}")
+    public ResponseEntity<Void> modifyPost(
+            @PathVariable Long postId,
+            @RequestBody PostAddRequest postAddRequest,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        postService.modify(userDetails.id(), postId, postAddRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping("/tags")
     public ResponseEntity<PopularTagsResponse> getPopularTags() {
         List<Tag> topTags = postQueryService.searchPopularTags();
