@@ -3,7 +3,7 @@ package com.konggogi.veganlife.post.service;
 
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
@@ -30,11 +30,11 @@ public class PostService {
     private final TagMapper tagMapper;
     private final PostImageMapper postImageMapper;
 
-    public Post add(Long memberId, PostAddRequest postAddRequest) {
+    public Post add(Long memberId, PostFormRequest postFormRequest) {
         Member member = memberQueryService.search(memberId);
-        Post post = postMapper.toEntity(member, postAddRequest);
-        mapToPostTag(postAddRequest.tags()).forEach(post::addPostTag);
-        mapToPostImage(postAddRequest.imageUrls()).forEach(post::addPostImage);
+        Post post = postMapper.toEntity(member, postFormRequest);
+        mapToPostTag(postFormRequest.tags()).forEach(post::addPostTag);
+        mapToPostImage(postFormRequest.imageUrls()).forEach(post::addPostImage);
         return postRepository.save(post);
     }
 
@@ -42,12 +42,12 @@ public class PostService {
         postRepository.setMemberToNull(memberId);
     }
 
-    public void modify(Long memberId, Long postId, PostAddRequest postAddRequest) {
+    public void modify(Long memberId, Long postId, PostFormRequest postFormRequest) {
         memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
-        List<PostImage> postImages = mapToPostImage(postAddRequest.imageUrls());
-        List<PostTag> tags = mapToPostTag(postAddRequest.tags());
-        post.update(postAddRequest.title(), postAddRequest.content(), postImages, tags);
+        List<PostImage> postImages = mapToPostImage(postFormRequest.imageUrls());
+        List<PostTag> tags = mapToPostTag(postFormRequest.tags());
+        post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
     }
 
     private List<PostTag> mapToPostTag(List<String> tagNames) {

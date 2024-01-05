@@ -2,7 +2,7 @@ package com.konggogi.veganlife.post.controller;
 
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PopularTagsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
@@ -37,9 +37,9 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostAddResponse> addPost(
-            @RequestBody @Valid PostAddRequest postAddRequest,
+            @RequestBody @Valid PostFormRequest postFormRequest,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Post post = postService.add(userDetails.id(), postAddRequest);
+        Post post = postService.add(userDetails.id(), postFormRequest);
         return ResponseEntity.ok(postMapper.toPostAddResponse(post));
     }
 
@@ -61,9 +61,9 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
-            @RequestBody PostAddRequest postAddRequest,
+            @RequestBody PostFormRequest postFormRequest,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.modify(userDetails.id(), postId, postAddRequest);
+        postService.modify(userDetails.id(), postId, postFormRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
