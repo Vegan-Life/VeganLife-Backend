@@ -51,6 +51,13 @@ public class CommentService {
         commentQueryService.search(commentId).update(commentModifyRequest.content());
     }
 
+    public void remove(Long memberId, Long postId, Long commentId) {
+        memberQueryService.search(memberId);
+        postQueryService.search(postId);
+        Comment comment = commentQueryService.search(commentId);
+        commentRepository.delete(comment);
+    }
+
     public void removeMemberFromComment(Long memberId) {
         commentRepository.setMemberToNull(memberId);
     }

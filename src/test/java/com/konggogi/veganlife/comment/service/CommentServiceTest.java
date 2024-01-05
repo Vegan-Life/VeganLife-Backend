@@ -3,6 +3,7 @@ package com.konggogi.veganlife.comment.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -169,5 +170,18 @@ class CommentServiceTest {
         commentService.modify(member.getId(), post.getId(), comment.getId(), commentModifyRequest);
         // then
         assertThat(comment.getContent()).isEqualTo(commentModifyRequest.content());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제")
+    void removeTest() {
+        // given
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        // when
+        commentService.remove(member.getId(), post.getId(), comment.getId());
+        // then
+        then(commentRepository).should().delete(any(Comment.class));
     }
 }

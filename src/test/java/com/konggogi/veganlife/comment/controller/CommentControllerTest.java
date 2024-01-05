@@ -386,6 +386,88 @@ class CommentControllerTest extends RestDocsTest {
     }
 
     @Test
+    @DisplayName("댓글 삭제 API")
+    void removeCommentTest() throws Exception {
+        // given
+        doNothing().when(commentService).remove(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "remove-comment",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(
+                                        parameterWithName("postId").description("게시글 번호"),
+                                        parameterWithName("commentId").description("댓글 번호"))));
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 API - 없는 회원 예외 발생")
+    void removeCommentNotFoundMemberTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(commentService)
+                .remove(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 API - 없는 게시글 예외 발생")
+    void removeCommentNotFoundPostTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(commentService)
+                .remove(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 API - 없는 댓글 예외 발생")
+    void removeCommentNotFoundCommentTest() throws Exception {
+        // given
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_COMMENT))
+                .when(commentService)
+                .remove(anyLong(), anyLong(), anyLong());
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/posts/{postId}/comments/{commentId}", 1L, 1L)
+                                .headers(authorizationHeader()));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("remove-comment-not-found-comment", getDocumentResponse()));
+    }
+
+    @Test
     @DisplayName("댓글 좋아요 API")
     void addCommentLikeTest() throws Exception {
         // given
