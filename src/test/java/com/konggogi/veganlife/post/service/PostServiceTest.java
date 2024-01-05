@@ -15,7 +15,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.domain.mapper.*;
@@ -36,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
     @Mock MemberQueryService memberQueryService;
+    @Mock PostQueryService postQueryService;
     @Mock PostRepository postRepository;
     @Spy PostMapper postMapper = new PostMapperImpl();
     @Spy TagMapper tagMapper = new TagMapperImpl();
@@ -51,7 +52,8 @@ class PostServiceTest {
         // given
         Post post = PostFixture.BAKERY.get();
         Long memberId = member.getId();
-        PostAddRequest request = createPostAddRequest();
+        PostFormRequest request =
+                new PostFormRequest("제목", "내용", List.of("image.png"), List.of("태그"));
         given(memberQueryService.search(memberId)).willReturn(member);
         given(postMapper.toEntity(member, request)).willReturn(post);
         given(tagRepository.findByName(anyString())).willReturn(Optional.empty());
@@ -73,7 +75,8 @@ class PostServiceTest {
     void addNoMemberTest() {
         // given
         Long memberId = member.getId();
-        PostAddRequest request = createPostAddRequest();
+        PostFormRequest request =
+                new PostFormRequest("제목", "내용", List.of("image.png"), List.of("태그"));
         given(memberQueryService.search(memberId))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
@@ -91,9 +94,23 @@ class PostServiceTest {
         then(postRepository).should().setMemberToNull(anyLong());
     }
 
-    private PostAddRequest createPostAddRequest() {
-        List<String> imageUrls = List.of("image.jpg");
-        List<String> tags = List.of("#tag");
-        return new PostAddRequest("title", "content", imageUrls, tags);
+    @Test
+    @DisplayName("게시글 수정")
+    void modifyTest() {
+        // given
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
+        PostFormRequest request =
+                new PostFormRequest("제목변경", "내용변경", List.of(), List.of("태그1", "태그2"));
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(tagRepository.save(any(Tag.class))).willReturn(tag);
+        // when
+        postService.modify(member.getId(), post.getId(), request);
+        // then
+        assertThat(post.getTitle()).isEqualTo(request.title());
+        assertThat(post.getContent()).isEqualTo(request.content());
+        assertThat(post.getImageUrls()).isEmpty();
+        assertThat(post.getTags()).hasSize(2);
+        then(tagRepository).should(atLeastOnce()).save(any(Tag.class));
     }
 }
