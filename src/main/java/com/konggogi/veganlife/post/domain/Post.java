@@ -82,4 +82,22 @@ public class Post extends TimeStamped {
     public int countComments() {
         return comments.size();
     }
+
+    public void update(
+            String title, String content, List<PostImage> imageUrls, List<PostTag> tags) {
+        this.title = title;
+        this.content = content;
+        updateImageUrls(imageUrls);
+        updateTags(tags);
+    }
+
+    private void updateImageUrls(List<PostImage> imageUrls) {
+        this.imageUrls.clear();
+        imageUrls.forEach(this::addPostImage);
+    }
+
+    private void updateTags(List<PostTag> tags) {
+        this.tags.clear();
+        tags.forEach(this::addPostTag);
+    }
 }
