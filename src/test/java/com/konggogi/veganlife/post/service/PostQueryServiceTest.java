@@ -12,8 +12,11 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.fixture.PostFixture;
+import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
+import com.konggogi.veganlife.post.repository.TagRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +33,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 @ExtendWith(MockitoExtension.class)
 class PostQueryServiceTest {
     @Mock PostRepository postRepository;
+    @Mock TagRepository tagRepository;
     @InjectMocks PostQueryService postQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
@@ -97,5 +101,17 @@ class PostQueryServiceTest {
         // then
         assertThat(result).hasSize(posts.size());
         then(postRepository).should().findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("인기 태그 조회")
+    void searchPopularTagsTest() {
+        // given
+        List<Tag> tags = List.of(TagFixture.CHALLENGE.getTag(), TagFixture.STORE.getTag());
+        given(tagRepository.findPopularTags()).willReturn(tags);
+        // when
+        List<Tag> foundTags = postQueryService.searchPopularTags();
+        // then
+        assertThat(foundTags).isEqualTo(tags);
     }
 }
