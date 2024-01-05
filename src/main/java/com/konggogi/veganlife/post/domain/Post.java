@@ -82,11 +82,4 @@ public class Post extends TimeStamped {
     public int countComments() {
         return comments.size();
     }
-
-    public String getThumbnailUrl() {
-        if (imageUrls.isEmpty()) {
-            return null;
-        }
-        return imageUrls.get(0).getImageUrl();
-    }
 }

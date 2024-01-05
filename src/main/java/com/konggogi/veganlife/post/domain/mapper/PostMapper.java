@@ -7,8 +7,8 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PopularTagsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
-import com.konggogi.veganlife.post.controller.dto.response.PostAllResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
+import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
@@ -19,7 +19,6 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring", uses = CommentMapper.class)
 public interface PostMapper {
@@ -47,11 +46,15 @@ public interface PostMapper {
     @Mapping(target = "createdAt", source = "postDetailsDto.post.createdAt")
     PostDetailsResponse toPostDetailsResponse(PostDetailsDto postDetailsDto);
 
-    @Mapping(target = "imageUrl", expression = "java(post.getThumbnailUrl())")
-    PostSimpleDto toPostSimpleDto(Post post);
+    @Mapping(target = "imageUrls", source = "imageUrls", qualifiedByName = "postImageToString")
+    PostSimpleDto toPostSimpleDto(Post post, List<PostImage> imageUrls);
 
-    @Mapping(target = "topTags", source = "tags", qualifiedByName = "tagsToString")
-    PostAllResponse toPostAllResponse(Page<PostSimpleDto> posts, List<Tag> tags);
+    @Mapping(target = "id", source = "postSimpleDto.post.id")
+    @Mapping(target = "title", source = "postSimpleDto.post.title")
+    @Mapping(target = "content", source = "postSimpleDto.post.content")
+    @Mapping(target = "createdAt", source = "postSimpleDto.post.createdAt")
+    @Mapping(target = "imageUrl", source = "imageUrls", qualifiedByName = "getThumbnail")
+    PostSimpleResponse toPostSimpleResponse(PostSimpleDto postSimpleDto, List<String> imageUrls);
 
     default PopularTagsResponse toPopularTagsResponse(List<Tag> tags) {
         List<String> topTags = tags.stream().map(Tag::getName).toList();
@@ -71,5 +74,13 @@ public interface PostMapper {
     @Named("tagsToString")
     static String tagsToString(Tag tag) {
         return tag.getName();
+    }
+
+    @Named("getThumbnail")
+    static String getThumbnail(List<String> imageUrls) {
+        if (imageUrls.isEmpty()) {
+            return null;
+        }
+        return imageUrls.get(0);
     }
 }
