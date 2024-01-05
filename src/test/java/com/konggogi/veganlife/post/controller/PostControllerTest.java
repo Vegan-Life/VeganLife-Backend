@@ -243,6 +243,90 @@ class PostControllerTest extends RestDocsTest {
     }
 
     @Test
+    @DisplayName("게시글 수정 API")
+    void modifyPostTest() throws Exception {
+        // then
+        Post post = PostFixture.BAKERY.get();
+        List<String> imageUrls =
+                List.of(
+                        PostImageFixture.DEFAULT.getImageUrl(),
+                        PostImageFixture.DEFAULT.getImageUrl());
+        List<String> tags = List.of("신사동", "맛집", "비건");
+        PostFormRequest request =
+                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        doNothing().when(postService).modify(anyLong(), anyLong(), any(PostFormRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}", 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "modify-post",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("postId").description("게시글 번호"))));
+    }
+
+    @Test
+    @DisplayName("게시글 수정 API - 없는 회원 예외 발생")
+    void modifyPostNotFoundMemberTest() throws Exception {
+        // then
+        Post post = PostFixture.BAKERY.get();
+        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
+        List<String> tags = List.of("신사동", "맛집", "비건");
+        PostFormRequest request =
+                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .when(postService)
+                .modify(anyLong(), anyLong(), any(PostFormRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}", 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(document("modify-post-not-found-member", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("게시글 수정 API - 없는 게시글 예외 발생")
+    void modifyPostNotFoundPostTest() throws Exception {
+        // then
+        Post post = PostFixture.BAKERY.get();
+        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
+        List<String> tags = List.of("신사동", "맛집", "비건");
+        PostFormRequest request =
+                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
+                .when(postService)
+                .modify(anyLong(), anyLong(), any(PostFormRequest.class));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/posts/{postId}", 1L)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print()).andDo(document("modify-post-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
     @DisplayName("인기 태그 조회 API")
     void getPopularTagsTest() throws Exception {
         // given
