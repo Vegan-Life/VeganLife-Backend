@@ -82,4 +82,8 @@ public class Comment extends TimeStamped {
     public int countLikes() {
         return likes.size();
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

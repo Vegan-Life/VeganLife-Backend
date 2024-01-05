@@ -2,6 +2,7 @@ package com.konggogi.veganlife.comment.service;
 
 
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
+import com.konggogi.veganlife.comment.controller.dto.request.CommentModifyRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.exception.IllegalCommentException;
@@ -41,6 +42,13 @@ public class CommentService {
         post.addComment(comment);
         commentNotifyService.notifyAddCommentIfNotAuthor(memberId, postId);
         return comment;
+    }
+
+    public void modify(
+            Long memberId, Long postId, Long commentId, CommentModifyRequest commentModifyRequest) {
+        memberQueryService.search(memberId);
+        postQueryService.search(postId);
+        commentQueryService.search(commentId).update(commentModifyRequest.content());
     }
 
     public void removeMemberFromComment(Long memberId) {
