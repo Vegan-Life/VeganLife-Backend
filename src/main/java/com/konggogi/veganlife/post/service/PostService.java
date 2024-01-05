@@ -50,8 +50,7 @@ public class PostService {
         post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
     }
 
-    public void remove(Long memberId, Long postId) {
-        memberQueryService.search(memberId);
+    public void remove(Long postId) {
         Post post = postQueryService.search(postId);
         postRepository.delete(post);
     }

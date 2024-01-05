@@ -68,9 +68,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> removePost(
-            @PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.remove(userDetails.id(), postId);
+    public ResponseEntity<Void> removePost(@PathVariable Long postId) {
+        postService.remove(postId);
         return ResponseEntity.noContent().build();
     }
 
