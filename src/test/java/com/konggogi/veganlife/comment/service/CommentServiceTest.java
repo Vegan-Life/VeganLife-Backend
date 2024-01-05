@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
+import com.konggogi.veganlife.comment.controller.dto.request.CommentModifyRequest;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapperImpl;
@@ -154,5 +155,19 @@ class CommentServiceTest {
         // when, then
         assertDoesNotThrow(() -> commentService.removeMemberFromComment(member.getId()));
         then(commentRepository).should().setMemberToNull(anyLong());
+    }
+
+    @Test
+    @DisplayName("댓글 수정")
+    void modifyTest() {
+        // given
+        CommentModifyRequest commentModifyRequest = new CommentModifyRequest("수정된 댓글");
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(commentQueryService.search(anyLong())).willReturn(comment);
+        // when
+        commentService.modify(member.getId(), post.getId(), comment.getId(), commentModifyRequest);
+        // then
+        assertThat(comment.getContent()).isEqualTo(commentModifyRequest.content());
     }
 }
