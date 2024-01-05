@@ -24,11 +24,9 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
-import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
@@ -36,7 +34,6 @@ import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
 import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -204,27 +201,17 @@ class PostControllerTest extends RestDocsTest {
     @DisplayName("게시글 전체 조회 API")
     void getAllTest() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        Post post = PostFixture.BAKERY.get();
-        Post otherPost = PostFixture.CHALLENGE.get();
-        List<PostSimpleDto> postSimpleDtos =
+        Post post1 = PostFixture.BAKERY.getWithId(1L, member);
+        Post post2 = PostFixture.CHALLENGE.getWithId(2L, member);
+        List<String> imageUrls =
                 List.of(
-                        new PostSimpleDto(
-                                2L,
-                                post.getTitle(),
-                                post.getContent(),
-                                null,
-                                LocalDate.of(2024, 1, 1).atStartOfDay()),
-                        new PostSimpleDto(
-                                1L,
-                                otherPost.getTitle(),
-                                otherPost.getContent(),
-                                PostImageFixture.DEFAULT.getImageUrl(),
-                                LocalDate.of(2023, 5, 4).atStartOfDay()));
+                        PostImageFixture.DEFAULT.getImageUrl(),
+                        PostImageFixture.DEFAULT.getImageUrl());
+        List<PostSimpleDto> postSimpleDtos =
+                List.of(new PostSimpleDto(post1, imageUrls), new PostSimpleDto(post2, List.of()));
         Page<PostSimpleDto> postSimpleDtoPage =
                 PageableExecutionUtils.getPage(postSimpleDtos, pageable, postSimpleDtos::size);
-        List<Tag> tags = List.of(TagFixture.CHALLENGE.getTag(), TagFixture.STORE.getTag());
         given(postSearchService.searchAllSimple(any(Pageable.class))).willReturn(postSimpleDtoPage);
-        given(postQueryService.searchPopularTags()).willReturn(tags);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -235,11 +222,9 @@ class PostControllerTest extends RestDocsTest {
                                 .queryParam("sort", "createdAt,DESC"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.topTags[0]").value(tags.get(0).getName()))
-                .andExpect(jsonPath("$.topTags[1]").value(tags.get(1).getName()))
-                .andExpect(jsonPath("$.posts.totalElements").value(postSimpleDtos.size()))
-                .andExpect(jsonPath("$.posts.pageable.pageNumber").value(0))
-                .andExpect(jsonPath("$.posts.pageable.pageSize").value(10));
+                .andExpect(jsonPath("$.totalElements").value(postSimpleDtos.size()))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.pageable.pageSize").value(10));
 
         perform.andDo(print())
                 .andDo(
