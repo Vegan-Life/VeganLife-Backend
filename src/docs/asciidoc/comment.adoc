@@ -80,6 +80,36 @@ include::{snippets}/get-comment-details-not-found-post/http-response.adoc[]
 
 include::{snippets}/get-comment-details-not-found-comment/http-response.adoc[]
 
+== 댓글 수정 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/modify-comment/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/modify-comment/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/modify-comment/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+
+include::{snippets}/modify-comment/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/modify-comment-not-found-member/http-response.adoc[]
+
+include::{snippets}/modify-comment-not-found-post/http-response.adoc[]
+
+include::{snippets}/modify-comment-not-found-comment/http-response.adoc[]
+
 == 댓글 좋아요 API
 
 === Request

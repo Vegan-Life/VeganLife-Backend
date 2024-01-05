@@ -2,6 +2,7 @@ package com.konggogi.veganlife.comment.controller;
 
 
 import com.konggogi.veganlife.comment.controller.dto.request.CommentAddRequest;
+import com.konggogi.veganlife.comment.controller.dto.request.CommentModifyRequest;
 import com.konggogi.veganlife.comment.controller.dto.response.CommentAddResponse;
 import com.konggogi.veganlife.comment.controller.dto.response.CommentDetailsResponse;
 import com.konggogi.veganlife.comment.domain.Comment;
@@ -44,6 +45,16 @@ public class CommentController {
         CommentDetailsDto commentDetailsDto =
                 commentSearchService.searchDetailsById(userDetails.id(), postId, commentId);
         return ResponseEntity.ok(commentMapper.toCommentDetailsResponse(commentDetailsDto));
+    }
+
+    @PutMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> modifyComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody @Valid CommentModifyRequest commentModifyRequest) {
+        commentService.modify(userDetails.id(), postId, commentId, commentModifyRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/{postId}/comments/{commentId}/likes")
