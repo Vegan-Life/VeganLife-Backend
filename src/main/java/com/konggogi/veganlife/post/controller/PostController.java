@@ -54,12 +54,7 @@ public class PostController {
     @GetMapping()
     public ResponseEntity<Page<PostSimpleResponse>> getAllPost(Pageable pageable) {
         Page<PostSimpleResponse> postSimpleResponsePage =
-                postSearchService
-                        .searchAllSimple(pageable)
-                        .map(
-                                simplePost ->
-                                        postMapper.toPostSimpleResponse(
-                                                simplePost, simplePost.imageUrls()));
+                postSearchService.searchAllSimple(pageable).map(postMapper::toPostSimpleResponse);
         return ResponseEntity.ok(postSimpleResponsePage);
     }
 

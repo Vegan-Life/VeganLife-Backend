@@ -53,8 +53,11 @@ public interface PostMapper {
     @Mapping(target = "title", source = "postSimpleDto.post.title")
     @Mapping(target = "content", source = "postSimpleDto.post.content")
     @Mapping(target = "createdAt", source = "postSimpleDto.post.createdAt")
-    @Mapping(target = "imageUrl", source = "imageUrls", qualifiedByName = "getThumbnail")
-    PostSimpleResponse toPostSimpleResponse(PostSimpleDto postSimpleDto, List<String> imageUrls);
+    @Mapping(
+            target = "imageUrl",
+            source = "postSimpleDto.imageUrls",
+            qualifiedByName = "getThumbnail")
+    PostSimpleResponse toPostSimpleResponse(PostSimpleDto postSimpleDto);
 
     default PopularTagsResponse toPopularTagsResponse(List<Tag> tags) {
         List<String> topTags = tags.stream().map(Tag::getName).toList();
