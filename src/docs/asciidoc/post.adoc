@@ -82,6 +82,34 @@ include::{snippets}/all-post/http-request.adoc[]
 
 include::{snippets}/all-post/http-response.adoc[]
 
+== 피드 수정 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/modify-post/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/modify-post/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/modify-post/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+
+include::{snippets}/modify-post/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/modify-post-not-found-member/http-response.adoc[]
+
+include::{snippets}/modify-post-not-found-post/http-response.adoc[]
+
 == 인기 태그 조회 API
 
 === Request
