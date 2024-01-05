@@ -22,7 +22,7 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
-import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
@@ -65,9 +65,9 @@ class PostControllerTest extends RestDocsTest {
         Post post = PostFixture.BAKERY.getWithId(1L, member);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
-        PostAddRequest request =
-                new PostAddRequest(post.getTitle(), post.getContent(), imageUrls, tags);
-        given(postService.add(anyLong(), any(PostAddRequest.class))).willReturn(post);
+        PostFormRequest request =
+                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        given(postService.add(anyLong(), any(PostFormRequest.class))).willReturn(post);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -96,9 +96,9 @@ class PostControllerTest extends RestDocsTest {
         Post post = PostFixture.BAKERY.getWithId(1L, member);
         List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
-        PostAddRequest request =
-                new PostAddRequest(post.getTitle(), post.getContent(), imageUrls, tags);
-        given(postService.add(anyLong(), any(PostAddRequest.class)))
+        PostFormRequest request =
+                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        given(postService.add(anyLong(), any(PostFormRequest.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
