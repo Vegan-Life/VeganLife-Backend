@@ -5,8 +5,8 @@ import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PopularTagsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
-import com.konggogi.veganlife.post.controller.dto.response.PostAllResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
+import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
@@ -15,7 +15,6 @@ import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
-import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -53,10 +52,15 @@ public class PostController {
     }
 
     @GetMapping()
-    public ResponseEntity<PostAllResponse> getAllPost(Pageable pageable) {
-        Page<PostSimpleDto> postSimpleDtos = postSearchService.searchAllSimple(pageable);
-        List<Tag> popularTags = postQueryService.searchPopularTags();
-        return ResponseEntity.ok(postMapper.toPostAllResponse(postSimpleDtos, popularTags));
+    public ResponseEntity<Page<PostSimpleResponse>> getAllPost(Pageable pageable) {
+        Page<PostSimpleResponse> postSimpleResponsePage =
+                postSearchService
+                        .searchAllSimple(pageable)
+                        .map(
+                                simplePost ->
+                                        postMapper.toPostSimpleResponse(
+                                                simplePost, simplePost.imageUrls()));
+        return ResponseEntity.ok(postSimpleResponsePage);
     }
 
     @GetMapping("/tags")
