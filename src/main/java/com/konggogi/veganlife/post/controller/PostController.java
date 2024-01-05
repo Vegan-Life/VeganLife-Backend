@@ -3,6 +3,7 @@ package com.konggogi.veganlife.post.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.response.PopularTagsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAllResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
@@ -56,6 +57,12 @@ public class PostController {
         Page<PostSimpleDto> postSimpleDtos = postSearchService.searchAllSimple(pageable);
         List<Tag> popularTags = postQueryService.searchPopularTags();
         return ResponseEntity.ok(postMapper.toPostAllResponse(postSimpleDtos, popularTags));
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<PopularTagsResponse> getPopularTags() {
+        List<Tag> topTags = postQueryService.searchPopularTags();
+        return ResponseEntity.ok(postMapper.toPopularTagsResponse(topTags));
     }
 
     @PostMapping("/{postId}/likes")
