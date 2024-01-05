@@ -2,16 +2,14 @@ package com.konggogi.veganlife.post.controller;
 
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,21 +24,29 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
+import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
+import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -192,6 +198,60 @@ class PostControllerTest extends RestDocsTest {
         perform.andExpect(status().isNotFound());
 
         perform.andDo(print()).andDo(document("get-post-not-found-post", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("게시글 전체 조회 API")
+    void getAllTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        Post post = PostFixture.BAKERY.get();
+        Post otherPost = PostFixture.CHALLENGE.get();
+        List<PostSimpleDto> postSimpleDtos =
+                List.of(
+                        new PostSimpleDto(
+                                2L,
+                                post.getTitle(),
+                                post.getContent(),
+                                null,
+                                LocalDate.of(2024, 1, 1).atStartOfDay()),
+                        new PostSimpleDto(
+                                1L,
+                                otherPost.getTitle(),
+                                otherPost.getContent(),
+                                PostImageFixture.DEFAULT.getImageUrl(),
+                                LocalDate.of(2023, 5, 4).atStartOfDay()));
+        Page<PostSimpleDto> postSimpleDtoPage =
+                PageableExecutionUtils.getPage(postSimpleDtos, pageable, postSimpleDtos::size);
+        List<Tag> tags = List.of(TagFixture.CHALLENGE.getTag(), TagFixture.STORE.getTag());
+        given(postSearchService.searchAllSimple(any(Pageable.class))).willReturn(postSimpleDtoPage);
+        given(postQueryService.searchPopularTags()).willReturn(tags);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts")
+                                .headers(authorizationHeader())
+                                .queryParam("page", "0")
+                                .queryParam("size", "10")
+                                .queryParam("sort", "createdAt,DESC"));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.topTags[0]").value(tags.get(0).getName()))
+                .andExpect(jsonPath("$.topTags[1]").value(tags.get(1).getName()))
+                .andExpect(jsonPath("$.posts.totalElements").value(postSimpleDtos.size()))
+                .andExpect(jsonPath("$.posts.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.posts.pageable.pageSize").value(10));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "all-post",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        pageDesc(),
+                                        sizeDesc(),
+                                        parameterWithName("sort").description("정렬 기준"))));
     }
 
     @Test
