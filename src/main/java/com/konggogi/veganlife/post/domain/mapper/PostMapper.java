@@ -5,6 +5,7 @@ import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
 import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.post.controller.dto.request.PostAddRequest;
+import com.konggogi.veganlife.post.controller.dto.response.PopularTagsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostAllResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
@@ -51,6 +52,11 @@ public interface PostMapper {
 
     @Mapping(target = "topTags", source = "tags", qualifiedByName = "tagsToString")
     PostAllResponse toPostAllResponse(Page<PostSimpleDto> posts, List<Tag> tags);
+
+    default PopularTagsResponse toPopularTagsResponse(List<Tag> tags) {
+        List<String> topTags = tags.stream().map(Tag::getName).toList();
+        return new PopularTagsResponse(topTags);
+    }
 
     @Named("postImageToString")
     static String postImageToString(PostImage postImage) {
