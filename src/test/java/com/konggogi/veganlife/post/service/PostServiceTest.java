@@ -113,4 +113,17 @@ class PostServiceTest {
         assertThat(post.getTags()).hasSize(2);
         then(tagRepository).should(atLeastOnce()).save(any(Tag.class));
     }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void removeTest() {
+        // given
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        // when
+        postService.remove(member.getId());
+        // then
+        assertThat(postRepository.findById(post.getId())).isEmpty();
+        then(postRepository).should().delete(any(Post.class));
+    }
 }
