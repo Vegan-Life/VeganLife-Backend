@@ -110,6 +110,32 @@ include::{snippets}/modify-post-not-found-member/http-response.adoc[]
 
 include::{snippets}/modify-post-not-found-post/http-response.adoc[]
 
+== 피드 삭제 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/remove-post/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/remove-post/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/remove-post/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+
+include::{snippets}/remove-post/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/remove-post-not-found-post/http-response.adoc[]
+
 == 인기 태그 조회 API
 
 === Request
