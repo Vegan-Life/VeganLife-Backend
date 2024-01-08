@@ -52,7 +52,7 @@ public class PostController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<PostSimpleResponse>> getAllPost(Pageable pageable) {
+    public ResponseEntity<Page<PostSimpleResponse>> getPostList(Pageable pageable) {
         Page<PostSimpleResponse> postSimpleResponsePage =
                 postSearchService.searchAllSimple(pageable).map(postMapper::toPostSimpleResponse);
         return ResponseEntity.ok(postSimpleResponsePage);
@@ -71,6 +71,16 @@ public class PostController {
     public ResponseEntity<Void> removePost(@PathVariable Long postId) {
         postService.remove(postId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostSimpleResponse>> getPostListByKeyword(
+            @RequestParam String keyword, Pageable pageable) {
+        Page<PostSimpleResponse> postSimpleResponsePage =
+                postSearchService
+                        .searchSimpleByKeyword(pageable, keyword)
+                        .map(postMapper::toPostSimpleResponse);
+        return ResponseEntity.ok(postSimpleResponsePage);
     }
 
     @GetMapping("/tags")

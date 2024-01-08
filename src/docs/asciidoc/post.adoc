@@ -82,6 +82,30 @@ include::{snippets}/all-post/http-request.adoc[]
 
 include::{snippets}/all-post/http-response.adoc[]
 
+== 피드 검색 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/search-post/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/search-post/query-parameters.adoc[]
+
+==== Body
+
+keyword=맛집
+
+include::{snippets}/search-post/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/search-post/http-response.adoc[]
+
 == 피드 수정 API
 
 === Request

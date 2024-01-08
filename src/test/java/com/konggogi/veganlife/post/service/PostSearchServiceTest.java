@@ -1,8 +1,7 @@
 package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 import com.konggogi.veganlife.comment.domain.Comment;
@@ -77,6 +76,22 @@ class PostSearchServiceTest {
         given(postQueryService.searchAll(any(Pageable.class))).willReturn(foundPosts);
         // when
         Page<PostSimpleDto> result = postSearchService.searchAllSimple(pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+    }
+
+    @Test
+    @DisplayName("검색어로 게시글 조회")
+    void searchSimpleByKeywordTest() {
+        // given
+        Post otherPost = PostFixture.BAKERY.getWithId(2L, member);
+        List<Post> posts = List.of(otherPost);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postQueryService.searchByKeyword(any(Pageable.class), anyString()))
+                .willReturn(foundPosts);
+        // when
+        Page<PostSimpleDto> result = postSearchService.searchSimpleByKeyword(pageable, "맛집");
         // then
         assertThat(result).hasSize(posts.size());
     }

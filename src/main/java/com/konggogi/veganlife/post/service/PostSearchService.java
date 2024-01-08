@@ -40,6 +40,12 @@ public class PostSearchService {
                 .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
     }
 
+    public Page<PostSimpleDto> searchSimpleByKeyword(Pageable pageable, String keyword) {
+        return postQueryService
+                .searchByKeyword(pageable, keyword)
+                .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
+    }
+
     private List<CommentDetailsDto> getAllCommentDetails(Long memberId, Post post) {
         return post.getComments().stream()
                 .filter(comment -> comment.getParent().isEmpty())
