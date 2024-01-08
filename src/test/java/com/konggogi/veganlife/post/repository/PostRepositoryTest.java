@@ -6,6 +6,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.post.domain.Post;
+import com.konggogi.veganlife.post.fixture.PostFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,8 +22,7 @@ class PostRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired PostRepository postRepository;
     private final Member member = MemberFixture.DEFAULT_M.get();
-    private final Post post =
-            Post.builder().member(member).title("title").content("content").build();
+    private final Post post = PostFixture.BAKERY.get(member);
 
     @BeforeEach
     void setup() {
@@ -65,5 +65,22 @@ class PostRepositoryTest {
         Page<Post> posts = postRepository.findAll(pageable);
         // then
         assertThat(posts).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("검색어로 게시글 조회")
+    void findByTitleContainingOrTagsTagNameContainingTest() {
+        // given
+        Post otherPost = PostFixture.CHALLENGE.get(member);
+        postRepository.save(otherPost);
+        Pageable pageable = PageRequest.of(0, 10);
+        String keyword = "맛집";
+        // when
+        Page<Post> posts =
+                postRepository.findByTitleContainingOrTagsTagNameContaining(
+                        keyword, keyword, pageable);
+        // then
+        assertThat(posts).hasSize(1);
+        assertThat(posts.getTotalElements()).isEqualTo(1);
     }
 }
