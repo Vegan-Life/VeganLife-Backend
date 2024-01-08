@@ -18,4 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     void setMemberToNull(Long memberId);
 
     Page<Post> findAll(Pageable pageable);
+
+    Page<Post> findByTitleContainingOrTagsTagNameContaining(
+            String title, String tagName, Pageable pageable);
 }
