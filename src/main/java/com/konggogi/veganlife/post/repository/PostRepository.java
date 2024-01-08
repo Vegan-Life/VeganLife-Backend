@@ -18,4 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     void setMemberToNull(Long memberId);
 
     Page<Post> findAll(Pageable pageable);
+
+    @Query(
+            "select p from Post p join p.tags t where p.title like %:keyword% or t.tag.name like %:keyword% or p.content like %:keyword%")
+    Page<Post> findByKeyword(String keyword, Pageable pageable);
 }
