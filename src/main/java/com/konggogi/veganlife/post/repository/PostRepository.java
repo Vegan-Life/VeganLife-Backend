@@ -20,6 +20,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAll(Pageable pageable);
 
     @Query(
-            "select p from Post p join p.tags t where p.title like %:keyword% or t.tag.name like %:keyword% or p.content like %:keyword%")
+            "SELECT DISTINCT p FROM Post p "
+                    + "WHERE p.title LIKE %:keyword% "
+                    + "OR p.content LIKE %:keyword% "
+                    + "OR p.id IN (SELECT pt.post.id FROM PostTag pt WHERE pt.tag.name LIKE %:keyword%)")
     Page<Post> findByKeyword(String keyword, Pageable pageable);
 }
