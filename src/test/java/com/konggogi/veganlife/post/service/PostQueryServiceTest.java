@@ -2,8 +2,7 @@ package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -113,5 +112,27 @@ class PostQueryServiceTest {
         List<Tag> foundTags = postQueryService.searchPopularTags();
         // then
         assertThat(foundTags).isEqualTo(tags);
+    }
+
+    @Test
+    @DisplayName("검색어로 게시글 조회")
+    void searchByKeywordTest() {
+        // given
+        Post otherPost = PostFixture.BAKERY.getWithId(2L, member);
+        List<Post> posts = List.of(post, otherPost);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(
+                        postRepository.findByTitleContainingOrTagsTagNameContaining(
+                                anyString(), anyString(), any(Pageable.class)))
+                .willReturn(foundPosts);
+        // when
+        Page<Post> result = postQueryService.searchByKeyword(pageable, "맛집");
+        // then
+        assertThat(result).hasSize(posts.size());
+        then(postRepository)
+                .should()
+                .findByTitleContainingOrTagsTagNameContaining(
+                        anyString(), anyString(), any(Pageable.class));
     }
 }
