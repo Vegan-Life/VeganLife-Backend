@@ -1,9 +1,11 @@
 package com.konggogi.veganlife.meallog.service;
 
 
+import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
+import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListResponse;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
-import com.konggogi.veganlife.meallog.service.dto.MealLogDetailsDto;
-import com.konggogi.veganlife.meallog.service.dto.MealLogListDto;
+import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.service.MemberQueryService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class MealLogSearchService {
 
     private final MealLogQueryService mealLogQueryService;
+    private final MemberQueryService memberQueryService;
     private final MealLogMapper mealLogMapper;
 
-    public List<MealLogListDto> searchByDate(LocalDate date, Long memberId) {
+    public List<MealLogListResponse> searchByDate(LocalDate date, Long memberId) {
 
-        return mealLogQueryService.searchByDate(date, memberId).stream()
-                .map(mealLogMapper::toMealLogListDto)
+        Member member = memberQueryService.search(memberId);
+        return mealLogQueryService.searchByDateAndMember(date, member).stream()
+                .map(mealLogMapper::toMealLogListResponse)
                 .toList();
     }
 
-    public MealLogDetailsDto searchById(Long id) {
+    public MealLogDetailsResponse searchById(Long id) {
 
-        return mealLogMapper.toMealDetailsDto(mealLogQueryService.searchById(id));
+        return mealLogMapper.toMealLogDetailsResponse(mealLogQueryService.search(id));
     }
 }
