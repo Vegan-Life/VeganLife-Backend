@@ -95,4 +95,18 @@ class PostSearchServiceTest {
         // then
         assertThat(result).hasSize(posts.size());
     }
+
+    @Test
+    @DisplayName("회원 Id로 모든 게시글 조회")
+    void searchAllSimpleByMemberIdTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Post> posts = List.of(post);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postQueryService.searchAll(anyLong(), any(Pageable.class))).willReturn(foundPosts);
+        // when
+        Page<PostSimpleDto> result = postSearchService.searchAllSimple(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+    }
 }
