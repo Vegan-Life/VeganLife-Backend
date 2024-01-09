@@ -13,10 +13,15 @@ import com.konggogi.veganlife.member.service.MemberService;
 import com.konggogi.veganlife.member.service.NutrientsQueryService;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
+import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
+import com.konggogi.veganlife.post.domain.mapper.PostMapper;
+import com.konggogi.veganlife.post.service.PostSearchService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,8 +34,10 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberQueryService memberQueryService;
     private final NutrientsQueryService nutrientsQueryService;
+    private final PostSearchService postSearchService;
     private final MemberMapper memberMapper;
     private final NutrientsMapper nutrientsMapper;
+    private final PostMapper postMapper;
 
     @PostMapping()
     public ResponseEntity<MemberInfoResponse> modifyMemberInfo(
@@ -112,5 +119,15 @@ public class MemberController {
         int totalCalorie = nutrientsQueryService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
+    }
+
+    @GetMapping("/{memberId}/posts")
+    public ResponseEntity<Page<PostSimpleResponse>> getMyPostList(
+            @PathVariable Long memberId, Pageable pageable) {
+        Page<PostSimpleResponse> postSimpleResponses =
+                postSearchService
+                        .searchAllSimple(memberId, pageable)
+                        .map(postMapper::toPostSimpleResponse);
+        return ResponseEntity.ok(postSimpleResponses);
     }
 }
