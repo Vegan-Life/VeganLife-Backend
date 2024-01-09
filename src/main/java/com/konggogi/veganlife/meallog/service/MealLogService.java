@@ -5,7 +5,6 @@ import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
-import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
@@ -13,6 +12,7 @@ import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.IntakeNotifyService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import java.util.List;
@@ -38,14 +38,14 @@ public class MealLogService {
     public void add(MealLogAddRequest request, Long memberId) {
         MealLog mealLog =
                 mealLogMapper.toEntity(request.mealType(), memberQueryService.search(memberId));
-        addMeals(request.meals(), mealLog);
-        addMealImages(request.imageUrls(), mealLog);
+        modifyMeals(request.meals(), mealLog);
+        modifyMealImages(request.imageUrls(), mealLog);
         mealLogRepository.save(mealLog);
         intakeNotifyService.notifyIfOverIntake(memberId);
     }
 
     public void modify(Long mealLogId, MealLogModifyRequest request) {
-        MealLog mealLog = mealLogQueryService.searchById(mealLogId);
+        MealLog mealLog = mealLogQueryService.search(mealLogId);
         modifyMeals(request.meals(), mealLog);
         modifyMealImages(request.imageUrls(), mealLog);
         mealLogRepository.flush();
@@ -54,14 +54,16 @@ public class MealLogService {
 
     public void remove(Long mealLogId) {
 
-        mealLogRepository.deleteById(mealLogId);
+        MealLog mealLog = mealLogQueryService.search(mealLogId);
+        mealLogRepository.delete(mealLog);
     }
 
     public void removeAll(Long memberId) {
-        mealLogRepository.deleteAllByMemberId(memberId);
+        Member member = memberQueryService.search(memberId);
+        mealLogRepository.deleteAllByMemberId(member.getId());
     }
 
-    private void addMeals(List<MealAddRequest> requests, MealLog mealLog) {
+    private void modifyMeals(List<MealAddRequest> requests, MealLog mealLog) {
         List<Meal> meals =
                 requests.stream()
                         .map(
@@ -71,28 +73,7 @@ public class MealLogService {
                                                 mealLog,
                                                 mealDataQueryService.search(request.mealDataId())))
                         .toList();
-        mealLog.addMeals(meals);
-    }
-
-    private void addMealImages(List<String> requests, MealLog mealLog) {
-        List<MealImage> mealImages =
-                requests.stream()
-                        .map(request -> mealImageMapper.toEntity(request, mealLog))
-                        .toList();
-        mealLog.addMealImages(mealImages);
-    }
-
-    private void modifyMeals(List<MealModifyRequest> requests, MealLog mealLog) {
-        List<Meal> meals =
-                requests.stream()
-                        .map(
-                                request ->
-                                        mealMapper.toEntity(
-                                                request,
-                                                mealLog,
-                                                mealDataQueryService.search(request.mealDataId())))
-                        .toList();
-        mealLog.updateMeals(meals);
+        mealLog.modifyMeals(meals);
     }
 
     private void modifyMealImages(List<String> requests, MealLog mealLog) {
@@ -100,6 +81,6 @@ public class MealLogService {
                 requests.stream()
                         .map(request -> mealImageMapper.toEntity(request, mealLog))
                         .toList();
-        mealLog.updateMealImages(mealImages);
+        mealLog.modifyMealImages(mealImages);
     }
 }
