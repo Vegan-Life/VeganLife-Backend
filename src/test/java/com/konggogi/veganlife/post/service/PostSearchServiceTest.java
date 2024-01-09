@@ -1,12 +1,15 @@
 package com.konggogi.veganlife.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.fixture.CommentFixture;
 import com.konggogi.veganlife.comment.service.CommentSearchService;
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -103,10 +106,24 @@ class PostSearchServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         List<Post> posts = List.of(post);
         Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.searchAll(anyLong(), any(Pageable.class))).willReturn(foundPosts);
         // when
         Page<PostSimpleDto> result = postSearchService.searchAllSimple(member.getId(), pageable);
         // then
         assertThat(result).hasSize(posts.size());
+    }
+
+    @Test
+    @DisplayName("회원 Id로 모든 게시글 조회 - 없는 회원 예외 발생")
+    void searchAllSimpleNotFoundMemberTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when, then
+        assertThatThrownBy(() -> postSearchService.searchAllSimple(member.getId(), pageable))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
 }
