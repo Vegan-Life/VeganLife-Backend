@@ -25,4 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     + "OR p.content LIKE %:keyword% "
                     + "OR p.id IN (SELECT pt.post.id FROM PostTag pt WHERE pt.tag.name LIKE %:keyword%)")
     Page<Post> findByKeyword(String keyword, Pageable pageable);
+
+    Page<Post> findAllByMemberId(Long memberId, Pageable pageable);
 }
