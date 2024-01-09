@@ -48,17 +48,13 @@ public class MealLogController {
     public ResponseEntity<List<MealLogListResponse>> getMealLogList(
             @RequestParam LocalDate date, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return ResponseEntity.ok(
-                mealLogSearchService.searchByDate(date, userDetails.id()).stream()
-                        .map(mealLogMapper::toMealLogListResponse)
-                        .toList());
+        return ResponseEntity.ok(mealLogSearchService.searchByDate(date, userDetails.id()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MealLogDetailsResponse> getMealLogDetails(@PathVariable Long id) {
 
-        return ResponseEntity.ok(
-                mealLogMapper.toMealLogDetailsResponse(mealLogSearchService.searchById(id)));
+        return ResponseEntity.ok(mealLogSearchService.searchById(id));
     }
 
     @PutMapping("/{id}")

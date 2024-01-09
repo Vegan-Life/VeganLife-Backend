@@ -2,6 +2,7 @@ package com.konggogi.veganlife.meallog.repository;
 
 
 import com.konggogi.veganlife.meallog.domain.MealLog;
+import com.konggogi.veganlife.member.domain.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +21,8 @@ public interface MealLogRepository extends JpaRepository<MealLog, Long> {
 
     @Query(
             " select distinct m from MealLog m join fetch m.meals"
-                    + " where cast(m.createdAt as localdate) = :date and m.member.id = :memberId")
-    List<MealLog> findAllByDate(LocalDate date, Long memberId);
+                    + " where cast(m.createdAt as localdate) = :date and m.member = :member")
+    List<MealLog> findAllByDateAndMember(LocalDate date, Member member);
 
     void deleteAllByMemberId(Long memberId);
 }

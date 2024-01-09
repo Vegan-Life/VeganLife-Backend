@@ -26,7 +26,8 @@ import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
-import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
+import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
+import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListResponse;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealType;
@@ -37,8 +38,6 @@ import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.service.MealLogSearchService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.meallog.service.dto.MealLogDetailsDto;
-import com.konggogi.veganlife.meallog.service.dto.MealLogListDto;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
@@ -75,25 +74,6 @@ public class MealLogControllerTest extends RestDocsTest {
                             10,
                             MealDataFixture.TOTAL_AMOUNT.getWithName(1L, "통밀빵", member).getId()),
                     new MealAddRequest(
-                            100,
-                            100,
-                            10,
-                            10,
-                            10,
-                            MealDataFixture.AMOUNT_PER_SERVE
-                                    .getWithName(2L, "통밀크래커", member)
-                                    .getId()));
-
-    List<MealModifyRequest> mealModifyRequests =
-            List.of(
-                    new MealModifyRequest(
-                            100,
-                            100,
-                            10,
-                            10,
-                            10,
-                            MealDataFixture.TOTAL_AMOUNT.getWithName(1L, "통밀빵", member).getId()),
-                    new MealModifyRequest(
                             100,
                             100,
                             10,
@@ -186,13 +166,13 @@ public class MealLogControllerTest extends RestDocsTest {
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        List<MealLogListDto> mealLogs =
+        List<MealLogListResponse> mealLogs =
                 List.of(
-                        mealLogMapper.toMealLogListDto(
+                        mealLogMapper.toMealLogListResponse(
                                 MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member)),
-                        mealLogMapper.toMealLogListDto(
+                        mealLogMapper.toMealLogListResponse(
                                 MealLogFixture.LUNCH.get(2L, meals, mealImages, member)),
-                        mealLogMapper.toMealLogListDto(
+                        mealLogMapper.toMealLogListResponse(
                                 MealLogFixture.DINNER_SNACK.get(3L, meals, mealImages, member)));
 
         given(mealLogSearchService.searchByDate(date, member.getId())).willReturn(mealLogs);
@@ -225,8 +205,8 @@ public class MealLogControllerTest extends RestDocsTest {
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        MealLogDetailsDto mealLog =
-                mealLogMapper.toMealDetailsDto(
+        MealLogDetailsResponse mealLog =
+                mealLogMapper.toMealLogDetailsResponse(
                         MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member));
 
         given(mealLogSearchService.searchById(1L)).willReturn(mealLog);
@@ -279,7 +259,7 @@ public class MealLogControllerTest extends RestDocsTest {
     void modifyMealLogTest() throws Exception {
 
         MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+                new MealLogModifyRequest(mealAddRequests, imageUrls);
 
         ResultActions perform =
                 mockMvc.perform(
@@ -305,7 +285,7 @@ public class MealLogControllerTest extends RestDocsTest {
     void modifyMealLogMemberNotFoundTest() throws Exception {
 
         MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+                new MealLogModifyRequest(mealAddRequests, imageUrls);
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG))
                 .given(mealLogService)
@@ -329,7 +309,7 @@ public class MealLogControllerTest extends RestDocsTest {
     void modifyMealLogMealDataNotFoundTest() throws Exception {
 
         MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+                new MealLogModifyRequest(mealAddRequests, imageUrls);
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA))
                 .given(mealLogService)
