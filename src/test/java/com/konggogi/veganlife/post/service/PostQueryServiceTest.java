@@ -130,4 +130,20 @@ class PostQueryServiceTest {
         assertThat(result).hasSize(posts.size());
         then(postRepository).should().findByKeyword(anyString(), any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("회원 Id로 모든 게시글 조회")
+    void searchAllByMemberIdTest() {
+        // given
+        List<Post> posts = List.of(post);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postRepository.findAllByMemberId(anyLong(), any(Pageable.class)))
+                .willReturn(foundPosts);
+        // when
+        Page<Post> result = postQueryService.searchAll(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+        then(postRepository).should().findAllByMemberId(anyLong(), any(Pageable.class));
+    }
 }
