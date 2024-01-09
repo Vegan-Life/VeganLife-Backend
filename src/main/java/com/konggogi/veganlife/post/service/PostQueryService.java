@@ -37,6 +37,10 @@ public class PostQueryService {
         return postRepository.findAll(pageable);
     }
 
+    public Page<Post> searchByKeyword(Pageable pageable, String keyword) {
+        return postRepository.findByKeyword(keyword, pageable);
+    }
+
     public List<Tag> searchPopularTags() {
         return tagRepository.findPopularTags();
     }
