@@ -41,6 +41,7 @@ public class PostSearchService {
     }
 
     public Page<PostSimpleDto> searchAllSimple(Long memberId, Pageable pageable) {
+        memberQueryService.search(memberId);
         return postQueryService
                 .searchAll(memberId, pageable)
                 .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
