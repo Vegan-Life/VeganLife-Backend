@@ -117,7 +117,7 @@ public class MealLogRepositoryTest {
         mealLogRepository.save(mealLog2);
         // when
         LocalDate date = LocalDate.of(2023, 12, 22);
-        List<MealLog> mealLogs = mealLogRepository.findAllByDate(date, member.getId());
+        List<MealLog> mealLogs = mealLogRepository.findAllByDateAndMember(date, member);
         // then
         assertThat(mealLogs).hasSize(1);
         assertThat(mealLogs.get(0)).isEqualTo(mealLog1);
@@ -134,8 +134,8 @@ public class MealLogRepositoryTest {
         modifiedMeals.add(MealFixture.DEFAULT.getWithMealLog(mealLog, mealData.get(0))); // 추가
         List<MealImage> modifiedMealImages = new ArrayList<>();
         modifiedMealImages.add(MealImageFixture.DEFAULT.getWithMealLog(mealLog));
-        mealLog.updateMeals(modifiedMeals);
-        mealLog.updateMealImages(modifiedMealImages);
+        mealLog.modifyMeals(modifiedMeals);
+        mealLog.modifyMealImages(modifiedMealImages);
         mealLogRepository.flush();
         // then
         assertThat(mealLog.getMeals()).hasSize(1);

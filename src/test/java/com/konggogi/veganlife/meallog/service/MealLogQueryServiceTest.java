@@ -51,9 +51,9 @@ public class MealLogQueryServiceTest {
         LocalDate date = LocalDate.of(2023, 12, 22);
         List<MealLog> mealLogs =
                 List.of(MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member));
-        given(mealLogRepository.findAllByDate(date, member.getId())).willReturn(mealLogs);
+        given(mealLogRepository.findAllByDateAndMember(date, member)).willReturn(mealLogs);
 
-        List<MealLog> found = mealLogQueryService.searchByDate(date, member.getId());
+        List<MealLog> found = mealLogQueryService.searchByDateAndMember(date, member);
 
         assertThat(found.size()).isEqualTo(1);
         assertThat(found.get(0)).isEqualTo(mealLogs.get(0));
@@ -74,7 +74,7 @@ public class MealLogQueryServiceTest {
 
         given(mealLogRepository.findById(1L)).willReturn(Optional.ofNullable(mealLog));
 
-        MealLog found = mealLogQueryService.searchById(1L);
+        MealLog found = mealLogQueryService.search(1L);
 
         assertThat(found).isEqualTo(mealLog);
         assertThat(found.getMeals().size()).isEqualTo(3);
@@ -87,7 +87,7 @@ public class MealLogQueryServiceTest {
 
         given(mealLogRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> mealLogQueryService.searchById(1L))
+        assertThatThrownBy(() -> mealLogQueryService.search(1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_MEAL_LOG.getDescription());
     }

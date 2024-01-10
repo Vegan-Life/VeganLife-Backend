@@ -14,7 +14,6 @@ import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
-import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
@@ -61,11 +60,6 @@ public class MealLogServiceTest {
                     .map(m -> new MealAddRequest(100, 100, 10, 10, 10, m.getId()))
                     .toList();
 
-    List<MealModifyRequest> mealModifyRequests =
-            mealData.stream()
-                    .map(m -> new MealModifyRequest(100, 100, 10, 10, 10, m.getId()))
-                    .toList();
-
     List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
 
     @Test
@@ -90,35 +84,43 @@ public class MealLogServiceTest {
     void mealLogModifyTest() {
         // given
         MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealModifyRequests, imageUrls);
+                new MealLogModifyRequest(mealAddRequests, imageUrls);
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
-        given(mealLogQueryService.searchById(1L)).willReturn(mealLog);
+        given(mealLogQueryService.search(1L)).willReturn(mealLog);
         doNothing().when(intakeNotifyService).notifyIfOverIntake(1L);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
         // when
         mealLogService.modify(1L, mealLogModifyRequest);
         // then
-        then(mealLogQueryService).should(times(1)).searchById(1L);
+        then(mealLogQueryService).should(times(1)).search(1L);
         mealData.forEach(m -> then(mealDataQueryService).should(times(1)).search(m.getId()));
     }
 
     @Test
     @DisplayName("식사 기록 삭제")
     void mealLogRemoveTest() {
+        // given
+        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
+        List<MealImage> mealImages =
+                imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
+        MealLog mealLog = MealLogFixture.DINNER.get(1L, meals, mealImages, member);
+        given(mealLogQueryService.search(1L)).willReturn(mealLog);
         // when
         mealLogService.remove(1L);
         // then
-        then(mealLogRepository).should(times(1)).deleteById(1L);
+        then(mealLogRepository).should(times(1)).delete(mealLog);
     }
 
     @Test
     @DisplayName("회원 Id로 MealLog 모두 삭제")
     void removeAllTest() {
+        // given
+        given(memberQueryService.search(1L)).willReturn(member);
         // when, then
-        assertDoesNotThrow(() -> mealLogService.removeAll(member.getId()));
+        assertDoesNotThrow(() -> mealLogService.removeAll(1L));
         then(mealLogRepository).should().deleteAllByMemberId(anyLong());
     }
 }

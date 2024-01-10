@@ -11,7 +11,6 @@ import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
-import com.konggogi.veganlife.meallog.controller.dto.request.MealModifyRequest;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.support.restassured.IntegrationTest;
 import com.konggogi.veganlife.support.utils.DateTimeImpl;
@@ -163,11 +162,11 @@ public class MealLogIntegrationTest extends IntegrationTest {
         MealLogAddRequest request = new MealLogAddRequest(MealType.BREAKFAST, meals, imageUrls);
         addMealLog(request);
 
-        List<MealModifyRequest> modifiedMeals =
+        List<MealAddRequest> modifiedMeals =
                 List.of(
-                        new MealModifyRequest(200, 200, 30, 10, 5, 1L),
-                        new MealModifyRequest(300, 220, 30, 10, 5, 2L),
-                        new MealModifyRequest(400, 240, 30, 10, 5, 3L));
+                        new MealAddRequest(200, 200, 30, 10, 5, 1L),
+                        new MealAddRequest(300, 220, 30, 10, 5, 2L),
+                        new MealAddRequest(400, 240, 30, 10, 5, 3L));
         List<String> modifiedImageUrls = List.of("/image1.png", "/image2.png", "/image4.png");
         MealLogModifyRequest mealLogModifyRequest =
                 new MealLogModifyRequest(modifiedMeals, modifiedImageUrls);
