@@ -130,4 +130,14 @@ public class MemberController {
                         .map(postMapper::toPostSimpleResponse);
         return ResponseEntity.ok(postSimpleResponses);
     }
+
+    @GetMapping("/me/posts-with-comments")
+    public ResponseEntity<Page<PostSimpleResponse>> getPostListContainingMyComment(
+            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Page<PostSimpleResponse> postSimpleResponses =
+                postSearchService
+                        .searchByMemberComments(userDetails.id(), pageable)
+                        .map(postMapper::toPostSimpleResponse);
+        return ResponseEntity.ok(postSimpleResponses);
+    }
 }
