@@ -2,6 +2,9 @@ package com.konggogi.veganlife.post.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.konggogi.veganlife.comment.domain.Comment;
+import com.konggogi.veganlife.comment.fixture.CommentFixture;
+import com.konggogi.veganlife.comment.repository.CommentRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
@@ -26,6 +29,7 @@ class PostRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired PostRepository postRepository;
     @Autowired PostTagRepository postTagRepository;
+    @Autowired CommentRepository commentRepository;
     @Autowired TagRepository tagRepository;
     private final Member member = MemberFixture.DEFAULT_M.get();
     private final Post post = PostFixture.BAKERY.get(member);
@@ -131,6 +135,26 @@ class PostRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         // when
         Page<Post> result = postRepository.findAllByMemberId(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("회원 Id로 작성된 댓글이 있는 게시글 모두 조회")
+    void findByMemberCommentsTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        Post otherPost = PostFixture.BAKERY.get(otherMember);
+        postRepository.save(otherPost);
+        Comment comment = CommentFixture.DEFAULT.getTopComment(member, post);
+        Comment subComment = CommentFixture.DEFAULT.getSubComment(otherMember, post, comment);
+        commentRepository.save(comment);
+        commentRepository.save(subComment);
+        Pageable pageable = PageRequest.of(0, 10);
+        // when
+        Page<Post> result = postRepository.findByMemberComments(member.getId(), pageable);
         // then
         assertThat(result).hasSize(1);
         assertThat(result.getTotalElements()).isEqualTo(1);
