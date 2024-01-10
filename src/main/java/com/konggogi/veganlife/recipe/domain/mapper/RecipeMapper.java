@@ -2,7 +2,6 @@ package com.konggogi.veganlife.recipe.domain.mapper;
 
 
 import com.konggogi.veganlife.member.domain.VegetarianType;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDescriptionDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
@@ -27,13 +26,22 @@ public interface RecipeMapper {
             qualifiedByName = "recipeTypeToVegetarianType")
     RecipeListResponse toRecipeListResponse(Recipe recipe);
 
-
     @Mapping(
             source = "recipe.recipeTypes",
             target = "recipeTypes",
             qualifiedByName = "recipeTypeToVegetarianType")
-    @Mapping(source = "recipe.recipeImages", target = "imageUrls", qualifiedByName = "recipeImageToImageUrl")
-    @Mapping(source = "recipe.ingredients", target = "ingredients", qualifiedByName = "recipeIngredientsToString")
+    @Mapping(
+            source = "recipe.recipeImages",
+            target = "imageUrls",
+            qualifiedByName = "recipeImageToImageUrl")
+    @Mapping(
+            source = "recipe.ingredients",
+            target = "ingredients",
+            qualifiedByName = "recipeIngredientToString")
+    @Mapping(
+            source = "recipe.descriptions",
+            target = "descriptions",
+            qualifiedByName = "recipeDescriptionToString")
     RecipeDetailsResponse toRecipeDetailsResponse(Recipe recipe, boolean isLiked);
 
     @Named("recipeImageToImageUrl")
@@ -48,9 +56,15 @@ public interface RecipeMapper {
         return recipeType.getVegetarianType();
     }
 
-    @Named("recipeIngredientsToString")
-    static String recipeIngredientsToString(RecipeIngredient ingredient) {
+    @Named("recipeIngredientToString")
+    static String recipeIngredientToString(RecipeIngredient ingredient) {
 
         return ingredient.getName();
+    }
+
+    @Named("recipeDescriptionToString")
+    static String recipeDescriptionToString(RecipeDescription description) {
+
+        return description.getDescription();
     }
 }
