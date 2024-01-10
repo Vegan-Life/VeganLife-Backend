@@ -56,7 +56,6 @@ class CommentSearchServiceTest {
                 commentSearchService.searchDetailsById(
                         member.getId(), post.getId(), comment.getId());
         // then
-        assertThat(result.id()).isEqualTo(comment.getId());
         assertThat(result.comment()).isEqualTo(comment);
         assertThat(result.isLike()).isTrue();
         assertThat(result.likeCount()).isEqualTo(1);

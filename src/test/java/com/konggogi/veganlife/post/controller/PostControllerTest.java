@@ -130,9 +130,8 @@ class PostControllerTest extends RestDocsTest {
                 new SubCommentDetailsDto(
                         3L, "콩고기M", "작심이틀로 태그 바꿔주세요~", true, 11, LocalDateTime.now());
         CommentDetailsDto commentDetailsDto1 =
-                new CommentDetailsDto(1L, comment1, true, 53, List.of(subComment1));
-        CommentDetailsDto commentDetailsDto2 =
-                new CommentDetailsDto(2L, comment2, false, 3, List.of());
+                new CommentDetailsDto(comment1, true, 53, List.of(subComment1));
+        CommentDetailsDto commentDetailsDto2 = new CommentDetailsDto(comment2, false, 3, List.of());
         List<CommentDetailsDto> commentDetailsDtos =
                 List.of(commentDetailsDto1, commentDetailsDto2);
 

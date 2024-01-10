@@ -204,7 +204,7 @@ class CommentControllerTest extends RestDocsTest {
         SubCommentDetailsDto subComment2 =
                 new SubCommentDetailsDto(3L, "콩고기F", "오오 꿀팁이네요ㅎㅎ", false, 3, LocalDateTime.now());
         CommentDetailsDto detailsDto =
-                new CommentDetailsDto(1L, comment, true, 53, List.of(subComment1, subComment2));
+                new CommentDetailsDto(comment, true, 53, List.of(subComment1, subComment2));
         given(commentSearchService.searchDetailsById(anyLong(), anyLong(), anyLong()))
                 .willReturn(detailsDto);
         // when
@@ -214,7 +214,7 @@ class CommentControllerTest extends RestDocsTest {
                                 .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(detailsDto.id()))
+                .andExpect(jsonPath("$.id").value(comment.getId()))
                 .andExpect(
                         jsonPath("$.author").value(detailsDto.comment().getMember().getNickname()))
                 .andExpect(jsonPath("$.content").value(detailsDto.comment().getContent()))
