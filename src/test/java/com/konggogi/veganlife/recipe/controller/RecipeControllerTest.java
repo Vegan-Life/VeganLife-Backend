@@ -3,19 +3,24 @@ package com.konggogi.veganlife.recipe.controller;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
@@ -27,7 +32,7 @@ import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapperImpl;
 import com.konggogi.veganlife.recipe.fixture.RecipeDescriptionFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeImageFixture;
-import com.konggogi.veganlife.recipe.fixture.RecipeIngredientsFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
@@ -101,6 +106,57 @@ public class RecipeControllerTest extends RestDocsTest {
                                         sizeDesc())));
     }
 
+    @Test
+    @DisplayName("레시피 상세 조회 API")
+    void getRecipeDetails() throws Exception {
+
+        Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
+        RecipeDetailsResponse response = recipeMapper.toRecipeDetailsResponse(recipe, false);
+
+        given(recipeSearchService.search(anyLong())).willReturn(response);
+
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
+
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.isLiked").value(false))
+                .andExpect(jsonPath("$.name").value("표고버섯 탕수"))
+                .andExpect(jsonPath("$.recipeTypes.size()").value(1))
+                .andExpect(jsonPath("$.recipeTypes[0]").value(VegetarianType.LACTO.name()))
+                .andExpect(jsonPath("$.imageUrls.size()").value(3))
+                .andExpect(jsonPath("$.ingredients.size()").value(3))
+                .andExpect(jsonPath("$.descriptions.size()").value(3));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recipe-details",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("id").description("레시피 id"))));
+    }
+
+    @Test
+    @DisplayName("레시피 상세 조회 API - 레시피 not found 예외")
+    void getRecipeDetailsNotFoundException() throws Exception {
+
+        given(recipeSearchService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recipe-details-not-found",
+                                getDocumentRequest(),
+                                getDocumentResponse()));
+    }
+
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
         List<RecipeType> recipeTypes = List.of(recipeType);
@@ -113,15 +169,15 @@ public class RecipeControllerTest extends RestDocsTest {
 
         List<RecipeIngredient> ingredients =
                 List.of(
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get());
+                        RecipeIngredientFixture.DEFAULT.getWithName("표고버섯 5개"),
+                        RecipeIngredientFixture.DEFAULT.getWithName("식용유 500ml"),
+                        RecipeIngredientFixture.DEFAULT.getWithName("시판 탕수육 소스 100ml"));
 
         List<RecipeDescription> descriptions =
                 List.of(
-                        RecipeDescriptionFixture.DEFAULT.get(),
-                        RecipeDescriptionFixture.DEFAULT.get(),
-                        RecipeDescriptionFixture.DEFAULT.get());
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(1, "표고버섯을 먹기 좋은 크기로 자릅니다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(2, "표고버섯을 튀깁니다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(3, "탕수육 소스에 버무립니다."));
 
         return RecipeFixture.DEFAULT.getWithName(
                 id, name, recipeTypes, recipeImages, ingredients, descriptions, member);

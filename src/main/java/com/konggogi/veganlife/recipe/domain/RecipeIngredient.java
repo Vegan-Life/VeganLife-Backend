@@ -28,22 +28,14 @@ public class RecipeIngredient extends TimeStamped {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Integer amount;
-
-    @Column(nullable = false)
-    private String unit;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     @Builder
-    public RecipeIngredient(Long id, String name, Integer amount, String unit, Recipe recipe) {
+    public RecipeIngredient(Long id, String name, Recipe recipe) {
         this.id = id;
         this.name = name;
-        this.amount = amount;
-        this.unit = unit;
         this.recipe = recipe;
     }
 }

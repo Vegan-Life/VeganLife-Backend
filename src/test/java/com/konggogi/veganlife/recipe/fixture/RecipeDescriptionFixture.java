@@ -27,4 +27,9 @@ public enum RecipeDescriptionFixture {
                 .description(description)
                 .build();
     }
+
+    public RecipeDescription getWithDesc(Integer sequence, String description) {
+
+        return RecipeDescription.builder().sequence(sequence).description(description).build();
+    }
 }

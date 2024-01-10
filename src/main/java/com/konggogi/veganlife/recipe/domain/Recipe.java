@@ -3,7 +3,6 @@ package com.konggogi.veganlife.recipe.domain;
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.domain.VegetarianType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -43,6 +43,7 @@ public class Recipe extends TimeStamped {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeIngredient> ingredients = new ArrayList<>();
 
+    @OrderBy("sequence")
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeDescription> descriptions = new ArrayList<>();
 
@@ -57,17 +58,12 @@ public class Recipe extends TimeStamped {
         this.member = member;
     }
 
-    public String getThumbnailUrl() {
+    public RecipeImage getThumbnailUrl() {
 
         if (recipeImages.isEmpty()) {
             return null;
         }
-        return recipeImages.get(0).getImageUrl();
-    }
-
-    public List<VegetarianType> getRecipeTypes() {
-
-        return recipeTypes.stream().map(RecipeType::getVegetarianType).toList();
+        return recipeImages.get(0);
     }
 
     public void update(

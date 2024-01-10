@@ -14,7 +14,7 @@ import com.konggogi.veganlife.recipe.domain.RecipeType;
 import com.konggogi.veganlife.recipe.fixture.RecipeDescriptionFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeImageFixture;
-import com.konggogi.veganlife.recipe.fixture.RecipeIngredientsFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
@@ -84,6 +84,21 @@ public class RecipeRepositoryTest {
         assertThat(recipes.getNumberOfElements()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("id 기반으로 Recipe 레코드를 조회한다. - RecipeDescription은 sequence로 정렬된다.")
+    void findByIdTest() {
+
+        Recipe recipe = createRecipe(List.of(RecipeTypeFixture.OVO.get()));
+        recipeRepository.save(recipe);
+        em.clear();
+
+        Recipe found = recipeRepository.findById(recipe.getId()).get();
+
+        assertThat(found.getDescriptions().get(0).getSequence()).isEqualTo(1);
+        assertThat(found.getDescriptions().get(1).getSequence()).isEqualTo(2);
+        assertThat(found.getDescriptions().get(2).getSequence()).isEqualTo(3);
+    }
+
     private Recipe createRecipe(List<RecipeType> recipeType) {
 
         List<RecipeType> recipeTypes = new ArrayList<>(recipeType);
@@ -96,15 +111,15 @@ public class RecipeRepositoryTest {
 
         List<RecipeIngredient> ingredients =
                 List.of(
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get());
+                        RecipeIngredientFixture.DEFAULT.get(),
+                        RecipeIngredientFixture.DEFAULT.get(),
+                        RecipeIngredientFixture.DEFAULT.get());
 
         List<RecipeDescription> descriptions =
                 List.of(
-                        RecipeDescriptionFixture.DEFAULT.get(),
-                        RecipeDescriptionFixture.DEFAULT.get(),
-                        RecipeDescriptionFixture.DEFAULT.get());
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(2, "표고버섯을 튀긴다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(1, "표고버섯을 먹기 좋은 크기로 썬다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(3, "탕수육 소스와 버무린다."));
 
         return RecipeFixture.DEFAULT.get(
                 recipeTypes, recipeImages, ingredients, descriptions, member);

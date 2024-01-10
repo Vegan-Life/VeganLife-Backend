@@ -29,3 +29,28 @@ include::{snippets}/recipe-get-recipe-list/http-request.adoc[]
 ==== 200 OK
 
 include::{snippets}/recipe-get-recipe-list/http-response.adoc[]
+
+== 레시피 상세 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recipe-get-recipe-details/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/recipe-get-recipe-details/path-parameters.adoc[]
+
+include::{snippets}/recipe-get-recipe-details/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recipe-get-recipe-details/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/recipe-get-recipe-details-not-found/http-response.adoc[]
+
