@@ -119,4 +119,20 @@ class PostRepositoryTest {
         assertThat(posts).hasSize(1);
         assertThat(posts.getTotalElements()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("회원 Id로 게시글 모두 조회")
+    void findAllByMemberIdTest() {
+        // given
+        Member otherMember = MemberFixture.DEFAULT_F.get();
+        memberRepository.save(otherMember);
+        Post otherPost = PostFixture.BAKERY.get(otherMember);
+        postRepository.save(otherPost);
+        Pageable pageable = PageRequest.of(0, 10);
+        // when
+        Page<Post> result = postRepository.findAllByMemberId(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+    }
 }
