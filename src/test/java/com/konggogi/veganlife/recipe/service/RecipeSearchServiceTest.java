@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
@@ -62,14 +63,15 @@ public class RecipeSearchServiceTest {
 
         assertThat(response.getNumberOfElements()).isEqualTo(2);
         assertThat(response.getContent().get(0).thumbnailUrl())
-                .isEqualTo(recipes.get(0).getThumbnailUrl());
+                .isEqualTo(recipes.get(0).getThumbnailUrl().getImageUrl());
         assertThat(response.getContent().get(1).thumbnailUrl())
-                .isEqualTo(recipes.get(1).getThumbnailUrl());
+                .isEqualTo(recipes.get(1).getThumbnailUrl().getImageUrl());
         assertThat(response.getContent().get(0).recipeTypes())
-                .containsAll(recipes.get(0).getRecipeTypes());
+                .containsAll(recipes.get(0).getRecipeTypes().stream().map(RecipeType::getVegetarianType).toList());
         assertThat(response.getContent().get(1).recipeTypes())
-                .containsAll(recipes.get(1).getRecipeTypes());
+                .containsAll(recipes.get(0).getRecipeTypes().stream().map(RecipeType::getVegetarianType).toList());
     }
+
 
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
