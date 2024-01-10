@@ -27,4 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByKeyword(String keyword, Pageable pageable);
 
     Page<Post> findAllByMemberId(Long memberId, Pageable pageable);
+
+    @Query("select distinct p from Post p join p.comments c where c.member.id = :memberId")
+    Page<Post> findByMemberComments(Long memberId, Pageable pageable);
 }
