@@ -121,12 +121,12 @@ public class MemberController {
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
     }
 
-    @GetMapping("/{memberId}/posts")
+    @GetMapping("/me/posts")
     public ResponseEntity<Page<PostSimpleResponse>> getMyPostList(
-            @PathVariable Long memberId, Pageable pageable) {
+            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Page<PostSimpleResponse> postSimpleResponses =
                 postSearchService
-                        .searchAllSimple(memberId, pageable)
+                        .searchAllSimple(userDetails.id(), pageable)
                         .map(postMapper::toPostSimpleResponse);
         return ResponseEntity.ok(postSimpleResponses);
     }
