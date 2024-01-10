@@ -557,7 +557,7 @@ class MemberControllerTest extends RestDocsTest {
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        get("/api/v1/members/{memberId}/posts", 1L)
+                        get("/api/v1/members/me/posts")
                                 .headers(authorizationHeader())
                                 .queryParam("page", "0")
                                 .queryParam("size", "10")
@@ -590,7 +590,7 @@ class MemberControllerTest extends RestDocsTest {
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        get("/api/v1/members/{memberId}/posts", 1L)
+                        get("/api/v1/members/me/posts")
                                 .headers(authorizationHeader())
                                 .queryParam("page", "0")
                                 .queryParam("size", "10")
