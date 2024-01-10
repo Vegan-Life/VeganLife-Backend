@@ -21,7 +21,7 @@ import org.mapstruct.Named;
 public interface RecipeMapper {
 
     @Mapping(
-            source = "recipe.thumbnailUrl",
+            source = "recipe.thumbnail",
             target = "thumbnailUrl",
             qualifiedByName = "recipeImageToImageUrl")
     @Mapping(
