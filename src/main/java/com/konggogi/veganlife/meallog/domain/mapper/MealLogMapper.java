@@ -17,7 +17,10 @@ public interface MealLogMapper {
     @Mapping(target = "id", ignore = true)
     MealLog toEntity(MealType mealType, Member member);
 
-    @Mapping(target = "thumbnailUrl", expression = "java(mealLog.getThumbnailUrl())")
+    @Mapping(
+            source = "mealLog.thumbnail",
+            target = "thumbnailUrl",
+            qualifiedByName = "mealImageToImageUrl")
     @Mapping(target = "totalCalorie", expression = "java(mealLog.getTotalCalorie())")
     MealLogListResponse toMealLogListResponse(MealLog mealLog);
 

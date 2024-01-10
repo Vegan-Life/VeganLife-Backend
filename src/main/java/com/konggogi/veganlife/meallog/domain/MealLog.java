@@ -65,12 +65,12 @@ public class MealLog extends TimeStamped {
         this.mealImages.addAll(mealImages);
     }
 
-    public String getThumbnailUrl() {
+    public MealImage getThumbnail() {
 
         if (mealImages.isEmpty()) {
             return null;
         }
-        return mealImages.get(0).getImageUrl();
+        return mealImages.get(0);
     }
 
     public int getTotalCalorie() {
