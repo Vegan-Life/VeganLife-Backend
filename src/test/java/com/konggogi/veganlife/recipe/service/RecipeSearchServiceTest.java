@@ -1,9 +1,12 @@
 package com.konggogi.veganlife.recipe.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
@@ -19,9 +22,10 @@ import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapperImpl;
 import com.konggogi.veganlife.recipe.fixture.RecipeDescriptionFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeImageFixture;
-import com.konggogi.veganlife.recipe.fixture.RecipeIngredientsFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,11 +71,51 @@ public class RecipeSearchServiceTest {
         assertThat(response.getContent().get(1).thumbnailUrl())
                 .isEqualTo(recipes.get(1).getThumbnailUrl().getImageUrl());
         assertThat(response.getContent().get(0).recipeTypes())
-                .containsAll(recipes.get(0).getRecipeTypes().stream().map(RecipeType::getVegetarianType).toList());
+                .containsAll(
+                        recipes.get(0).getRecipeTypes().stream()
+                                .map(RecipeType::getVegetarianType)
+                                .toList());
         assertThat(response.getContent().get(1).recipeTypes())
-                .containsAll(recipes.get(0).getRecipeTypes().stream().map(RecipeType::getVegetarianType).toList());
+                .containsAll(
+                        recipes.get(0).getRecipeTypes().stream()
+                                .map(RecipeType::getVegetarianType)
+                                .toList());
     }
 
+    @Test
+    @DisplayName("레시피 상세 조회 테스트")
+    void searchTest() {
+
+        Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
+
+        given(recipeQueryService.search(1L)).willReturn(recipe);
+
+        RecipeDetailsResponse response = recipeSearchService.search(1L);
+
+        assertThat(response.isLiked()).isEqualTo(false);
+        assertThat(response.name()).isEqualTo("표고버섯 탕수");
+        assertThat(response.recipeTypes()).hasSize(1);
+        assertThat(response.recipeTypes().get(0)).isEqualTo(VegetarianType.LACTO);
+        assertThat(response.imageUrls())
+                .containsAll(
+                        recipe.getRecipeImages().stream().map(RecipeImage::getImageUrl).toList());
+        assertThat(response.ingredients())
+                .containsAll(
+                        recipe.getIngredients().stream().map(RecipeIngredient::getName).toList());
+        assertThat(response.descriptions()).allMatch(Objects::nonNull);
+    }
+
+    @Test
+    @DisplayName("레시피 상세 조회 테스트 - 존재하지 않는 레시피")
+    void searchNotFoundExceptionTest() {
+
+        given(recipeQueryService.search(1L))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+
+        assertThatThrownBy(() -> recipeSearchService.search(1L))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_RECIPE.getDescription());
+    }
 
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
@@ -85,9 +129,9 @@ public class RecipeSearchServiceTest {
 
         List<RecipeIngredient> ingredients =
                 List.of(
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get(),
-                        RecipeIngredientsFixture.DEFAULT.get());
+                        RecipeIngredientFixture.DEFAULT.get(),
+                        RecipeIngredientFixture.DEFAULT.get(),
+                        RecipeIngredientFixture.DEFAULT.get());
 
         List<RecipeDescription> descriptions =
                 List.of(
