@@ -58,7 +58,7 @@ public class Recipe extends TimeStamped {
         this.member = member;
     }
 
-    public RecipeImage getThumbnailUrl() {
+    public RecipeImage getThumbnail() {
 
         if (recipeImages.isEmpty()) {
             return null;

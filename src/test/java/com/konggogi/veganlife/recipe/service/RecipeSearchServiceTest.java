@@ -67,9 +67,9 @@ public class RecipeSearchServiceTest {
 
         assertThat(response.getNumberOfElements()).isEqualTo(2);
         assertThat(response.getContent().get(0).thumbnailUrl())
-                .isEqualTo(recipes.get(0).getThumbnailUrl().getImageUrl());
+                .isEqualTo(recipes.get(0).getThumbnail().getImageUrl());
         assertThat(response.getContent().get(1).thumbnailUrl())
-                .isEqualTo(recipes.get(1).getThumbnailUrl().getImageUrl());
+                .isEqualTo(recipes.get(1).getThumbnail().getImageUrl());
         assertThat(response.getContent().get(0).recipeTypes())
                 .containsAll(
                         recipes.get(0).getRecipeTypes().stream()

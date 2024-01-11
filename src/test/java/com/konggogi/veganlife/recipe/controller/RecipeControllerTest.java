@@ -5,9 +5,11 @@ import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRe
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -20,6 +22,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
+import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
@@ -35,6 +38,7 @@ import com.konggogi.veganlife.recipe.fixture.RecipeImageFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
+import com.konggogi.veganlife.recipe.service.RecipeService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -45,19 +49,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(RecipeController.class)
 public class RecipeControllerTest extends RestDocsTest {
 
     @MockBean RecipeSearchService recipeSearchService;
+    @MockBean RecipeService recipeService;
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
 
     private final Member member = MemberFixture.DEFAULT_M.get();
 
     @Test
     @DisplayName("레시피 목록 조회 API")
-    void getRecipeList() throws Exception {
+    void getRecipeListTest() throws Exception {
 
         List<RecipeListResponse> recipe =
                 List.of(
@@ -108,7 +114,7 @@ public class RecipeControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("레시피 상세 조회 API")
-    void getRecipeDetails() throws Exception {
+    void getRecipeDetailsTest() throws Exception {
 
         Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
         RecipeDetailsResponse response = recipeMapper.toRecipeDetailsResponse(recipe, false);
@@ -139,7 +145,7 @@ public class RecipeControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("레시피 상세 조회 API - 레시피 not found 예외")
-    void getRecipeDetailsNotFoundException() throws Exception {
+    void getRecipeDetailsNotFoundExceptionTest() throws Exception {
 
         given(recipeSearchService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
@@ -155,6 +161,69 @@ public class RecipeControllerTest extends RestDocsTest {
                                 "recipe-get-recipe-details-not-found",
                                 getDocumentRequest(),
                                 getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("레시피 등록 API")
+    void addRecipeTest() throws Exception {
+
+        RecipeAddRequest request =
+                new RecipeAddRequest(
+                        "표고버섯 탕수",
+                        List.of(VegetarianType.LACTO),
+                        List.of("/image1.png", "/image2.png"),
+                        List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/recipes")
+                                .headers(authorizationHeader())
+                                .content(toJson(request))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-add-recipe",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("레시피 등록 API 예외 - Member Not Found")
+    void addRecipeMemberNotFoundExceptionTest() throws Exception {
+
+        RecipeAddRequest request =
+                new RecipeAddRequest(
+                        "표고버섯 탕수",
+                        List.of(VegetarianType.LACTO),
+                        List.of("/image1.png", "/image2.png"),
+                        List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+
+        willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
+                .given(recipeService)
+                .add(any(RecipeAddRequest.class), anyLong());
+
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/recipes")
+                                .headers(authorizationHeader())
+                                .content(toJson(request))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-add-recipe-member-not-found",
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
     }
 
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {

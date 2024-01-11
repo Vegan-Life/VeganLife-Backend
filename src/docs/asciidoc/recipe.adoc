@@ -30,6 +30,7 @@ include::{snippets}/recipe-get-recipe-list/http-request.adoc[]
 
 include::{snippets}/recipe-get-recipe-list/http-response.adoc[]
 
+
 == 레시피 상세 조회 API
 
 === Request
@@ -54,3 +55,23 @@ include::{snippets}/recipe-get-recipe-details/http-response.adoc[]
 
 include::{snippets}/recipe-get-recipe-details-not-found/http-response.adoc[]
 
+
+== 레시피 등록 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recipe-add-recipe/request-headers.adoc[]
+
+include::{snippets}/recipe-add-recipe/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recipe-add-recipe/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/recipe-add-recipe-member-not-found/http-response.adoc[]
