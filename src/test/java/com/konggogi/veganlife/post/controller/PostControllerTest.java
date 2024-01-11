@@ -25,11 +25,9 @@ import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
-import com.konggogi.veganlife.post.exception.IllegalLikeStatusException;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
 import com.konggogi.veganlife.post.fixture.TagFixture;
-import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -53,7 +51,6 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(PostController.class)
 class PostControllerTest extends RestDocsTest {
     @MockBean PostService postService;
-    @MockBean PostLikeService postLikeService;
     @MockBean PostSearchService postSearchService;
     @MockBean PostQueryService postQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -429,155 +426,5 @@ class PostControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 API")
-    void addPostLikeTest() throws Exception {
-        // given
-        doNothing().when(postLikeService).addPostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        post("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isCreated());
-
-        perform.andDo(print())
-                .andDo(
-                        document(
-                                "add-post-like",
-                                getDocumentRequest(),
-                                getDocumentResponse(),
-                                requestHeaders(authorizationDesc()),
-                                pathParameters(parameterWithName("postId").description("게시글 번호"))));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 API - 없는 회원 예외 발생")
-    void addPostLikeNotFoundMemberTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
-                .when(postLikeService)
-                .addPostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        post("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("add-post-like-not-found-member", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 API - 없는 게시글 예외 발생")
-    void addPostLikeNotFoundPostTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
-                .when(postLikeService)
-                .addPostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        post("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("add-post-like-not-found-post", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 API - 이미 좋아요한 경우 예외 발생")
-    void addPostLikeAlreadyTest() throws Exception {
-        // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_LIKED))
-                .when(postLikeService)
-                .addPostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        post("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isConflict());
-
-        perform.andDo(print()).andDo(document("add-post-like-already", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 취소 API")
-    void removePostLikeTest() throws Exception {
-        // given
-        doNothing().when(postLikeService).removePostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        delete("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNoContent());
-
-        perform.andDo(print())
-                .andDo(
-                        document(
-                                "remove-post-like",
-                                getDocumentRequest(),
-                                getDocumentResponse(),
-                                requestHeaders(authorizationDesc()),
-                                pathParameters(parameterWithName("postId").description("게시글 번호"))));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 취소 API - 없는 회원 예외 발생")
-    void removePostLikeNotFoundMemberTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
-                .when(postLikeService)
-                .removePostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        delete("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("remove-post-like-not-found-member", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 취소 API - 없는 게시글 예외 발생")
-    void removePostLikeNotFoundPostTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
-                .when(postLikeService)
-                .removePostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        delete("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("remove-post-like-not-found-post", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 취소 API - 좋아요 되어 있지 않은 경우 예외 발생")
-    void removePostLikeAlreadyTest() throws Exception {
-        // given
-        doThrow(new IllegalLikeStatusException(ErrorCode.ALREADY_POST_UNLIKED))
-                .when(postLikeService)
-                .removePostLike(anyLong(), anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        delete("/api/v1/posts/{postId}/likes", 1L).headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isConflict());
-
-        perform.andDo(print()).andDo(document("remove-post-like-already", getDocumentResponse()));
     }
 }
