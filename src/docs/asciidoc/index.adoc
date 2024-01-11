@@ -14,6 +14,10 @@ include::{docdir}/src/docs/asciidoc/auth.adoc[]
 
 include::{docdir}/src/docs/asciidoc/sse.adoc[]
 
+include::{docdir}/src/docs/asciidoc/my-page.adoc[]
+
+include::{docdir}/src/docs/asciidoc/nutrients.adoc[]
+
 include::{docdir}/src/docs/asciidoc/meal-data.adoc[]
 
 include::{docdir}/src/docs/asciidoc/meal-log.adoc[]
