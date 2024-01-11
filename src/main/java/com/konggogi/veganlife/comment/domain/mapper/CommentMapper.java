@@ -32,6 +32,7 @@ public interface CommentMapper {
     CommentDetailsDto toCommentDetailsDto(
             Comment comment, List<SubCommentDetailsDto> subComments, boolean isLike);
 
+    @Mapping(target = "id", source = "commentDetailsDto.comment.id")
     @Mapping(target = "author", source = "commentDetailsDto.comment.member.nickname")
     @Mapping(target = "content", source = "commentDetailsDto.comment.content")
     @Mapping(target = "createdAt", source = "commentDetailsDto.comment.createdAt")

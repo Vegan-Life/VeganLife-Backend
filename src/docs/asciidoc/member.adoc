@@ -242,3 +242,29 @@ include::{snippets}/get-my-post/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/get-my-post-not-found-member/http-response.adoc[]
+
+== 내가 쓴 댓글의 피드 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-post-containing-my-comments/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/get-post-containing-my-comments/query-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/get-post-containing-my-comments/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-post-containing-my-comments/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/get-post-containing-my-comments-not-found-member/http-response.adoc[]

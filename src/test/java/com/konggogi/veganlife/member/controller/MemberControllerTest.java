@@ -601,4 +601,73 @@ class MemberControllerTest extends RestDocsTest {
         perform.andDo(print())
                 .andDo(document("get-my-post-not-found-member", getDocumentResponse()));
     }
+
+    @Test
+    @DisplayName("내가 작성한 댓글이 있는 게시글 조회 API")
+    void getPostListContainingMyCommentTest() throws Exception {
+        // given
+        Member member = MemberFixture.DEFAULT_F.getWithId(1L);
+        Pageable pageable = PageRequest.of(0, 10);
+        Post post1 = PostFixture.BAKERY.getWithDate(1L, member, LocalDate.of(2023, 5, 25));
+        Post post2 = PostFixture.BAKERY.getWithDate(2L, member, LocalDate.of(2024, 1, 1));
+        List<String> imageUrls =
+                List.of(
+                        PostImageFixture.DEFAULT.getImageUrl(),
+                        PostImageFixture.DEFAULT.getImageUrl());
+        List<PostSimpleDto> postSimpleDtos =
+                List.of(new PostSimpleDto(post2, imageUrls), new PostSimpleDto(post1, List.of()));
+        Page<PostSimpleDto> postSimpleDtoPage =
+                PageableExecutionUtils.getPage(postSimpleDtos, pageable, postSimpleDtos::size);
+        given(postSearchService.searchByMemberComments(anyLong(), any(Pageable.class)))
+                .willReturn(postSimpleDtoPage);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/me/posts-with-comments")
+                                .headers(authorizationHeader())
+                                .queryParam("page", "0")
+                                .queryParam("size", "10")
+                                .queryParam("sort", "createdAt,DESC"));
+        // then
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(postSimpleDtos.size()))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.pageable.pageSize").value(10));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "get-post-containing-my-comments",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        pageDesc(),
+                                        sizeDesc(),
+                                        parameterWithName("sort").description("정렬 기준"))));
+    }
+
+    @Test
+    @DisplayName("내가 작성한 댓글이 있는 게시글 조회 API - 없는 회원 예외 발생")
+    void getPostListContainingMyCommentNotFoundMemberTest() throws Exception {
+        // given
+        given(postSearchService.searchByMemberComments(anyLong(), any(Pageable.class)))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/me/posts-with-comments")
+                                .headers(authorizationHeader())
+                                .queryParam("page", "0")
+                                .queryParam("size", "10")
+                                .queryParam("sort", "createdAt,DESC"));
+        // then
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "get-post-containing-my-comments-not-found-member",
+                                getDocumentResponse()));
+    }
 }

@@ -53,6 +53,13 @@ public class PostSearchService {
                 .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
     }
 
+    public Page<PostSimpleDto> searchByMemberComments(Long memberId, Pageable pageable) {
+        memberQueryService.search(memberId);
+        return postQueryService
+                .searchByMemberComments(memberId, pageable)
+                .map(post -> postMapper.toPostSimpleDto(post, post.getImageUrls()));
+    }
+
     private List<CommentDetailsDto> getAllCommentDetails(Long memberId, Post post) {
         return post.getComments().stream()
                 .filter(comment -> comment.getParent().isEmpty())

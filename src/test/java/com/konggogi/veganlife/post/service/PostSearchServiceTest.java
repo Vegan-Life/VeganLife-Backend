@@ -126,4 +126,21 @@ class PostSearchServiceTest {
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
+
+    @Test
+    @DisplayName("회원 id로 작성된 댓글이 있는 게시글 모두 조회")
+    void searchByMemberCommentsTest() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Post> posts = List.of(post);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.searchByMemberComments(anyLong(), any(Pageable.class)))
+                .willReturn(foundPosts);
+        // when
+        Page<PostSimpleDto> result =
+                postSearchService.searchByMemberComments(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+    }
 }

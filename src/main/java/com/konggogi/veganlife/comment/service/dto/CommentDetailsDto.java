@@ -5,7 +5,6 @@ import com.konggogi.veganlife.comment.domain.Comment;
 import java.util.List;
 
 public record CommentDetailsDto(
-        Long id,
         Comment comment,
         boolean isLike,
         Integer likeCount,

@@ -45,6 +45,10 @@ public class PostQueryService {
         return postRepository.findByKeyword(keyword, pageable);
     }
 
+    public Page<Post> searchByMemberComments(Long memberId, Pageable pageable) {
+        return postRepository.findByMemberComments(memberId, pageable);
+    }
+
     public List<Tag> searchPopularTags() {
         return tagRepository.findPopularTags();
     }

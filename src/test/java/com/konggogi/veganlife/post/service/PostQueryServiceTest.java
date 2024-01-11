@@ -146,4 +146,20 @@ class PostQueryServiceTest {
         assertThat(result).hasSize(posts.size());
         then(postRepository).should().findAllByMemberId(anyLong(), any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("회원 Id로 작성된 댓글이 있는 게시글 모두 조회")
+    void searchByMemberCommentsTest() {
+        // given
+        List<Post> posts = List.of(post);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> foundPosts = PageableExecutionUtils.getPage(posts, pageable, posts::size);
+        given(postRepository.findByMemberComments(anyLong(), any(Pageable.class)))
+                .willReturn(foundPosts);
+        // when
+        Page<Post> result = postQueryService.searchByMemberComments(member.getId(), pageable);
+        // then
+        assertThat(result).hasSize(posts.size());
+        then(postRepository).should().findByMemberComments(anyLong(), any(Pageable.class));
+    }
 }
