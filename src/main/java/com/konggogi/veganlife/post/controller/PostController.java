@@ -10,7 +10,6 @@ import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
-import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private final PostService postService;
     private final PostSearchService postSearchService;
-    private final PostLikeService postLikeService;
     private final PostQueryService postQueryService;
     private final PostMapper postMapper;
 
@@ -87,19 +85,5 @@ public class PostController {
     public ResponseEntity<PopularTagsResponse> getPopularTags() {
         List<Tag> topTags = postQueryService.searchPopularTags();
         return ResponseEntity.ok(postMapper.toPopularTagsResponse(topTags));
-    }
-
-    @PostMapping("/{postId}/likes")
-    public ResponseEntity<Void> addPostLike(
-            @PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postLikeService.addPostLike(userDetails.id(), postId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @DeleteMapping("/{postId}/likes")
-    public ResponseEntity<Void> removePostLike(
-            @PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postLikeService.removePostLike(userDetails.id(), postId);
-        return ResponseEntity.noContent().build();
     }
 }
