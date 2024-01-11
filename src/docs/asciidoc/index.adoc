@@ -24,6 +24,10 @@ include::{docdir}/src/docs/asciidoc/meal-log.adoc[]
 
 include::{docdir}/src/docs/asciidoc/post.adoc[]
 
+include::{docdir}/src/docs/asciidoc/post-search.adoc[]
+
+include::{docdir}/src/docs/asciidoc/post-like.adoc[]
+
 include::{docdir}/src/docs/asciidoc/comment.adoc[]
 
 include::{docdir}/src/docs/asciidoc/comment-like.adoc[]
