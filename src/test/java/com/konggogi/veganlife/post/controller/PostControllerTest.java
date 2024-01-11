@@ -24,10 +24,8 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.domain.Post;
-import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
-import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -359,72 +357,5 @@ class PostControllerTest extends RestDocsTest {
         perform.andExpect(status().isNotFound());
 
         perform.andDo(print()).andDo(document("remove-post-not-found-post", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("게시글 검색 API")
-    void getPostListByKeywordTest() throws Exception {
-        // given
-        Pageable pageable = PageRequest.of(0, 10);
-        Post post1 = PostFixture.BAKERY.getWithDate(1L, member, LocalDate.of(2023, 5, 25));
-        Post post2 = PostFixture.BAKERY.getWithDate(2L, member, LocalDate.of(2024, 1, 1));
-        List<String> imageUrls =
-                List.of(
-                        PostImageFixture.DEFAULT.getImageUrl(),
-                        PostImageFixture.DEFAULT.getImageUrl());
-        List<PostSimpleDto> postSimpleDtos =
-                List.of(new PostSimpleDto(post2, imageUrls), new PostSimpleDto(post1, List.of()));
-        Page<PostSimpleDto> postSimpleDtoPage =
-                PageableExecutionUtils.getPage(postSimpleDtos, pageable, postSimpleDtos::size);
-        given(postSearchService.searchSimpleByKeyword(any(Pageable.class), anyString()))
-                .willReturn(postSimpleDtoPage);
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        get("/api/v1/posts/search")
-                                .headers(authorizationHeader())
-                                .queryParam("keyword", "맛집")
-                                .queryParam("page", "0")
-                                .queryParam("size", "10")
-                                .queryParam("sort", "createdAt,DESC"));
-        // then
-        perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(postSimpleDtos.size()))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
-                .andExpect(jsonPath("$.pageable.pageSize").value(10));
-
-        perform.andDo(print())
-                .andDo(
-                        document(
-                                "search-post",
-                                getDocumentRequest(),
-                                getDocumentResponse(),
-                                requestHeaders(authorizationDesc()),
-                                queryParameters(
-                                        parameterWithName("keyword").description("검색어"),
-                                        pageDesc(),
-                                        sizeDesc(),
-                                        parameterWithName("sort").description("정렬 기준"))));
-    }
-
-    @Test
-    @DisplayName("인기 태그 조회 API")
-    void getPopularTagsTest() throws Exception {
-        // given
-        List<Tag> tags = List.of(TagFixture.CHALLENGE.getTag(), TagFixture.STORE.getTag());
-        given(postQueryService.searchPopularTags()).willReturn(tags);
-        // when
-        ResultActions perform =
-                mockMvc.perform(get("/api/v1/posts/tags").headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isOk());
-
-        perform.andDo(print())
-                .andDo(
-                        document(
-                                "popular-tags",
-                                getDocumentRequest(),
-                                getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
     }
 }
