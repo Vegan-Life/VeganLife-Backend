@@ -65,11 +65,11 @@ public interface RecipeMapper {
                         .map(ingredient -> toRecipeIngredient(ingredient, recipe))
                         .toList();
         List<RecipeDescription> descriptions =
-                IntStream.range(1, request.descriptions().size())
+                IntStream.range(0, request.descriptions().size())
                         .mapToObj(
                                 idx ->
                                         this.toRecipeDescription(
-                                                idx, request.descriptions().get(idx), recipe))
+                                                idx + 1, request.descriptions().get(idx), recipe))
                         .toList();
 
         recipe.update(recipeTypes, recipeImages, ingredients, descriptions);
