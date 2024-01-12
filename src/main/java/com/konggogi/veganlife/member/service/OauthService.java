@@ -28,7 +28,7 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String NAVER_USER_INFO_URI;
 
-    public Member createMember(OauthProvider provider, String oauthToken) {
+    public Member userAttributesToMember(OauthProvider provider, String oauthToken) {
         Map<String, Object> userAttributes = getUserAttributes(provider, oauthToken);
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
