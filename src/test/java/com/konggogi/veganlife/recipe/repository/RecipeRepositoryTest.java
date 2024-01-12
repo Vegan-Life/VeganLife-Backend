@@ -99,6 +99,45 @@ public class RecipeRepositoryTest {
         assertThat(found.getDescriptions().get(2).getSequence()).isEqualTo(3);
     }
 
+    @Test
+    @DisplayName("vegetarian type 기반으로 Recipe 레코드를 랜덤 조회한다.")
+    void findAllRandomTest() {
+
+        List<Recipe> recipes =
+                List.of(
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO_OVO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO_OVO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO_OVO.get())));
+        recipeRepository.saveAll(recipes);
+        em.clear();
+
+        List<Recipe> found1 = recipeRepository.findAllRandomByVegetarianType(VegetarianType.OVO);
+        List<Recipe> found2 =
+                recipeRepository.findAllRandomByVegetarianType(VegetarianType.LACTO_OVO);
+        List<Recipe> found3 = recipeRepository.findAllRandomByVegetarianType(VegetarianType.LACTO);
+
+        assertThat(found1.size()).isEqualTo(4);
+        assertThat(found2.size()).isEqualTo(3);
+        assertThat(found3.size()).isEqualTo(2);
+    }
+
     private Recipe createRecipe(List<RecipeType> recipeType) {
 
         List<RecipeType> recipeTypes = new ArrayList<>(recipeType);
