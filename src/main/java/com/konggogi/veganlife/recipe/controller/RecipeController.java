@@ -54,7 +54,7 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/me/recommend")
+    @GetMapping("/recommend")
     public ResponseEntity<List<RecipeResponse>> getRecommendedRecipe(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
