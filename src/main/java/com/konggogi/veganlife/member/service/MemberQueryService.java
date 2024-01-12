@@ -31,8 +31,10 @@ public class MemberQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
-    public Optional<Member> search(String email) {
-        return memberRepository.findByEmail(email);
+    public Member search(String email) {
+        return memberRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
     public Optional<RefreshToken> searchRefreshToken(Long memberId) {
@@ -59,13 +61,7 @@ public class MemberQueryService {
 
     public Member findMemberByToken(String token) {
         return jwtUtils.extractUserEmail(token)
-                .map(
-                        email ->
-                                search(email)
-                                        .orElseThrow(
-                                                () ->
-                                                        new NotFoundEntityException(
-                                                                ErrorCode.NOT_FOUND_MEMBER)))
+                .map(this::search)
                 .orElseThrow(() -> new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
     }
 }

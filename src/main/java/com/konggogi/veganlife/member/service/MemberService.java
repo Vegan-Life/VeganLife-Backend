@@ -37,8 +37,8 @@ public class MemberService {
     private final MemberMapper memberMapper;
 
     public Member addIfNotPresent(String email) {
-        return memberQueryService
-                .search(email)
+        return memberRepository
+                .findByEmail(email)
                 .orElseGet(() -> memberRepository.save(memberMapper.toMember(email)));
     }
 
