@@ -4,7 +4,6 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
@@ -64,17 +63,6 @@ public class MemberService {
                 infoRequest.height(),
                 infoRequest.weight());
         return member;
-    }
-
-    public void saveRefreshToken(Long memberId, String token) {
-        refreshTokenRepository
-                .findRefreshTokenByMemberId(memberId)
-                .ifPresentOrElse(
-                        refreshToken -> refreshToken.updateToken(token),
-                        () -> {
-                            RefreshToken newRefreshToken = new RefreshToken(token, memberId);
-                            refreshTokenRepository.save(newRefreshToken);
-                        });
     }
 
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
