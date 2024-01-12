@@ -40,9 +40,8 @@ public class RecipeSearchService {
 
         Member member = memberQueryService.search(memberId);
 
-        return recipeQueryService.searchAllRandomByRecipeType(member.getVegetarianType())
-                .stream().map(recipeMapper::toRecipeResponse)
+        return recipeQueryService.searchAllRandomByRecipeType(member.getVegetarianType()).stream()
+                .map(recipeMapper::toRecipeResponse)
                 .toList();
     }
-
 }

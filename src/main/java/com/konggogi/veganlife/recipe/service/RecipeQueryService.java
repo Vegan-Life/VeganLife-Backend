@@ -34,6 +34,6 @@ public class RecipeQueryService {
 
     public List<Recipe> searchAllRandomByRecipeType(VegetarianType vegetarianType) {
 
-        return recipeRepository.findAllRandom(vegetarianType);
+        return recipeRepository.findAllRandomByVegetarianType(vegetarianType);
     }
 }

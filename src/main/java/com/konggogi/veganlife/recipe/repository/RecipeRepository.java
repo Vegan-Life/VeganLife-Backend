@@ -20,6 +20,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                     + " where (t.vegetarianType = :vegetarianType or :vegetarianType is null))")
     Page<Recipe> findAllByRecipeTypes(VegetarianType vegetarianType, Pageable pageable);
 
-    @Query(value = "select * from recipe where recipe.vegetarianType = :vegetarianType order by rand() limit 4", nativeQuery = true)
-    List<Recipe> findAllRandom(VegetarianType vegetarianType);
+    @Query(
+            value =
+                    " select * from recipe"
+                            + " where recipe_id"
+                            + " in (select recipe_id from recipe_type where vegetarian_type = :#{#vegetarianType.name()})"
+                            + " order by rand() limit 4",
+            nativeQuery = true)
+    List<Recipe> findAllRandomByVegetarianType(VegetarianType vegetarianType);
 }
