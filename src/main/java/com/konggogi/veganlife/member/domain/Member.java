@@ -25,7 +25,6 @@ public class Member extends TimeStamped {
     private String nickname;
 
     private String profileImageUrl;
-
     private Integer birthYear;
 
     @Enumerated(EnumType.STRING)
@@ -39,9 +38,7 @@ public class Member extends TimeStamped {
     private Role role;
 
     private Integer height;
-
     private Integer weight;
-
     private Integer dailyCarbs;
     private Integer dailyProtein;
     private Integer dailyFat;
