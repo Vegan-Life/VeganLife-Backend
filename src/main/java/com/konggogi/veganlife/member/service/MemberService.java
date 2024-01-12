@@ -36,7 +36,7 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
 
-    public Member add(String email) {
+    public Member addIfNotPresent(String email) {
         return memberRepository
                 .findByEmail(email)
                 .orElseGet(

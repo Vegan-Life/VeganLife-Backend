@@ -29,11 +29,11 @@ public class OauthController {
             @PathVariable OauthProvider provider, @RequestBody OauthRequest oauthRequest) {
         String userEmail =
                 oauthService.createMember(provider, oauthRequest.accessToken()).getEmail();
-        Member savedMember = memberService.add(userEmail);
+        Member member = memberService.addIfNotPresent(userEmail);
         String accessToken = jwtProvider.createToken(userEmail);
         String refreshToken = jwtProvider.createRefreshToken(userEmail);
-        refreshTokenService.addOrUpdate(savedMember.getId(), refreshToken);
+        refreshTokenService.addOrUpdate(member.getId(), refreshToken);
         return ResponseEntity.ok(
-                memberMapper.toOauthLoginResponse(savedMember, accessToken, refreshToken));
+                memberMapper.toOauthLoginResponse(member, accessToken, refreshToken));
     }
 }
