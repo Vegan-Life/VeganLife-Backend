@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenException;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
@@ -19,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class OauthService {
     private final OauthUserInfoFactory oauthUserInfoFactory;
+    private final MemberMapper memberMapper;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
@@ -31,7 +33,7 @@ public class OauthService {
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
-        return Member.builder().email(email).build();
+        return memberMapper.toMember(email);
     }
 
     private Map<String, Object> getUserAttributes(OauthProvider provider, String oauthToken) {

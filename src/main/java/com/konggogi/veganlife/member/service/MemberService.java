@@ -10,6 +10,7 @@ import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
@@ -34,13 +35,14 @@ public class MemberService {
     private final MealDataService mealDataService;
     private final MealLogService mealLogService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberMapper memberMapper;
 
     public Member add(String email) {
         return memberRepository
                 .findByEmail(email)
                 .orElseGet(
                         () -> {
-                            Member member = Member.builder().email(email).build();
+                            Member member = memberMapper.toMember(email);
                             return memberRepository.save(member);
                         });
     }

@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
+    Member toMember(String email);
+
     OauthLoginResponse toOauthLoginResponse(Member member, String accessToken, String refreshToken);
 
     @Mapping(target = "imageUrl", source = "member.profileImageUrl")
