@@ -6,10 +6,12 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
+import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,17 +31,21 @@ public class MemberQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
-    public Member searchByEmail(String userEmail) {
+    public Member search(String email) {
         return memberRepository
-                .findByEmail(userEmail)
+                .findByEmail(email)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+    }
+
+    public Optional<RefreshToken> searchRefreshToken(Long memberId) {
+        return refreshTokenRepository.findByMemberId(memberId);
     }
 
     public String reissueToken(String refreshToken) {
         jwtUtils.validateToken(refreshToken);
         Member member = findMemberByToken(refreshToken);
         return refreshTokenRepository
-                .findRefreshTokenByMemberId(member.getId())
+                .findByMemberId(member.getId())
                 .map(
                         token -> {
                             if (!token.isSameToken(refreshToken)) {
@@ -55,7 +61,7 @@ public class MemberQueryService {
 
     public Member findMemberByToken(String token) {
         return jwtUtils.extractUserEmail(token)
-                .map(this::searchByEmail)
+                .map(this::search)
                 .orElseThrow(() -> new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
     }
 }

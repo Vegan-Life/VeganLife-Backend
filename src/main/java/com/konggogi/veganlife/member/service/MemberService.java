@@ -4,12 +4,12 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
@@ -34,15 +34,12 @@ public class MemberService {
     private final MealDataService mealDataService;
     private final MealLogService mealLogService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberMapper memberMapper;
 
-    public Member addMember(String email) {
+    public Member addIfNotPresent(String email) {
         return memberRepository
                 .findByEmail(email)
-                .orElseGet(
-                        () -> {
-                            Member member = Member.builder().email(email).build();
-                            return memberRepository.save(member);
-                        });
+                .orElseGet(() -> memberRepository.save(memberMapper.toMember(email)));
     }
 
     public void removeMember(Long memberId) {
@@ -62,17 +59,6 @@ public class MemberService {
                 infoRequest.height(),
                 infoRequest.weight());
         return member;
-    }
-
-    public void saveRefreshToken(Long memberId, String token) {
-        refreshTokenRepository
-                .findRefreshTokenByMemberId(memberId)
-                .ifPresentOrElse(
-                        refreshToken -> refreshToken.updateToken(token),
-                        () -> {
-                            RefreshToken newRefreshToken = new RefreshToken(token, memberId);
-                            refreshTokenRepository.save(newRefreshToken);
-                        });
     }
 
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
