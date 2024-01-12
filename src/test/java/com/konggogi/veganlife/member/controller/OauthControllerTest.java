@@ -4,7 +4,6 @@ import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRe
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -15,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.controller.dto.request.OauthRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
@@ -23,7 +21,7 @@ import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberService;
 import com.konggogi.veganlife.member.service.OauthService;
-import com.konggogi.veganlife.member.service.RefreshTokenService;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,24 +34,19 @@ import org.springframework.test.web.servlet.ResultActions;
 class OauthControllerTest extends RestDocsTest {
     @MockBean OauthService oauthService;
     @MockBean MemberService memberService;
-    @MockBean RefreshTokenService refreshTokenService;
-    @MockBean JwtProvider jwtProvider;
 
     @Test
     @DisplayName("소셜 로그인 API")
     void loginTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
-        String email = member.getEmail();
         String accessToken = "Bearer accessToken";
         String refreshToken = "Bearer refreshToken";
         OauthRequest oauthRequest = new OauthRequest("oauthAccessToken");
+        MemberLoginDto loginDto = new MemberLoginDto(member, accessToken, refreshToken);
         given(oauthService.userAttributesToMember(any(OauthProvider.class), anyString()))
                 .willReturn(member);
-        given(memberService.addIfNotPresent(anyString())).willReturn(member);
-        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
-        given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
-        doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
+        given(memberService.login(anyString())).willReturn(loginDto);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -64,7 +57,7 @@ class OauthControllerTest extends RestDocsTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.hasAdditionalInfo").value(false))
-                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.email").value(member.getEmail()))
                 .andExpect(jsonPath("$.accessToken").value(accessToken))
                 .andExpect(jsonPath("$.refreshToken").value(refreshToken));
 

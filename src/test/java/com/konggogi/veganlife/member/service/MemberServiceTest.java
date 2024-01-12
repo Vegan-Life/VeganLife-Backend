@@ -12,6 +12,7 @@ import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
@@ -25,6 +26,7 @@ import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import com.konggogi.veganlife.notification.service.NotificationService;
 import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -49,32 +51,48 @@ class MemberServiceTest {
     @Mock CommentService commentService;
     @Mock MealDataService mealDataService;
     @Mock MealLogService mealLogService;
+    @Mock JwtProvider jwtProvider;
+    @Mock RefreshTokenService refreshTokenService;
     @Spy MemberMapper memberMapper = new MemberMapperImpl();
     @InjectMocks MemberService memberService;
     private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
     @Test
-    @DisplayName("회원 가입")
-    void addIfNotPresentTest() {
+    @DisplayName("로그인 - 새로 가입한 경우")
+    void loginAndJoinTest() {
         // given
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
         given(memberRepository.save(any(Member.class))).willReturn(member);
+        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
+        doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when
-        Member result = memberService.addIfNotPresent(member.getEmail());
+        MemberLoginDto result = memberService.login(member.getEmail());
         // then
-        assertThat(result).isEqualTo(member);
+        assertThat(result.member()).isEqualTo(member);
+        assertThat(result.accessToken()).isEqualTo(accessToken);
+        assertThat(result.refreshToken()).isEqualTo(refreshToken);
         then(memberRepository).should().save(any(Member.class));
     }
 
     @Test
-    @DisplayName("회원 가입 - 이미 가입한 경우 기존 Member 반환")
-    void notAddIfPresentTest() {
+    @DisplayName("로그인 - 이미 가입한 경우")
+    void loginNotJoinTest() {
         // given
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
+        doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when
-        Member result = memberService.addIfNotPresent(member.getEmail());
+        MemberLoginDto result = memberService.login(member.getEmail());
         // then
-        assertThat(result).isEqualTo(member);
+        assertThat(result.member()).isEqualTo(member);
+        assertThat(result.accessToken()).isEqualTo(accessToken);
+        assertThat(result.refreshToken()).isEqualTo(refreshToken);
         then(memberRepository).should(never()).save(any(Member.class));
     }
 
