@@ -11,11 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class RefreshTokenService {
+    private final MemberQueryService memberQueryService;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void add(Long memberId, String token) {
-        refreshTokenRepository
-                .findRefreshTokenByMemberId(memberId)
+        memberQueryService
+                .searchRefreshToken(memberId)
                 .ifPresentOrElse(
                         refreshToken -> refreshToken.updateToken(token),
                         () -> {
