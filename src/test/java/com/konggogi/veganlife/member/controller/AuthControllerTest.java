@@ -2,10 +2,12 @@ package com.konggogi.veganlife.member.controller;
 
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
@@ -14,9 +16,8 @@ import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
-import com.konggogi.veganlife.member.service.MemberQueryService;
+import com.konggogi.veganlife.member.service.RefreshTokenService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,19 +27,17 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTest extends RestDocsTest {
-    @MockBean MemberQueryService memberQueryService;
+    @MockBean RefreshTokenService refreshTokenService;
     @MockBean JwtUtils jwtUtils;
-
-    private final String refreshToken = "refreshToken";
+    private final String refreshToken = "Bearer refreshToken";
 
     @Test
-    @DisplayName("accessToken 재발급 API")
+    @DisplayName("AccessToken 재발급 API")
     void reissueTokenTest() throws Exception {
         // given
-        String accessToken = "accessToken";
+        String accessToken = "Bearer accessToken";
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
-        given(memberQueryService.reissueToken(refreshToken)).willReturn(accessToken);
+        given(refreshTokenService.reissueAccessToken(anyString())).willReturn(accessToken);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -46,18 +45,19 @@ class AuthControllerTest extends RestDocsTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(toJson(request)));
         // then
-        perform.andExpect(status().isOk());
+        perform.andExpect(status().isOk()).andExpect(jsonPath("$.accessToken").value(accessToken));
 
         perform.andDo(print())
                 .andDo(document("reissue-token", getDocumentRequest(), getDocumentResponse()));
     }
 
     @Test
-    @DisplayName("accessToken 재발급 API - 유효하지 않은 refreshToken 예외 발생")
+    @DisplayName("AccessToken 재발급 API - Invalid Jwt caused by Fail extract bearerToken")
     void reissueTokenInvalidTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.empty());
+        given(refreshTokenService.reissueAccessToken(anyString()))
+                .willThrow(new InvalidJwtException(ErrorCode.INVALID_TOKEN));
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -72,13 +72,12 @@ class AuthControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("accessToken 재발급 API - refreshToken 불일치 예외 발생")
-    void reissueTokenMismatchTest() throws Exception {
+    @DisplayName("accessToken 재발급 API - Invalid Jwt caused by Fail extract email")
+    void reissueTokenExtractEmailTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
-        given(memberQueryService.reissueToken(refreshToken))
-                .willThrow(new MismatchTokenException(ErrorCode.MISMATCH_REFRESH_TOKEN));
+        given(refreshTokenService.reissueAccessToken(anyString()))
+                .willThrow(new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -86,39 +85,18 @@ class AuthControllerTest extends RestDocsTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(toJson(request)));
         // then
-        perform.andExpect(status().isBadRequest());
-
-        perform.andDo(print()).andDo(document("reissue-token-mismatch", getDocumentResponse()));
-    }
-
-    @Test
-    @DisplayName("accessToken 재발급 API - 없는 refreshToken 예외 발생")
-    void reissueTokenNotFoundRefreshTokenTest() throws Exception {
-        // given
-        ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
-        given(memberQueryService.reissueToken(refreshToken))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
-        // when
-        ResultActions perform =
-                mockMvc.perform(
-                        post("/api/v1/auth/reissue")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
-        // then
-        perform.andExpect(status().isNotFound());
+        perform.andExpect(status().isUnauthorized());
 
         perform.andDo(print())
-                .andDo(document("reissue-token-not-found-token", getDocumentResponse()));
+                .andDo(document("reissue-token-not-found-user-info", getDocumentResponse()));
     }
 
     @Test
-    @DisplayName("accessToken 재발급 API - 없는 회원 예외 발생")
+    @DisplayName("accessToken 재발급 API - Not Found Member")
     void reissueTokenNotFoundMemberTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
-        given(memberQueryService.reissueToken(refreshToken))
+        given(refreshTokenService.reissueAccessToken(anyString()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
@@ -134,13 +112,12 @@ class AuthControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("accessToken 재발급 API - 토큰에서 이메일 추출 실패 예외 발생")
-    void reissueTokenExtractEmailTest() throws Exception {
+    @DisplayName("AccessToken 재발급 API - Not Found RefreshToken")
+    void reissueTokenNotFoundRefreshTokenTest() throws Exception {
         // given
         ReissueRequest request = new ReissueRequest(refreshToken);
-        given(jwtUtils.extractBearerToken(refreshToken)).willReturn(Optional.of(refreshToken));
-        given(memberQueryService.reissueToken(refreshToken))
-                .willThrow(new InvalidJwtException(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
+        given(refreshTokenService.reissueAccessToken(anyString()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -148,9 +125,28 @@ class AuthControllerTest extends RestDocsTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(toJson(request)));
         // then
-        perform.andExpect(status().isUnauthorized());
+        perform.andExpect(status().isNotFound());
 
         perform.andDo(print())
-                .andDo(document("reissue-token-not-found-user-info", getDocumentResponse()));
+                .andDo(document("reissue-token-not-found-token", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("AccessToken 재발급 API - Mismatch")
+    void reissueTokenMismatchTest() throws Exception {
+        // given
+        ReissueRequest request = new ReissueRequest(refreshToken);
+        given(refreshTokenService.reissueAccessToken(anyString()))
+                .willThrow(new MismatchTokenException(ErrorCode.MISMATCH_REFRESH_TOKEN));
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        post("/api/v1/auth/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(request)));
+        // then
+        perform.andExpect(status().isBadRequest());
+
+        perform.andDo(print()).andDo(document("reissue-token-mismatch", getDocumentResponse()));
     }
 }
