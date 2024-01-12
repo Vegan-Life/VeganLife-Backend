@@ -26,9 +26,12 @@ public class RefreshTokenService {
                             log.debug("Refresh token updated for memberId: {}", memberId);
                         },
                         () -> {
-                            refreshTokenRepository.save(
-                                    memberMapper.toRefreshToken(memberId, token));
+                            add(memberId, token);
                             log.debug("New refresh token created for memberId: {}", memberId);
                         });
+    }
+
+    private void add(Long memberId, String token) {
+        refreshTokenRepository.save(memberMapper.toRefreshToken(memberId, token));
     }
 }
