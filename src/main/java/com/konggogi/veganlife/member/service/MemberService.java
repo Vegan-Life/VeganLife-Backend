@@ -35,7 +35,7 @@ public class MemberService {
     private final MealLogService mealLogService;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public Member addMember(String email) {
+    public Member add(String email) {
         return memberRepository
                 .findByEmail(email)
                 .orElseGet(

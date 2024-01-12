@@ -26,7 +26,7 @@ public class OauthController {
     public ResponseEntity<OauthLoginResponse> login(
             @PathVariable OauthProvider provider, @RequestBody OauthRequest oauthRequest) {
         Member member = oauthService.createMemberFromToken(provider, oauthRequest.accessToken());
-        Member savedMember = memberService.addMember(member.getEmail());
+        Member savedMember = memberService.add(member.getEmail());
         String accessToken = jwtProvider.createToken(savedMember.getEmail());
         String refreshToken = jwtProvider.createRefreshToken(savedMember.getEmail());
         memberService.saveRefreshToken(savedMember.getId(), refreshToken);
