@@ -69,7 +69,7 @@ class MemberQueryServiceTest {
         String email = member.getEmail();
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
         // when
-        Member result = memberQueryService.search(email);
+        Member result = memberQueryService.searchByEmail(email);
         // then
         assertThat(result).isEqualTo(member);
         then(memberRepository).should().findByEmail(eq(email));
@@ -82,7 +82,7 @@ class MemberQueryServiceTest {
         String email = member.getEmail();
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
         // when, then
-        assertThatThrownBy(() -> memberQueryService.search(email))
+        assertThatThrownBy(() -> memberQueryService.searchByEmail(email))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findByEmail(eq(email));
