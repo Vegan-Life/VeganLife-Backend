@@ -32,7 +32,7 @@ public class OauthController {
         Member savedMember = memberService.add(userEmail);
         String accessToken = jwtProvider.createToken(userEmail);
         String refreshToken = jwtProvider.createRefreshToken(userEmail);
-        refreshTokenService.add(savedMember.getId(), refreshToken);
+        refreshTokenService.addOrUpdate(savedMember.getId(), refreshToken);
         return ResponseEntity.ok(
                 memberMapper.toOauthLoginResponse(savedMember, accessToken, refreshToken));
     }

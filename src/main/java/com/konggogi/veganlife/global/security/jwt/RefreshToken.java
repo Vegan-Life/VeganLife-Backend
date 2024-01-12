@@ -23,12 +23,12 @@ public class RefreshToken {
     private String token;
     private Long memberId;
 
-    public RefreshToken(String token, Long id) {
+    public RefreshToken(String token, Long memberId) {
         this.token = token;
-        this.memberId = id;
+        this.memberId = memberId;
     }
 
-    public void updateToken(String token) {
+    public void update(String token) {
         this.token = token;
     }
 
