@@ -12,7 +12,7 @@ import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
@@ -20,10 +20,13 @@ import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapperImpl;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import com.konggogi.veganlife.notification.service.NotificationService;
 import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -33,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,34 +51,49 @@ class MemberServiceTest {
     @Mock CommentService commentService;
     @Mock MealDataService mealDataService;
     @Mock MealLogService mealLogService;
+    @Mock JwtProvider jwtProvider;
+    @Mock RefreshTokenService refreshTokenService;
+    @Spy MemberMapper memberMapper = new MemberMapperImpl();
     @InjectMocks MemberService memberService;
     private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
     @Test
-    @DisplayName("이미 가입한 회원인 경우 기존 Member 반환")
-    void addExistingMemberTest() {
+    @DisplayName("로그인 - 새로 가입한 경우")
+    void loginAndJoinTest() {
         // given
-        String email = member.getEmail();
-        given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
+        given(memberRepository.save(any(Member.class))).willReturn(member);
+        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
+        doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when
-        Member existingMember = memberService.addMember(email);
+        MemberLoginDto result = memberService.login(member.getEmail());
         // then
-        assertThat(existingMember).isEqualTo(member);
-        then(memberRepository).should(never()).save(any(Member.class));
+        assertThat(result.member()).isEqualTo(member);
+        assertThat(result.accessToken()).isEqualTo(accessToken);
+        assertThat(result.refreshToken()).isEqualTo(refreshToken);
+        then(memberRepository).should().save(any(Member.class));
     }
 
     @Test
-    @DisplayName("처음 가입할 경우 Member 생성 및 저장")
-    void addNewMemberTest() {
+    @DisplayName("로그인 - 이미 가입한 경우")
+    void loginNotJoinTest() {
         // given
-        String email = member.getEmail();
-        given(memberRepository.findByEmail(email)).willReturn(Optional.empty());
-        given(memberRepository.save(any(Member.class))).willReturn(member);
+        String accessToken = "accessToken";
+        String refreshToken = "refreshToken";
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
+        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
+        doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when
-        Member newMember = memberService.addMember(email);
+        MemberLoginDto result = memberService.login(member.getEmail());
         // then
-        assertThat(member).isEqualTo(newMember);
-        then(memberRepository).should().save(any(Member.class));
+        assertThat(result.member()).isEqualTo(member);
+        assertThat(result.accessToken()).isEqualTo(accessToken);
+        assertThat(result.refreshToken()).isEqualTo(refreshToken);
+        then(memberRepository).should(never()).save(any(Member.class));
     }
 
     @Test
@@ -133,39 +152,6 @@ class MemberServiceTest {
                 .isInstanceOf(DuplicatedNicknameException.class);
         then(memberRepository).should().findByNickname(nickname);
         then(memberRepository).should(never()).save(any(Member.class));
-    }
-
-    @Test
-    @DisplayName("기존 RefreshToken 업데이트")
-    void updateRefreshTokenTest() {
-        // given
-        Long memberId = member.getId();
-        String oldToken = "oldRefreshToken";
-        String newToken = "newRefreshToken";
-        RefreshToken refreshToken = new RefreshToken(oldToken, memberId);
-        given(refreshTokenRepository.findRefreshTokenByMemberId(memberId))
-                .willReturn(Optional.of(refreshToken));
-        // when
-        memberService.saveRefreshToken(memberId, newToken);
-        // then
-        then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
-        then(memberRepository).should(never()).save(any(Member.class));
-        assertThat(refreshToken.getToken()).isEqualTo(newToken);
-    }
-
-    @Test
-    @DisplayName("새로 RefreshToken 저장")
-    void saveRefreshTokenTest() {
-        // given
-        Long memberId = member.getId();
-        String newToken = "newRefreshToken";
-        given(refreshTokenRepository.findRefreshTokenByMemberId(memberId))
-                .willReturn(Optional.empty());
-        // when
-        memberService.saveRefreshToken(memberId, newToken);
-        // then
-        then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
-        then(refreshTokenRepository).should().save(any(RefreshToken.class));
     }
 
     @Test

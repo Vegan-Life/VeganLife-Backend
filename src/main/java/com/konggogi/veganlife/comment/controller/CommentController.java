@@ -7,7 +7,6 @@ import com.konggogi.veganlife.comment.controller.dto.response.CommentAddResponse
 import com.konggogi.veganlife.comment.controller.dto.response.CommentDetailsResponse;
 import com.konggogi.veganlife.comment.domain.Comment;
 import com.konggogi.veganlife.comment.domain.mapper.CommentMapper;
-import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentSearchService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.comment.service.dto.CommentDetailsDto;
@@ -21,14 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/posts")
+@RequestMapping("api/v1/posts/{postId}/comments")
 public class CommentController {
     private final CommentService commentService;
-    private final CommentLikeService commentLikeService;
     private final CommentSearchService commentSearchService;
     private final CommentMapper commentMapper;
 
-    @PostMapping("/{postId}/comments")
+    @PostMapping
     public ResponseEntity<CommentAddResponse> addComment(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -37,7 +35,7 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toCommentAddResponse(comment));
     }
 
-    @GetMapping("/{postId}/comments/{commentId}")
+    @GetMapping("/{commentId}")
     public ResponseEntity<CommentDetailsResponse> getCommentDetails(
             @PathVariable Long postId,
             @PathVariable Long commentId,
@@ -47,7 +45,7 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toCommentDetailsResponse(commentDetailsDto));
     }
 
-    @PutMapping("/{postId}/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<Void> modifyComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
@@ -57,30 +55,12 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{postId}/comments/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> removeComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         commentService.remove(userDetails.id(), postId, commentId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{postId}/comments/{commentId}/likes")
-    public ResponseEntity<Void> addCommentLike(
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        commentLikeService.addCommentLike(userDetails.id(), postId, commentId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @DeleteMapping("/{postId}/comments/{commentId}/likes")
-    public ResponseEntity<Void> removeCommentLike(
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        commentLikeService.removeCommentLike(userDetails.id(), postId, commentId);
         return ResponseEntity.noContent().build();
     }
 }

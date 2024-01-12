@@ -1,9 +1,7 @@
 package com.konggogi.veganlife.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -18,6 +16,7 @@ import com.konggogi.veganlife.global.security.jwt.RefreshToken;
 import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
+import com.konggogi.veganlife.member.fixture.RefreshTokenFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
 import java.util.Optional;
@@ -38,21 +37,21 @@ class MemberQueryServiceTest {
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
-    @DisplayName("회원 번호로 조회")
-    void searchTest() {
+    @DisplayName("회원 Id로 Member 조회")
+    void searchByIdTest() {
         // given
         Long memberId = member.getId();
-        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         // when
-        Member foundMember = memberQueryService.search(memberId);
+        Member result = memberQueryService.search(memberId);
         // then
+        assertThat(result).isEqualTo(member);
         then(memberRepository).should().findById(memberId);
-        assertThat(foundMember).isEqualTo(member);
     }
 
     @Test
-    @DisplayName("없는 회원 번호로 조회 시 예외 발생")
-    void searchNotMemberTest() {
+    @DisplayName("회원 Id로 Member 조회 - Not Found Member")
+    void searchByIdNotFoundMemberTest() {
         // given
         Long memberId = member.getId();
         given(memberRepository.findById(anyLong())).willReturn(Optional.empty());
@@ -60,24 +59,25 @@ class MemberQueryServiceTest {
         assertThatThrownBy(() -> memberQueryService.search(memberId))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-        then(memberRepository).should().findById(memberId);
+        then(memberRepository).should().findById(eq(memberId));
     }
 
     @Test
-    @DisplayName("이메일로 회원 조회")
+    @DisplayName("회원 email로 Member 조회")
     void searchByEmailTest() {
         // given
         String email = member.getEmail();
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
         // when
-        Member foundMember = memberQueryService.searchByEmail(email);
+        Member result = memberQueryService.searchByEmail(email);
         // then
-        assertThat(foundMember).isEqualTo(member);
+        assertThat(result).isEqualTo(member);
+        then(memberRepository).should().findByEmail(eq(email));
     }
 
     @Test
-    @DisplayName("이메일로 회원 조회 실패")
-    void searchByEmailNotFoundTest() {
+    @DisplayName("회원 email로 Member 조회 - Not Found Member")
+    void searchByEmailNotFoundMemberTest() {
         // given
         String email = member.getEmail();
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
@@ -85,7 +85,15 @@ class MemberQueryServiceTest {
         assertThatThrownBy(() -> memberQueryService.searchByEmail(email))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-        then(memberRepository).should().findByEmail(anyString());
+        then(memberRepository).should().findByEmail(eq(email));
+    }
+
+    @Test
+    @DisplayName("회원 RefreshToken 조회")
+    void searchRefreshToken() {
+        // when, then
+        assertThatNoException()
+                .isThrownBy(() -> memberQueryService.searchRefreshToken(member.getId()));
     }
 
     @Test
@@ -97,18 +105,18 @@ class MemberQueryServiceTest {
         String token = "refreshToken";
         String bearerToken = JwtUtils.BEARER_PREFIX + token;
         String accessToken = "accessToken";
-        RefreshToken refreshToken = new RefreshToken(bearerToken, memberId);
+        RefreshToken refreshToken = RefreshTokenFixture.DEFAULT.getWithToken(memberId, bearerToken);
         doNothing().when(jwtUtils).validateToken(token);
         given(jwtUtils.extractUserEmail(token)).willReturn(Optional.of(email));
         given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
-        given(refreshTokenRepository.findRefreshTokenByMemberId(memberId))
+        given(refreshTokenRepository.findByMemberId(memberId))
                 .willReturn(Optional.of(refreshToken));
         given(jwtProvider.createToken(email)).willReturn(accessToken);
         // when
         String reissueToken = memberQueryService.reissueToken(token);
         // then
         assertThat(reissueToken).isEqualTo(accessToken);
-        then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
+        then(refreshTokenRepository).should().findByMemberId(memberId);
         then(jwtProvider).should().createToken(email);
     }
 
@@ -122,13 +130,12 @@ class MemberQueryServiceTest {
         doNothing().when(jwtUtils).validateToken(token);
         given(jwtUtils.extractUserEmail(token)).willReturn(Optional.of(email));
         given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
-        given(refreshTokenRepository.findRefreshTokenByMemberId(memberId))
-                .willReturn(Optional.empty());
+        given(refreshTokenRepository.findByMemberId(memberId)).willReturn(Optional.empty());
         // when, then
         assertThatThrownBy(() -> memberQueryService.reissueToken(token))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_REFRESH_TOKEN.getDescription());
-        then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
+        then(refreshTokenRepository).should().findByMemberId(memberId);
         then(jwtProvider).should(never()).createToken(email);
     }
 
@@ -140,17 +147,17 @@ class MemberQueryServiceTest {
         String email = member.getEmail();
         String token = "refreshToken";
         String bearerToken = JwtUtils.BEARER_PREFIX + "mismatch" + token;
-        RefreshToken refreshToken = new RefreshToken(bearerToken, memberId);
+        RefreshToken refreshToken = RefreshTokenFixture.DEFAULT.getWithToken(memberId, bearerToken);
         doNothing().when(jwtUtils).validateToken(token);
         given(jwtUtils.extractUserEmail(token)).willReturn(Optional.of(email));
         given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
-        given(refreshTokenRepository.findRefreshTokenByMemberId(memberId))
+        given(refreshTokenRepository.findByMemberId(memberId))
                 .willReturn(Optional.of(refreshToken));
         // when, then
         assertThatThrownBy(() -> memberQueryService.reissueToken(token))
                 .isInstanceOf(MismatchTokenException.class)
                 .hasMessageContaining(ErrorCode.MISMATCH_REFRESH_TOKEN.getDescription());
-        then(refreshTokenRepository).should().findRefreshTokenByMemberId(memberId);
+        then(refreshTokenRepository).should().findByMemberId(memberId);
         then(jwtProvider).should(never()).createToken(email);
     }
 
@@ -167,7 +174,7 @@ class MemberQueryServiceTest {
         assertThatThrownBy(() -> memberQueryService.reissueToken(token))
                 .isInstanceOf(InvalidJwtException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_USER_INFO_TOKEN.getDescription());
-        then(refreshTokenRepository).should(never()).findRefreshTokenByMemberId(memberId);
+        then(refreshTokenRepository).should(never()).findByMemberId(memberId);
         then(jwtProvider).should(never()).createToken(email);
     }
 
@@ -225,23 +232,5 @@ class MemberQueryServiceTest {
                 .hasMessageContaining(ErrorCode.NOT_FOUND_USER_INFO_TOKEN.getDescription());
         then(jwtUtils).should().extractUserEmail(anyString());
         then(memberRepository).should(never()).findByEmail(anyString());
-    }
-
-    @Test
-    @DisplayName("토큰에서 추출한 이메일로 회원 조회 시 회원을 찾을 수 없으면 예외 발생")
-    void findMemberByTokenNotFoundMemberTest() {
-        // given
-        String email = member.getEmail();
-        String token = "accessToken";
-        given(jwtUtils.extractUserEmail(anyString())).willReturn(Optional.of(email));
-        given(memberRepository.findByEmail(anyString()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        // when, then
-        assertThatThrownBy(() -> memberQueryService.findMemberByToken(token))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-        // then
-        then(jwtUtils).should().extractUserEmail(anyString());
-        then(memberRepository).should().findByEmail(anyString());
     }
 }

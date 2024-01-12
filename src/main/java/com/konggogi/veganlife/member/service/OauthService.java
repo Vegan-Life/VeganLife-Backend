@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.exception.InvalidOauthTokenException;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
 import com.konggogi.veganlife.member.domain.oauth.OauthUserInfo;
 import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
@@ -19,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class OauthService {
     private final OauthUserInfoFactory oauthUserInfoFactory;
+    private final MemberMapper memberMapper;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
@@ -26,21 +28,21 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String NAVER_USER_INFO_URI;
 
-    public Member createMemberFromToken(OauthProvider provider, String token) {
-        Map<String, Object> userAttributes = getUserAttributesByToken(provider, token);
+    public Member userAttributesToMember(OauthProvider provider, String oauthToken) {
+        Map<String, Object> userAttributes = getUserAttributes(provider, oauthToken);
         OauthUserInfo oauthUserInfo =
                 oauthUserInfoFactory.createOauthUserInfo(provider, userAttributes);
         String email = oauthUserInfo.getEmail();
-        return Member.builder().email(email).build();
+        return memberMapper.toMember(email);
     }
 
-    private Map<String, Object> getUserAttributesByToken(OauthProvider provider, String token) {
+    private Map<String, Object> getUserAttributes(OauthProvider provider, String oauthToken) {
         String userInfoUri = getUserInfoUri(provider);
         try {
             return WebClient.create()
                     .get()
                     .uri(userInfoUri)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                    .headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken))
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();

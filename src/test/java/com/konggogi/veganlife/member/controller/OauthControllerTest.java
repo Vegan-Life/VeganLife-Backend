@@ -2,10 +2,8 @@ package com.konggogi.veganlife.member.controller;
 
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -16,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.controller.dto.request.OauthRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.oauth.OauthProvider;
@@ -24,6 +21,7 @@ import com.konggogi.veganlife.member.exception.UnsupportedProviderException;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberService;
 import com.konggogi.veganlife.member.service.OauthService;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,23 +34,19 @@ import org.springframework.test.web.servlet.ResultActions;
 class OauthControllerTest extends RestDocsTest {
     @MockBean OauthService oauthService;
     @MockBean MemberService memberService;
-    @MockBean JwtProvider jwtProvider;
 
     @Test
     @DisplayName("소셜 로그인 API")
     void loginTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
-        String email = member.getEmail();
-        String accessToken = "accessToken";
-        String refreshToken = "refreshToken";
+        String accessToken = "Bearer accessToken";
+        String refreshToken = "Bearer refreshToken";
         OauthRequest oauthRequest = new OauthRequest("oauthAccessToken");
-        given(oauthService.createMemberFromToken(any(OauthProvider.class), anyString()))
+        MemberLoginDto loginDto = new MemberLoginDto(member, accessToken, refreshToken);
+        given(oauthService.userAttributesToMember(any(OauthProvider.class), anyString()))
                 .willReturn(member);
-        given(memberService.addMember(email)).willReturn(member);
-        given(jwtProvider.createToken(email)).willReturn(accessToken);
-        given(jwtProvider.createRefreshToken(email)).willReturn(refreshToken);
-        doNothing().when(memberService).saveRefreshToken(member.getId(), refreshToken);
+        given(memberService.login(anyString())).willReturn(loginDto);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -63,7 +57,7 @@ class OauthControllerTest extends RestDocsTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.hasAdditionalInfo").value(false))
-                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.email").value(member.getEmail()))
                 .andExpect(jsonPath("$.accessToken").value(accessToken))
                 .andExpect(jsonPath("$.refreshToken").value(refreshToken));
 
@@ -75,7 +69,8 @@ class OauthControllerTest extends RestDocsTest {
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc()),
                                 pathParameters(
-                                        parameterWithName("provider").description("Oauth 제공자"))));
+                                        parameterWithName("provider")
+                                                .description("Oauth 제공자 (naver, kakao)"))));
     }
 
     @Test
@@ -83,7 +78,7 @@ class OauthControllerTest extends RestDocsTest {
     void loginUnsupportedProviderTest() throws Exception {
         // given
         OauthRequest oauthRequest = new OauthRequest("oauthAccessToken");
-        given(oauthService.createMemberFromToken(any(OauthProvider.class), anyString()))
+        given(oauthService.userAttributesToMember(any(OauthProvider.class), anyString()))
                 .willThrow(new UnsupportedProviderException(ErrorCode.UNSUPPORTED_PROVIDER));
 
         // when

@@ -14,12 +14,22 @@ include::{docdir}/src/docs/asciidoc/auth.adoc[]
 
 include::{docdir}/src/docs/asciidoc/sse.adoc[]
 
+include::{docdir}/src/docs/asciidoc/my-page.adoc[]
+
+include::{docdir}/src/docs/asciidoc/nutrients.adoc[]
+
 include::{docdir}/src/docs/asciidoc/meal-data.adoc[]
 
 include::{docdir}/src/docs/asciidoc/meal-log.adoc[]
 
 include::{docdir}/src/docs/asciidoc/post.adoc[]
 
+include::{docdir}/src/docs/asciidoc/post-search.adoc[]
+
+include::{docdir}/src/docs/asciidoc/post-like.adoc[]
+
 include::{docdir}/src/docs/asciidoc/comment.adoc[]
+
+include::{docdir}/src/docs/asciidoc/comment-like.adoc[]
 
 include::{docdir}/src/docs/asciidoc/recipe.adoc[]

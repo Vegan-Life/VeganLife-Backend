@@ -1,0 +1,79 @@
+= Comment Like API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+== 댓글 좋아요 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/add-comment-like/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/add-comment-like/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/add-comment-like/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+
+include::{snippets}/add-comment-like/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/add-comment-like-not-found-member/http-response.adoc[]
+
+include::{snippets}/add-comment-like-not-found-post/http-response.adoc[]
+
+include::{snippets}/add-comment-like-not-found-comment/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/add-comment-like-already/http-response.adoc[]
+
+== 댓글 좋아요 취소 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/remove-comment-like/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/remove-comment-like/path-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/remove-comment-like/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+
+include::{snippets}/remove-comment-like/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/remove-comment-like-not-found-member/http-response.adoc[]
+
+include::{snippets}/remove-comment-like-not-found-post/http-response.adoc[]
+
+include::{snippets}/remove-comment-like-not-found-comment/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/remove-comment-like-already/http-response.adoc[]

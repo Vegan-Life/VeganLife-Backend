@@ -4,15 +4,17 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.security.jwt.RefreshToken;
+import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
 import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import com.konggogi.veganlife.notification.service.NotificationService;
 import com.konggogi.veganlife.post.service.PostLikeService;
 import com.konggogi.veganlife.post.service.PostService;
@@ -33,16 +35,17 @@ public class MemberService {
     private final CommentService commentService;
     private final MealDataService mealDataService;
     private final MealLogService mealLogService;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberMapper memberMapper;
 
-    public Member addMember(String email) {
-        return memberRepository
-                .findByEmail(email)
-                .orElseGet(
-                        () -> {
-                            Member member = Member.builder().email(email).build();
-                            return memberRepository.save(member);
-                        });
+    public MemberLoginDto login(String email) {
+        Member member = addIfNotPresent(email);
+        String accessToken = jwtProvider.createToken(email);
+        String refreshToken = jwtProvider.createRefreshToken(email);
+        refreshTokenService.addOrUpdate(member.getId(), refreshToken);
+        return memberMapper.toMemberLoginDto(member, accessToken, refreshToken);
     }
 
     public void removeMember(Long memberId) {
@@ -64,17 +67,6 @@ public class MemberService {
         return member;
     }
 
-    public void saveRefreshToken(Long memberId, String token) {
-        refreshTokenRepository
-                .findRefreshTokenByMemberId(memberId)
-                .ifPresentOrElse(
-                        refreshToken -> refreshToken.updateToken(token),
-                        () -> {
-                            RefreshToken newRefreshToken = new RefreshToken(token, memberId);
-                            refreshTokenRepository.save(newRefreshToken);
-                        });
-    }
-
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
         validateNickname(profileRequest.nickname());
         Member member = memberQueryService.search(memberId);
@@ -87,6 +79,12 @@ public class MemberService {
                 profileRequest.height(),
                 profileRequest.weight());
         return member;
+    }
+
+    private Member addIfNotPresent(String email) {
+        return memberRepository
+                .findByEmail(email)
+                .orElseGet(() -> memberRepository.save(memberMapper.toMember(email)));
     }
 
     private void validateNickname(String nickname) {
