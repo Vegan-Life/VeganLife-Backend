@@ -11,7 +11,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
-    Member toMember(String email);
+    default Member toMember(String email) {
+        return Member.builder().email(email).build();
+    }
 
     RefreshToken toRefreshToken(Long memberId, String token);
 
