@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,9 +24,11 @@ public class RefreshToken {
     private String token;
     private Long memberId;
 
-    public RefreshToken(String token, Long memberId) {
-        this.token = token;
+    @Builder
+    public RefreshToken(Long id, Long memberId, String token) {
+        this.id = id;
         this.memberId = memberId;
+        this.token = token;
     }
 
     public void update(String token) {

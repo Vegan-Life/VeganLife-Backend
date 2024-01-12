@@ -15,6 +15,7 @@ public interface MemberMapper {
         return Member.builder().email(email).build();
     }
 
+    @Mapping(target = "id", ignore = true)
     RefreshToken toRefreshToken(Long memberId, String token);
 
     OauthLoginResponse toOauthLoginResponse(Member member, String accessToken, String refreshToken);
