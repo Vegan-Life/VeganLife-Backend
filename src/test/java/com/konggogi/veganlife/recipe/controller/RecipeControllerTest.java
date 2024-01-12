@@ -226,6 +226,54 @@ public class RecipeControllerTest extends RestDocsTest {
                                 requestHeaders(authorizationDesc())));
     }
 
+    @Test
+    @DisplayName("추천 레시피 목록 조회 API")
+    void getRecommendedRecipeTest() throws Exception {
+
+        List<RecipeResponse> response =
+                List.of(
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get())),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get())),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get())));
+
+        given(recipeSearchService.searchRecommended(1L)).willReturn(response);
+
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/recipes/recommend").headers(authorizationHeader()));
+
+        perform.andExpect(status().isOk()).andExpect(jsonPath("$.size()").value(3));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recommended-recipe",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("추천 레시피 목록 조회 API 예외 - Member Not Found")
+    void getRecommendedRecipeMemberNotFoundExceptionTest() throws Exception {
+
+        given(recipeSearchService.searchRecommended(1L))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/recipes/recommend").headers(authorizationHeader()));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recommended-recipe-member-not-found",
+                                getDocumentResponse()));
+    }
+
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
         List<RecipeType> recipeTypes = List.of(recipeType);
