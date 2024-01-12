@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
@@ -37,13 +38,11 @@ public class MemberService {
     private final MemberMapper memberMapper;
 
     public Member addIfNotPresent(String email) {
-        return memberRepository
-                .findByEmail(email)
-                .orElseGet(
-                        () -> {
-                            Member member = memberMapper.toMember(email);
-                            return memberRepository.save(member);
-                        });
+        try {
+            return memberQueryService.search(email);
+        } catch (NotFoundEntityException e) {
+            return memberRepository.save(memberMapper.toMember(email));
+        }
     }
 
     public void removeMember(Long memberId) {
