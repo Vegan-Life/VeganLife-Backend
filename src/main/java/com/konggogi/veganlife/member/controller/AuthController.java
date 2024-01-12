@@ -2,7 +2,7 @@ package com.konggogi.veganlife.member.controller;
 
 
 import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
-import com.konggogi.veganlife.member.controller.dto.response.AuthResponse;
+import com.konggogi.veganlife.member.controller.dto.response.ReissueTokenResponse;
 import com.konggogi.veganlife.member.domain.mapper.AuthMapper;
 import com.konggogi.veganlife.member.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +20,10 @@ public class AuthController {
     private final AuthMapper authMapper;
 
     @PostMapping("/reissue")
-    public ResponseEntity<AuthResponse> reissueToken(@RequestBody ReissueRequest reissueRequest) {
+    public ResponseEntity<ReissueTokenResponse> reissueToken(
+            @RequestBody ReissueRequest reissueRequest) {
         String refreshToken = reissueRequest.refreshToken();
         String accessToken = refreshTokenService.reissueAccessToken(refreshToken);
-        return ResponseEntity.ok(authMapper.toAuthResponse(accessToken));
+        return ResponseEntity.ok(authMapper.toReissueTokenResponse(accessToken));
     }
 }
