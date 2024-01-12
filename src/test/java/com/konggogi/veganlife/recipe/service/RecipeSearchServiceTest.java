@@ -11,7 +11,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
@@ -62,7 +62,7 @@ public class RecipeSearchServiceTest {
                                 any(VegetarianType.class), any(Pageable.class)))
                 .willReturn(result);
 
-        Page<RecipeListResponse> response =
+        Page<RecipeResponse> response =
                 recipeSearchService.searchAll(VegetarianType.OVO, Pageable.ofSize(20));
 
         assertThat(response.getNumberOfElements()).isEqualTo(2);

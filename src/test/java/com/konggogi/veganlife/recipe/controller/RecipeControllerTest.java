@@ -24,7 +24,7 @@ import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
@@ -65,15 +65,15 @@ public class RecipeControllerTest extends RestDocsTest {
     @DisplayName("레시피 목록 조회 API")
     void getRecipeListTest() throws Exception {
 
-        List<RecipeListResponse> recipe =
+        List<RecipeResponse> recipe =
                 List.of(
-                        recipeMapper.toRecipeListResponse(
+                        recipeMapper.toRecipeResponse(
                                 createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get())),
-                        recipeMapper.toRecipeListResponse(
+                        recipeMapper.toRecipeResponse(
                                 createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get())),
-                        recipeMapper.toRecipeListResponse(
+                        recipeMapper.toRecipeResponse(
                                 createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get())));
-        Page<RecipeListResponse> response =
+        Page<RecipeResponse> response =
                 PageableExecutionUtils.getPage(recipe, Pageable.ofSize(20), recipe::size);
 
         given(recipeSearchService.searchAll(any(VegetarianType.class), any(Pageable.class)))
