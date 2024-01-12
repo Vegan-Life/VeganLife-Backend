@@ -6,6 +6,7 @@ import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
 import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
 import com.konggogi.veganlife.member.controller.dto.response.OauthLoginResponse;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.service.dto.MemberLoginDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -15,10 +16,14 @@ public interface MemberMapper {
         return Member.builder().email(email).build();
     }
 
+    MemberLoginDto toMemberLoginDto(Member member, String accessToken, String refreshToken);
+
     @Mapping(target = "id", ignore = true)
     RefreshToken toRefreshToken(Long memberId, String token);
 
-    OauthLoginResponse toOauthLoginResponse(Member member, String accessToken, String refreshToken);
+    @Mapping(target = "email", source = "memberLoginDto.member.email")
+    @Mapping(target = "hasAdditionalInfo", source = "memberLoginDto.member.hasAdditionalInfo")
+    OauthLoginResponse toOauthLoginResponse(MemberLoginDto memberLoginDto);
 
     @Mapping(target = "imageUrl", source = "member.profileImageUrl")
     MemberProfileResponse toMemberProfileResponse(Member member);
