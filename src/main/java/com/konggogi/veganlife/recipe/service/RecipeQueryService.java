@@ -6,6 +6,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.repository.RecipeRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,5 +30,10 @@ public class RecipeQueryService {
         return recipeRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+    }
+
+    public List<Recipe> searchAllRandomByRecipeType(VegetarianType vegetarianType) {
+
+        return recipeRepository.findAllRandom(vegetarianType);
     }
 }
