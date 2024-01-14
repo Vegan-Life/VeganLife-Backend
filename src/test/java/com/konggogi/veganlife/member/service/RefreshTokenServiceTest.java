@@ -5,16 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
-import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapperImpl;
@@ -35,7 +32,6 @@ class RefreshTokenServiceTest {
     @Mock RefreshTokenRepository refreshTokenRepository;
     @Mock MemberQueryService memberQueryService;
     @Mock JwtProvider jwtProvider;
-    @Mock JwtUtils jwtUtils;
     @Spy MemberMapper memberMapper = new MemberMapperImpl();
     @InjectMocks RefreshTokenService refreshTokenService;
     private final Member member = MemberFixture.DEFAULT_F.getWithId(1L);
@@ -75,47 +71,30 @@ class RefreshTokenServiceTest {
     void reissueAccessTokenTest() {
         // given
         Long memberId = member.getId();
-        String bearerRefreshToken = "Bearer refreshToken";
+        String refreshToken = "refreshToken";
         String bearerAccessToken = "Bearer accessToken";
-        RefreshToken refreshToken =
-                RefreshTokenFixture.DEFAULT.getWithToken(memberId, bearerRefreshToken);
-        given(jwtUtils.extractBearerToken(anyString())).willReturn(Optional.of("refreshToken"));
-        doNothing().when(jwtUtils).validateToken(anyString());
+        RefreshToken refreshTokenEntity =
+                RefreshTokenFixture.DEFAULT.getWithToken(memberId, "Bearer " + refreshToken);
         given(memberQueryService.searchByToken(anyString())).willReturn(member);
         given(memberQueryService.searchRefreshToken(anyLong()))
-                .willReturn(Optional.of(refreshToken));
+                .willReturn(Optional.of(refreshTokenEntity));
         given(jwtProvider.createToken(anyString())).willReturn(bearerAccessToken);
         // when
-        String result = refreshTokenService.reissueAccessToken(bearerRefreshToken);
+        String result = refreshTokenService.reissueAccessToken(refreshToken);
         // then
         assertThat(result).isEqualTo(bearerAccessToken);
         then(jwtProvider).should().createToken(eq(member.getEmail()));
     }
 
     @Test
-    @DisplayName("AccessToken 재발급 - Invalid Jwt")
-    void reissueAccessTokenInvalidJwtTest() {
-        // given
-        String bearerRefreshToken = "Bearer refreshToken";
-        given(jwtUtils.extractBearerToken(anyString())).willReturn(Optional.empty());
-        // when, then
-        assertThatThrownBy(() -> refreshTokenService.reissueAccessToken(bearerRefreshToken))
-                .isInstanceOf(InvalidJwtException.class)
-                .hasMessageContaining(ErrorCode.INVALID_TOKEN.getDescription());
-        then(jwtUtils).should(never()).validateToken(anyString());
-    }
-
-    @Test
     @DisplayName("AccessToken 재발급 - Not Found RefreshToken")
     void reissueAccessTokenNotFoundTokenTest() {
         // given
-        String bearerRefreshToken = "Bearer refreshToken";
-        given(jwtUtils.extractBearerToken(anyString())).willReturn(Optional.of("refreshToken"));
-        doNothing().when(jwtUtils).validateToken(anyString());
+        String refreshToken = "refreshToken";
         given(memberQueryService.searchByToken(anyString())).willReturn(member);
         given(memberQueryService.searchRefreshToken(anyLong())).willReturn(Optional.empty());
         // when, then
-        assertThatThrownBy(() -> refreshTokenService.reissueAccessToken(bearerRefreshToken))
+        assertThatThrownBy(() -> refreshTokenService.reissueAccessToken(refreshToken))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_REFRESH_TOKEN.getDescription());
         then(jwtProvider).should(never()).createRefreshToken(anyString());
@@ -126,17 +105,15 @@ class RefreshTokenServiceTest {
     void reissueAccessTokenMismatchTest() {
         // given
         Long memberId = member.getId();
-        String bearerMismatchToken = "Bearer mismatchToken";
+        String mismatchToken = "mismatchToken";
         String bearerRefreshToken = "Bearer refreshToken";
         RefreshToken refreshToken =
                 RefreshTokenFixture.DEFAULT.getWithToken(memberId, bearerRefreshToken);
-        given(jwtUtils.extractBearerToken(anyString())).willReturn(Optional.of("mismatchToken"));
-        doNothing().when(jwtUtils).validateToken(anyString());
         given(memberQueryService.searchByToken(anyString())).willReturn(member);
         given(memberQueryService.searchRefreshToken(anyLong()))
                 .willReturn(Optional.of(refreshToken));
         // when, then
-        assertThatThrownBy(() -> refreshTokenService.reissueAccessToken(bearerMismatchToken))
+        assertThatThrownBy(() -> refreshTokenService.reissueAccessToken(mismatchToken))
                 .isInstanceOf(MismatchTokenException.class)
                 .hasMessageContaining(ErrorCode.MISMATCH_REFRESH_TOKEN.getDescription());
         then(jwtProvider).should(never()).createRefreshToken(anyString());

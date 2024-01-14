@@ -70,7 +70,7 @@ public abstract class RestDocsTest {
     /** Authorization Header만 단독으로 필요한 경우 */
     protected HttpHeaders authorizationHeader() {
         return new HttpHeaders(
-                new LinkedMultiValueMap<>(Map.of("Authorization", List.of("ACCESS_TOKEN"))));
+                new LinkedMultiValueMap<>(Map.of("Authorization", List.of("Bearer AccessToken"))));
     }
 
     /**
@@ -80,12 +80,12 @@ public abstract class RestDocsTest {
      */
     protected HttpHeaders withAuthorizationHeader(Map<String, List<String>> headers) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>(headers);
-        map.put("Authorization", List.of("ACCESS_TOKEN"));
+        map.put("Authorization", List.of("Bearer AccessToken"));
         return new HttpHeaders(map);
     }
 
     protected HeaderDescriptor authorizationDesc() {
-        return headerWithName("Authorization").description("Access Token을 담는 헤더입니다.");
+        return headerWithName("Authorization").description("Bearer AccessToken을 담는 헤더");
     }
 
     protected ParameterDescriptor pageDesc() {
