@@ -14,6 +14,10 @@ endif::[]
 
 === Request
 
+==== Header
+
+include::{snippets}/reissue-token/request-headers.adoc[]
+
 ==== Body
 
 include::{snippets}/reissue-token/http-request.adoc[]
