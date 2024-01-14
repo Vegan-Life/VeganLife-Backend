@@ -1,16 +1,12 @@
 package com.konggogi.veganlife.member.controller;
 
 
-import com.konggogi.veganlife.member.controller.dto.request.ReissueRequest;
 import com.konggogi.veganlife.member.controller.dto.response.ReissueTokenResponse;
 import com.konggogi.veganlife.member.domain.mapper.AuthMapper;
 import com.konggogi.veganlife.member.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,8 +17,7 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueTokenResponse> reissueToken(
-            @RequestBody ReissueRequest reissueRequest) {
-        String refreshToken = reissueRequest.refreshToken();
+            @RequestAttribute("refreshToken") String refreshToken) {
         String accessToken = refreshTokenService.reissueAccessToken(refreshToken);
         return ResponseEntity.ok(authMapper.toReissueTokenResponse(accessToken));
     }
