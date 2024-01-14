@@ -3,11 +3,9 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.global.security.exception.InvalidJwtException;
 import com.konggogi.veganlife.global.security.exception.MismatchTokenException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.global.security.jwt.RefreshToken;
-import com.konggogi.veganlife.global.util.JwtUtils;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.repository.RefreshTokenRepository;
@@ -24,7 +22,6 @@ public class RefreshTokenService {
     private final MemberQueryService memberQueryService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-    private final JwtUtils jwtUtils;
     private final MemberMapper memberMapper;
 
     public void addOrUpdate(Long memberId, String bearerRefreshToken) {
@@ -41,21 +38,7 @@ public class RefreshTokenService {
                         });
     }
 
-    public String reissueAccessToken(String bearerRefreshToken) {
-        return jwtUtils.extractBearerToken(bearerRefreshToken)
-                .map(
-                        token -> {
-                            jwtUtils.validateToken(token);
-                            return generateNewAccessToken(token);
-                        })
-                .orElseThrow(() -> new InvalidJwtException(ErrorCode.INVALID_TOKEN));
-    }
-
-    private void add(Long memberId, String refreshToken) {
-        refreshTokenRepository.save(memberMapper.toRefreshToken(memberId, refreshToken));
-    }
-
-    private String generateNewAccessToken(String refreshToken) {
+    public String reissueAccessToken(String refreshToken) {
         Member member = memberQueryService.searchByToken(refreshToken);
         return memberQueryService
                 .searchRefreshToken(member.getId())
@@ -65,6 +48,10 @@ public class RefreshTokenService {
                             return jwtProvider.createToken(member.getEmail());
                         })
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
+    }
+
+    private void add(Long memberId, String refreshToken) {
+        refreshTokenRepository.save(memberMapper.toRefreshToken(memberId, refreshToken));
     }
 
     private void validateIsSameToken(RefreshToken refreshToken, String token) {
