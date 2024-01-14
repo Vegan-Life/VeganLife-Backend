@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private static final String REISSUE_URI = "/api/v1/auth/reissue";
 
     protected boolean shouldNotFilterAsyncDispatch() {
         return false;
@@ -50,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             jwt -> {
                                 jwtUtils.validateToken(jwt);
                                 setAuthentication(request, jwt);
+                                setRefreshTokenAttribute(request, jwt);
                             });
         } catch (InvalidJwtException | UsernameNotFoundException e) {
             request.setAttribute(JwtUtils.JWT_EXCEPTION, e);
@@ -65,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void setAuthentication(HttpServletRequest request, String jwt) {
         getAuthentication()
                 .ifPresentOrElse(
-                        (auth) -> {},
+                        auth -> {},
                         () -> {
                             String email = getUserEmailFromJwt(jwt);
                             UserDetails userDetails =
@@ -85,5 +87,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    private void setRefreshTokenAttribute(HttpServletRequest request, String token) {
+        String requestURI = request.getRequestURI();
+        if (requestURI.equals(REISSUE_URI)) {
+            request.setAttribute("refreshToken", token);
+        }
     }
 }
