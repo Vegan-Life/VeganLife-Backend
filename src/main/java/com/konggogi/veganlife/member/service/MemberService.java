@@ -8,7 +8,7 @@ import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
-import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
@@ -67,7 +67,7 @@ public class MemberService {
         return member;
     }
 
-    public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+    public Member modifyProfile(Long memberId, ProfileModifyRequest profileRequest) {
         validateNickname(profileRequest.nickname());
         Member member = memberQueryService.search(memberId);
         member.modifyProfile(
