@@ -36,7 +36,7 @@ public class IntegrationTest {
     @BeforeEach
     void beforeEach() {
         member = Member.builder().email("test123@test.com").build();
-        member.updateMemberInfo("비건라이프", Gender.F, VegetarianType.VEGAN, 2000, 160, 50);
+        member.updateAdditionalInfo("비건라이프", Gender.F, VegetarianType.VEGAN, 2000, 160, 50);
         memberRepository.save(member);
     }
 

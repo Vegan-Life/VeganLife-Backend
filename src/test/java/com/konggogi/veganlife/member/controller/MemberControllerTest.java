@@ -43,7 +43,7 @@ class MemberControllerTest extends RestDocsTest {
         AdditionalInfoRequest request =
                 new AdditionalInfoRequest(
                         member.getNickname(), Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(AdditionalInfoRequest.class)))
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoRequest.class)))
                 .willReturn(member);
         // when
         ResultActions perform =
@@ -71,7 +71,7 @@ class MemberControllerTest extends RestDocsTest {
         // given
         AdditionalInfoRequest request =
                 new AdditionalInfoRequest("비건라이프", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(AdditionalInfoRequest.class)))
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoRequest.class)))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =

@@ -126,7 +126,7 @@ class MemberServiceTest {
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(memberId)).willReturn(member);
         // when
-        Member updatedMember = memberService.modifyMemberInfo(memberId, request);
+        Member updatedMember = memberService.updateAdditionalInfo(memberId, request);
         // then
         assertThat(updatedMember.getNickname()).isEqualTo(request.nickname());
         assertThat(updatedMember.getGender()).isEqualTo(request.gender());
@@ -148,7 +148,7 @@ class MemberServiceTest {
                 new AdditionalInfoRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
         given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyMemberInfo(memberId, request))
+        assertThatThrownBy(() -> memberService.updateAdditionalInfo(memberId, request))
                 .isInstanceOf(DuplicatedNicknameException.class);
         then(memberRepository).should().findByNickname(nickname);
         then(memberRepository).should(never()).save(any(Member.class));
