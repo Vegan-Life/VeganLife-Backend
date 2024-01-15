@@ -79,10 +79,35 @@ public class Member extends TimeStamped {
         this.hasAdditionalInfo = false;
     }
 
-    public int calcAge() {
-        LocalDate now = LocalDate.now();
-        int currentYear = now.getYear();
-        return (currentYear - birthYear);
+    public void updateAdditionalInfo(
+            String nickname,
+            Gender gender,
+            VegetarianType vegetarianType,
+            Integer birthYear,
+            Integer height,
+            Integer weight) {
+        updateProfile(nickname, vegetarianType, gender, birthYear, height, weight);
+        this.hasAdditionalInfo = true;
+    }
+
+    public void modifyProfile(
+            String nickname,
+            String profileImageUrl,
+            VegetarianType vegetarianType,
+            Gender gender,
+            Integer birthYear,
+            Integer height,
+            Integer weight) {
+        updateProfile(nickname, vegetarianType, gender, birthYear, height, weight);
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    private void updateDailyIntake() {
+        int bmr = calcBMR();
+        AMR = (int) Math.round(bmr * 1.375);
+        dailyCarbs = (int) ((AMR * (50.0 / 100)) / 4);
+        dailyProtein = (int) ((AMR * (30.0 / 100)) / 4);
+        dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
     }
 
     private int calcBMR() {
@@ -94,41 +119,20 @@ public class Member extends TimeStamped {
         }
     }
 
-    public void updateDailyIntake() {
-        int bmr = calcBMR();
-        AMR = (int) Math.round(bmr * 1.375);
-        dailyCarbs = (int) ((AMR * (50.0 / 100)) / 4);
-        dailyProtein = (int) ((AMR * (30.0 / 100)) / 4);
-        dailyFat = (int) ((AMR * (20.0 / 100)) / 9);
+    private int calcAge() {
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+        return (currentYear - birthYear);
     }
 
-    public void updateMemberInfo(
+    private void updateProfile(
             String nickname,
-            Gender gender,
-            VegetarianType vegetarianType,
-            Integer birthYear,
-            Integer height,
-            Integer weight) {
-        this.nickname = nickname;
-        this.gender = gender;
-        this.vegetarianType = vegetarianType;
-        this.birthYear = birthYear;
-        this.height = height;
-        this.weight = weight;
-        this.hasAdditionalInfo = true;
-        updateDailyIntake();
-    }
-
-    public void modifyMemberProfile(
-            String nickname,
-            String profileImageUrl,
             VegetarianType vegetarianType,
             Gender gender,
             Integer birthYear,
             Integer height,
             Integer weight) {
         this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
         this.vegetarianType = vegetarianType;
         this.gender = gender;
         this.birthYear = birthYear;

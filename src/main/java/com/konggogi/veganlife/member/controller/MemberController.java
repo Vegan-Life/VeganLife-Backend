@@ -24,7 +24,7 @@ public class MemberController {
     public ResponseEntity<AdditionalInfoResponse> modifyMemberInfo(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid AdditionalInfoRequest additionalInfoRequest) {
-        Member member = memberService.modifyMemberInfo(userDetails.id(), additionalInfoRequest);
+        Member member = memberService.updateAdditionalInfo(userDetails.id(), additionalInfoRequest);
         return ResponseEntity.ok(memberMapper.toAdditionalInfoResponse(member));
     }
 

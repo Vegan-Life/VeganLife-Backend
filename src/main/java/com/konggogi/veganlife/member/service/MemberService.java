@@ -54,10 +54,10 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member modifyMemberInfo(Long memberId, AdditionalInfoRequest infoRequest) {
+    public Member updateAdditionalInfo(Long memberId, AdditionalInfoRequest infoRequest) {
         validateNickname(infoRequest.nickname());
         Member member = memberQueryService.search(memberId);
-        member.updateMemberInfo(
+        member.updateAdditionalInfo(
                 infoRequest.nickname(),
                 infoRequest.gender(),
                 infoRequest.vegetarianType(),
@@ -70,7 +70,7 @@ public class MemberService {
     public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
         validateNickname(profileRequest.nickname());
         Member member = memberQueryService.search(memberId);
-        member.modifyMemberProfile(
+        member.modifyProfile(
                 profileRequest.nickname(),
                 profileRequest.imageUrl(),
                 profileRequest.vegetarianType(),
