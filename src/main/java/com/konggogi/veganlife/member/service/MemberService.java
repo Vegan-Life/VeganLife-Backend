@@ -7,7 +7,7 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
@@ -54,7 +54,7 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
+    public Member modifyMemberInfo(Long memberId, AdditionalInfoRequest infoRequest) {
         validateNickname(infoRequest.nickname());
         Member member = memberQueryService.search(memberId);
         member.updateMemberInfo(
