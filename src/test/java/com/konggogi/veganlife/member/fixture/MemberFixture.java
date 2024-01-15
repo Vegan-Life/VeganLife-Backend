@@ -15,10 +15,10 @@ public enum MemberFixture {
             VegetarianType.VEGAN,
             165,
             50,
-            227,
+            226,
             136,
             40,
-            1821),
+            1814),
     DEFAULT_M(
             "testM@test.com",
             "비건라이프M",
@@ -28,8 +28,8 @@ public enum MemberFixture {
             VegetarianType.OVO,
             185,
             85,
-            340,
-            204,
+            339,
+            203,
             60,
             2721);
     private final String email;
