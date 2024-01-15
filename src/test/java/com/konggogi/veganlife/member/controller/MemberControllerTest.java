@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -40,10 +40,10 @@ class MemberControllerTest extends RestDocsTest {
     void updateAdditionalInfoTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-        AdditionalInfoRequest request =
-                new AdditionalInfoRequest(
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
                         member.getNickname(), Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoRequest.class)))
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoUpdateRequest.class)))
                 .willReturn(member);
         // when
         ResultActions perform =
@@ -69,9 +69,10 @@ class MemberControllerTest extends RestDocsTest {
     @DisplayName("추가 정보 입력 API - Duplicated Nickname")
     void updateAdditionalInfoDuplicatedNicknameTest() throws Exception {
         // given
-        AdditionalInfoRequest request =
-                new AdditionalInfoRequest("비건라이프", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoRequest.class)))
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        "비건라이프", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoUpdateRequest.class)))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =

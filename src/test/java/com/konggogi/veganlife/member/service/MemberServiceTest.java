@@ -15,7 +15,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
 import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
@@ -121,8 +121,9 @@ class MemberServiceTest {
     void updateAdditionalInfoTest() {
         // given
         Long memberId = member.getId();
-        AdditionalInfoRequest request =
-                new AdditionalInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        "테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(memberId)).willReturn(member);
         // when
@@ -144,8 +145,9 @@ class MemberServiceTest {
         Long memberId = member.getId();
         Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
         String nickname = existingMember.getNickname();
-        AdditionalInfoRequest request =
-                new AdditionalInfoRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
         given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
         // when, then
         assertThatThrownBy(() -> memberService.updateAdditionalInfo(memberId, request))
