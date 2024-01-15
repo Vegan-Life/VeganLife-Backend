@@ -16,21 +16,21 @@ endif::[]
 
 ==== Header
 
-include::{snippets}/modify-member-info/request-headers.adoc[]
+include::{snippets}/update-additional-info/request-headers.adoc[]
 
 ==== Body
 
-include::{snippets}/modify-member-info/http-request.adoc[]
+include::{snippets}/update-additional-info/http-request.adoc[]
 
 === Response
 
 ==== 200 OK
 
-include::{snippets}/modify-member-info/http-response.adoc[]
+include::{snippets}/update-additional-info/http-response.adoc[]
 
 ==== 409 CONFLICT
 
-include::{snippets}/modify-member-info-duplicated-nickname/http-response.adoc[]
+include::{snippets}/update-additional-info-duplicated-nickname/http-response.adoc[]
 
 == 회원 탈퇴 API
 
