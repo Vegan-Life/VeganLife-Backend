@@ -2,8 +2,8 @@ package com.konggogi.veganlife.member.controller;
 
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
-import com.konggogi.veganlife.member.controller.dto.response.MemberInfoResponse;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
+import com.konggogi.veganlife.member.controller.dto.response.AdditionalInfoUpdateResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberService;
@@ -21,11 +21,12 @@ public class MemberController {
     private final MemberMapper memberMapper;
 
     @PostMapping()
-    public ResponseEntity<MemberInfoResponse> modifyMemberInfo(
+    public ResponseEntity<AdditionalInfoUpdateResponse> modifyAdditionalInfo(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody @Valid MemberInfoRequest memberInfoRequest) {
-        Member member = memberService.modifyMemberInfo(userDetails.id(), memberInfoRequest);
-        return ResponseEntity.ok(memberMapper.toMemberInfoResponse(member));
+            @RequestBody @Valid AdditionalInfoUpdateRequest additionalInfoUpdateRequest) {
+        Member member =
+                memberService.updateAdditionalInfo(userDetails.id(), additionalInfoUpdateRequest);
+        return ResponseEntity.ok(memberMapper.toAdditionalInfoUpdateResponse(member));
     }
 
     @DeleteMapping()

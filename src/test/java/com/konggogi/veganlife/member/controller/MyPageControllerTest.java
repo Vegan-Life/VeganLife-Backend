@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -100,8 +100,8 @@ class MyPageControllerTest extends RestDocsTest {
     void modifyMemberProfileTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-        MemberProfileRequest request =
-                new MemberProfileRequest(
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
                         member.getNickname(),
                         member.getProfileImageUrl(),
                         member.getVegetarianType(),
@@ -109,7 +109,7 @@ class MyPageControllerTest extends RestDocsTest {
                         member.getBirthYear(),
                         member.getHeight(),
                         member.getWeight());
-        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
                 .willReturn(member);
         // when
         ResultActions perform =
@@ -134,10 +134,10 @@ class MyPageControllerTest extends RestDocsTest {
     @DisplayName("회원 프로필 수정 API - 중복된 닉네임 예외 발생")
     void modifyMemberProfileDuplicatedNicknameTest() throws Exception {
         // given
-        MemberProfileRequest request =
-                new MemberProfileRequest(
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =
@@ -157,10 +157,10 @@ class MyPageControllerTest extends RestDocsTest {
     @DisplayName("회원 프로필 수정 API - 없는 회원 예외 발생")
     void modifyNotMemberProfileTest() throws Exception {
         // given
-        MemberProfileRequest request =
-                new MemberProfileRequest(
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberService.modifyMemberProfile(anyLong(), any(MemberProfileRequest.class)))
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =

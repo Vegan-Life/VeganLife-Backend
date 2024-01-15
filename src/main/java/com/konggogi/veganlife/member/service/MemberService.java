@@ -7,8 +7,8 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
-import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
+import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.exception.DuplicatedNicknameException;
@@ -54,10 +54,10 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member modifyMemberInfo(Long memberId, MemberInfoRequest infoRequest) {
+    public Member updateAdditionalInfo(Long memberId, AdditionalInfoUpdateRequest infoRequest) {
         validateNickname(infoRequest.nickname());
         Member member = memberQueryService.search(memberId);
-        member.updateMemberInfo(
+        member.updateAdditionalInfo(
                 infoRequest.nickname(),
                 infoRequest.gender(),
                 infoRequest.vegetarianType(),
@@ -67,10 +67,10 @@ public class MemberService {
         return member;
     }
 
-    public Member modifyMemberProfile(Long memberId, MemberProfileRequest profileRequest) {
+    public Member modifyProfile(Long memberId, ProfileModifyRequest profileRequest) {
         validateNickname(profileRequest.nickname());
         Member member = memberQueryService.search(memberId);
-        member.modifyMemberProfile(
+        member.modifyProfile(
                 profileRequest.nickname(),
                 profileRequest.imageUrl(),
                 profileRequest.vegetarianType(),

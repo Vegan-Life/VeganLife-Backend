@@ -15,8 +15,8 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
-import com.konggogi.veganlife.member.controller.dto.request.MemberProfileRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
+import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -117,16 +117,17 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 정보 수정")
-    void modifyMemberInfoTest() {
+    @DisplayName("추가 정보 입력")
+    void updateAdditionalInfoTest() {
         // given
         Long memberId = member.getId();
-        MemberInfoRequest request =
-                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        "테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(memberId)).willReturn(member);
         // when
-        Member updatedMember = memberService.modifyMemberInfo(memberId, request);
+        Member updatedMember = memberService.updateAdditionalInfo(memberId, request);
         // then
         assertThat(updatedMember.getNickname()).isEqualTo(request.nickname());
         assertThat(updatedMember.getGender()).isEqualTo(request.gender());
@@ -138,17 +139,18 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("중복된 닉네임으로 인한 회원 정보 수정 예외 발생")
-    void modifyMemberInfoFailTest() {
+    @DisplayName("추가 정보 입력 - Duplicated Nickname")
+    void updateAdditionalInfoDuplicatedNicknameTest() {
         // given
         Long memberId = member.getId();
         Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
         String nickname = existingMember.getNickname();
-        MemberInfoRequest request =
-                new MemberInfoRequest(nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
         given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyMemberInfo(memberId, request))
+        assertThatThrownBy(() -> memberService.updateAdditionalInfo(memberId, request))
                 .isInstanceOf(DuplicatedNicknameException.class);
         then(memberRepository).should().findByNickname(nickname);
         then(memberRepository).should(never()).save(any(Member.class));
@@ -158,14 +160,14 @@ class MemberServiceTest {
     @DisplayName("회원 프로필 수정")
     void modifyMemberProfileTest() {
         // given
-        MemberProfileRequest profileRequest =
-                new MemberProfileRequest(
+        ProfileModifyRequest profileRequest =
+                new ProfileModifyRequest(
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberRepository.findByNickname(profileRequest.nickname()))
                 .willReturn(Optional.empty());
         given(memberQueryService.search(anyLong())).willReturn(member);
         // when
-        Member updatedMember = memberService.modifyMemberProfile(member.getId(), profileRequest);
+        Member updatedMember = memberService.modifyProfile(member.getId(), profileRequest);
         // then
         assertThat(updatedMember.getNickname()).isEqualTo(profileRequest.nickname());
         assertThat(updatedMember.getProfileImageUrl()).isEqualTo(profileRequest.imageUrl());
@@ -184,8 +186,8 @@ class MemberServiceTest {
         // given
         Long memberId = member.getId();
         Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
-        MemberProfileRequest profileRequest =
-                new MemberProfileRequest(
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
                         existingMember.getNickname(),
                         "imageUrl",
                         VegetarianType.LACTO,
@@ -193,10 +195,10 @@ class MemberServiceTest {
                         1993,
                         190,
                         90);
-        given(memberRepository.findByNickname(profileRequest.nickname()))
+        given(memberRepository.findByNickname(request.nickname()))
                 .willReturn(Optional.of(existingMember));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
+        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request))
                 .isInstanceOf(DuplicatedNicknameException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
         then(memberRepository).should().findByNickname(anyString());
@@ -208,15 +210,14 @@ class MemberServiceTest {
     void modifyNotMemberProfileTest() {
         // given
         Long memberId = member.getId();
-        MemberProfileRequest profileRequest =
-                new MemberProfileRequest(
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
                         "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberRepository.findByNickname(profileRequest.nickname()))
-                .willReturn(Optional.empty());
+        given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(member.getId()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyMemberProfile(memberId, profileRequest))
+        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findByNickname(anyString());

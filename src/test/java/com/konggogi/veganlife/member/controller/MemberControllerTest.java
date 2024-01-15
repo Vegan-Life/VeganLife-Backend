@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.member.controller.dto.request.MemberInfoRequest;
+import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
@@ -36,14 +36,14 @@ class MemberControllerTest extends RestDocsTest {
     @MockBean MemberService memberService;
 
     @Test
-    @DisplayName("회원 정보 수정 API")
-    void modifyMemberInfoTest() throws Exception {
+    @DisplayName("추가 정보 입력 API")
+    void updateAdditionalInfoTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-        MemberInfoRequest request =
-                new MemberInfoRequest(
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
                         member.getNickname(), Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoUpdateRequest.class)))
                 .willReturn(member);
         // when
         ResultActions perform =
@@ -59,19 +59,20 @@ class MemberControllerTest extends RestDocsTest {
         perform.andDo(print())
                 .andDo(
                         document(
-                                "modify-member-info",
+                                "update-additional-info",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
     }
 
     @Test
-    @DisplayName("회원 정보 수정 API - 중복 닉네임 예외 발생")
-    void modifyMemberInfoDuplicatedNicknameTest() throws Exception {
+    @DisplayName("추가 정보 입력 API - Duplicated Nickname")
+    void updateAdditionalInfoDuplicatedNicknameTest() throws Exception {
         // given
-        MemberInfoRequest request =
-                new MemberInfoRequest("테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberService.modifyMemberInfo(anyLong(), any(MemberInfoRequest.class)))
+        AdditionalInfoUpdateRequest request =
+                new AdditionalInfoUpdateRequest(
+                        "비건라이프", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
+        given(memberService.updateAdditionalInfo(anyLong(), any(AdditionalInfoUpdateRequest.class)))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =
@@ -84,7 +85,10 @@ class MemberControllerTest extends RestDocsTest {
         perform.andExpect(status().isConflict());
 
         perform.andDo(print())
-                .andDo(document("modify-member-info-duplicated-nickname", getDocumentResponse()));
+                .andDo(
+                        document(
+                                "update-additional-info-duplicated-nickname",
+                                getDocumentResponse()));
     }
 
     @Test
