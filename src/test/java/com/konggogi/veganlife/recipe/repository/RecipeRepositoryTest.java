@@ -100,42 +100,32 @@ public class RecipeRepositoryTest {
     }
 
     @Test
-    @DisplayName("vegetarian type 기반으로 Recipe 레코드를 랜덤 조회한다.")
-    void findAllRandomTest() {
+    @DisplayName("VegetarianType에 해당하는 Recipe 레코드 개수를 조회한다.")
+    void countByRecipeTypeTest() {
 
         List<Recipe> recipes =
                 List.of(
                         createRecipe(
                                 List.of(
                                         RecipeTypeFixture.OVO.get(),
-                                        RecipeTypeFixture.LACTO_OVO.get())),
-                        createRecipe(
-                                List.of(
-                                        RecipeTypeFixture.OVO.get(),
                                         RecipeTypeFixture.LACTO.get())),
                         createRecipe(
                                 List.of(
                                         RecipeTypeFixture.OVO.get(),
-                                        RecipeTypeFixture.LACTO_OVO.get())),
+                                        RecipeTypeFixture.PESCO.get())),
                         createRecipe(
                                 List.of(
                                         RecipeTypeFixture.OVO.get(),
-                                        RecipeTypeFixture.LACTO.get())),
-                        createRecipe(
-                                List.of(
-                                        RecipeTypeFixture.OVO.get(),
-                                        RecipeTypeFixture.LACTO_OVO.get())));
+                                        RecipeTypeFixture.LACTO.get())));
         recipeRepository.saveAll(recipes);
-        em.clear();
 
-        List<Recipe> found1 = recipeRepository.findAllRandomByVegetarianType(VegetarianType.OVO);
-        List<Recipe> found2 =
-                recipeRepository.findAllRandomByVegetarianType(VegetarianType.LACTO_OVO);
-        List<Recipe> found3 = recipeRepository.findAllRandomByVegetarianType(VegetarianType.LACTO);
+        int ovoTotal = recipeRepository.countByRecipeType(VegetarianType.OVO);
+        int lactoTotal = recipeRepository.countByRecipeType(VegetarianType.LACTO);
+        int pescoTotal = recipeRepository.countByRecipeType(VegetarianType.PESCO);
 
-        assertThat(found1.size()).isEqualTo(4);
-        assertThat(found2.size()).isEqualTo(3);
-        assertThat(found3.size()).isEqualTo(2);
+        assertThat(ovoTotal).isEqualTo(3);
+        assertThat(lactoTotal).isEqualTo(2);
+        assertThat(pescoTotal).isEqualTo(1);
     }
 
     private Recipe createRecipe(List<RecipeType> recipeType) {

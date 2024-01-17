@@ -274,6 +274,25 @@ public class RecipeControllerTest extends RestDocsTest {
                                 getDocumentResponse()));
     }
 
+    @Test
+    @DisplayName("추천 레시피 목록 조회 API 예외 - Recipe Not Found")
+    void getRecommendedRecipeRecipeNotFoundExceptionTest() throws Exception {
+
+        given(recipeSearchService.searchRecommended(1L))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+
+        ResultActions perform =
+                mockMvc.perform(get("/api/v1/recipes/recommend").headers(authorizationHeader()));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recommended-recipe-recipe-not-found",
+                                getDocumentResponse()));
+    }
+
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
         List<RecipeType> recipeTypes = List.of(recipeType);

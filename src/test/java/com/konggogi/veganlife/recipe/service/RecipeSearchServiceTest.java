@@ -47,7 +47,7 @@ public class RecipeSearchServiceTest {
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
     @InjectMocks RecipeSearchService recipeSearchService;
 
-    private final Member member = MemberFixture.DEFAULT_M.get();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("레시피 목록 조회 테스트 - response dto로 변환하여 반환한다.")
@@ -124,18 +124,21 @@ public class RecipeSearchServiceTest {
     @DisplayName("추천 레시피 목록 조회 테스트")
     void searchRecommendedTest() {
 
-        List<Recipe> recipes =
-                List.of(
-                        createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.OVO.get()),
-                        createRecipe(2L, "가지 탕수", RecipeTypeFixture.OVO.get()));
+        Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.OVO.get());
 
-        given(memberQueryService.search(1L)).willReturn(member);
-        given(recipeQueryService.searchAllRandomByRecipeType(VegetarianType.OVO))
-                .willReturn(recipes);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(recipeQueryService.countAllRecipeType(any(VegetarianType.class))).willReturn(1);
+        given(
+                        recipeQueryService.searchFirstElementByRecipeType(
+                                any(VegetarianType.class), any(Pageable.class)))
+                .willReturn(recipe);
 
-        List<RecipeResponse> found = recipeSearchService.searchRecommended(1L);
-        assertThat(found).hasSize(2);
-        assertThat(found).allMatch(Objects::nonNull);
+        List<RecipeResponse> response = recipeSearchService.searchRecommended(anyLong());
+
+        assertThat(response).hasSize(1);
+        assertThat(response.get(0).id()).isEqualTo(1L);
+        assertThat(response.get(0).name()).isEqualTo("표고버섯 탕수");
+        assertThat(response.get(0).recipeTypes()).hasSameElementsAs(List.of(VegetarianType.OVO));
     }
 
     @Test
@@ -148,6 +151,18 @@ public class RecipeSearchServiceTest {
         assertThatThrownBy(() -> recipeSearchService.searchRecommended(1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+    }
+
+    @Test
+    @DisplayName("추천 레시피 목록 조회 테스트 - 존재하지 않는 레시피")
+    void searchRecommendedRecipeNotFoundExceptionTest() {
+
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+
+        assertThatThrownBy(() -> recipeSearchService.searchRecommended(1L))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_RECIPE.getDescription());
     }
 
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
