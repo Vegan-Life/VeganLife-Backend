@@ -6,7 +6,6 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.repository.RecipeRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +24,14 @@ public class RecipeQueryService {
         return recipeRepository.findAllByRecipeTypes(vegetarianType, pageable);
     }
 
+    /** 사용자의 VegetarianType으로 조회한 결과 중 첫번째 요소를 반환한다. */
+    public Recipe searchFirstElementByRecipeType(VegetarianType vegetarianType, Pageable pageable) {
+
+        return searchAllByRecipeType(vegetarianType, pageable).stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+    }
+
     public Recipe search(Long id) {
 
         return recipeRepository
@@ -32,8 +39,8 @@ public class RecipeQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
     }
 
-    public List<Recipe> searchAllRandomByRecipeType(VegetarianType vegetarianType) {
+    public int countAllRecipeType(VegetarianType vegetarianType) {
 
-        return recipeRepository.findAllRandomByVegetarianType(vegetarianType);
+        return recipeRepository.countByRecipeType(vegetarianType);
     }
 }
