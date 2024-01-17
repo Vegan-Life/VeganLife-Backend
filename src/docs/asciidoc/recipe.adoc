@@ -95,3 +95,5 @@ include::{snippets}/recipe-get-recommended-recipe/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/recipe-get-recommended-recipe-member-not-found/http-response.adoc[]
+
+include::{snippets}/recipe-get-recommended-recipe-recipe-not-found/http-response.adoc[]
