@@ -124,7 +124,7 @@ public class RecipeLikeControllerTest extends RestDocsTest {
         perform.andExpect(status().isConflict());
 
         perform.andDo(print())
-                .andDo(document("recipe-like-add-member-not-found", getDocumentResponse()));
+                .andDo(document("recipe-like-add-duplicate", getDocumentResponse()));
     }
 
     @Test
@@ -142,6 +142,6 @@ public class RecipeLikeControllerTest extends RestDocsTest {
         perform.andExpect(status().isConflict());
 
         perform.andDo(print())
-                .andDo(document("recipe-like-remove-member-not-found", getDocumentResponse()));
+                .andDo(document("recipe-like-remove-duplicate", getDocumentResponse()));
     }
 }
