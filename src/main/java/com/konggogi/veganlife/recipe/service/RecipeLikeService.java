@@ -55,7 +55,7 @@ public class RecipeLikeService {
                 .searchByRecipeIdAndMemberId(recipeId, memberId)
                 .ifPresent(
                         r -> {
-                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_POST_LIKED);
+                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_RECIPE_LIKED);
                         });
     }
 
@@ -63,6 +63,7 @@ public class RecipeLikeService {
 
         return recipeLikeQueryService
                 .searchByRecipeIdAndMemberId(recipeId, memberId)
-                .orElseThrow(() -> new IllegalLikeStatusException(ErrorCode.ALREADY_POST_UNLIKED));
+                .orElseThrow(
+                        () -> new IllegalLikeStatusException(ErrorCode.ALREADY_RECIPE_UNLIKED));
     }
 }
