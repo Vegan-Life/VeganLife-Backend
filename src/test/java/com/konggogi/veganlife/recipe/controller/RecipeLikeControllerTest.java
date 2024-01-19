@@ -123,8 +123,7 @@ public class RecipeLikeControllerTest extends RestDocsTest {
 
         perform.andExpect(status().isConflict());
 
-        perform.andDo(print())
-                .andDo(document("recipe-like-add-duplicate", getDocumentResponse()));
+        perform.andDo(print()).andDo(document("recipe-like-add-duplicate", getDocumentResponse()));
     }
 
     @Test
