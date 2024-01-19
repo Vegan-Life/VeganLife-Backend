@@ -24,10 +24,23 @@ public class RecipeQueryService {
         return recipeRepository.findAllByRecipeTypes(vegetarianType, pageable);
     }
 
+    /** 사용자의 VegetarianType으로 조회한 결과 중 첫번째 요소를 반환한다. */
+    public Recipe searchFirstElementByRecipeType(VegetarianType vegetarianType, Pageable pageable) {
+
+        return searchAllByRecipeType(vegetarianType, pageable).stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+    }
+
     public Recipe search(Long id) {
 
         return recipeRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+    }
+
+    public int countAllRecipeType(VegetarianType vegetarianType) {
+
+        return recipeRepository.countByRecipeType(vegetarianType);
     }
 }

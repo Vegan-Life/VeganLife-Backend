@@ -99,6 +99,35 @@ public class RecipeRepositoryTest {
         assertThat(found.getDescriptions().get(2).getSequence()).isEqualTo(3);
     }
 
+    @Test
+    @DisplayName("VegetarianType에 해당하는 Recipe 레코드 개수를 조회한다.")
+    void countByRecipeTypeTest() {
+
+        List<Recipe> recipes =
+                List.of(
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.PESCO.get())),
+                        createRecipe(
+                                List.of(
+                                        RecipeTypeFixture.OVO.get(),
+                                        RecipeTypeFixture.LACTO.get())));
+        recipeRepository.saveAll(recipes);
+
+        int ovoTotal = recipeRepository.countByRecipeType(VegetarianType.OVO);
+        int lactoTotal = recipeRepository.countByRecipeType(VegetarianType.LACTO);
+        int pescoTotal = recipeRepository.countByRecipeType(VegetarianType.PESCO);
+
+        assertThat(ovoTotal).isEqualTo(3);
+        assertThat(lactoTotal).isEqualTo(2);
+        assertThat(pescoTotal).isEqualTo(1);
+    }
+
     private Recipe createRecipe(List<RecipeType> recipeType) {
 
         List<RecipeType> recipeTypes = new ArrayList<>(recipeType);

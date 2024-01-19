@@ -5,7 +5,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
@@ -28,7 +28,7 @@ public interface RecipeMapper {
             source = "recipe.recipeTypes",
             target = "recipeTypes",
             qualifiedByName = "recipeTypeToVegetarianType")
-    RecipeListResponse toRecipeListResponse(Recipe recipe);
+    RecipeResponse toRecipeResponse(Recipe recipe);
 
     @Mapping(
             source = "recipe.recipeTypes",

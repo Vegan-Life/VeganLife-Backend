@@ -3,6 +3,7 @@ package com.konggogi.veganlife.recipe.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
@@ -10,8 +11,9 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
+import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
@@ -40,11 +42,12 @@ import org.springframework.data.support.PageableExecutionUtils;
 @ExtendWith(MockitoExtension.class)
 public class RecipeSearchServiceTest {
 
+    @Mock MemberQueryService memberQueryService;
     @Mock RecipeQueryService recipeQueryService;
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
     @InjectMocks RecipeSearchService recipeSearchService;
 
-    private final Member member = MemberFixture.DEFAULT_M.get();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("레시피 목록 조회 테스트 - response dto로 변환하여 반환한다.")
@@ -62,7 +65,7 @@ public class RecipeSearchServiceTest {
                                 any(VegetarianType.class), any(Pageable.class)))
                 .willReturn(result);
 
-        Page<RecipeListResponse> response =
+        Page<RecipeResponse> response =
                 recipeSearchService.searchAll(VegetarianType.OVO, Pageable.ofSize(20));
 
         assertThat(response.getNumberOfElements()).isEqualTo(2);
@@ -113,6 +116,51 @@ public class RecipeSearchServiceTest {
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
 
         assertThatThrownBy(() -> recipeSearchService.search(1L))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_RECIPE.getDescription());
+    }
+
+    @Test
+    @DisplayName("추천 레시피 목록 조회 테스트")
+    void searchRecommendedTest() {
+
+        Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.OVO.get());
+
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(recipeQueryService.countAllRecipeType(any(VegetarianType.class))).willReturn(1);
+        given(
+                        recipeQueryService.searchFirstElementByRecipeType(
+                                any(VegetarianType.class), any(Pageable.class)))
+                .willReturn(recipe);
+
+        List<RecipeResponse> response = recipeSearchService.searchRecommended(anyLong());
+
+        assertThat(response).hasSize(1);
+        assertThat(response.get(0).id()).isEqualTo(1L);
+        assertThat(response.get(0).name()).isEqualTo("표고버섯 탕수");
+        assertThat(response.get(0).recipeTypes()).hasSameElementsAs(List.of(VegetarianType.OVO));
+    }
+
+    @Test
+    @DisplayName("추천 레시피 목록 조회 테스트 - 존재하지 않는 사용자")
+    void searchRecommendedMemberNotFoundExceptionTest() {
+
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+
+        assertThatThrownBy(() -> recipeSearchService.searchRecommended(1L))
+                .isInstanceOf(NotFoundEntityException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+    }
+
+    @Test
+    @DisplayName("추천 레시피 목록 조회 테스트 - 존재하지 않는 레시피")
+    void searchRecommendedRecipeNotFoundExceptionTest() {
+
+        given(memberQueryService.search(anyLong()))
+                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
+
+        assertThatThrownBy(() -> recipeSearchService.searchRecommended(1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_RECIPE.getDescription());
     }

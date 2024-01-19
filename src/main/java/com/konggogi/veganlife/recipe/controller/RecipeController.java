@@ -5,10 +5,11 @@ import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
-import com.konggogi.veganlife.recipe.controller.dto.response.RecipeListResponse;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import com.konggogi.veganlife.recipe.service.RecipeService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping
-    public ResponseEntity<Page<RecipeListResponse>> getRecipeList(
+    public ResponseEntity<Page<RecipeResponse>> getRecipeList(
             VegetarianType vegetarianType, Pageable pageable) {
 
         return ResponseEntity.ok(recipeSearchService.searchAll(vegetarianType, pageable));
@@ -51,5 +52,12 @@ public class RecipeController {
         recipeService.add(request, userDetails.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<List<RecipeResponse>> getRecommendedRecipe(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return ResponseEntity.ok(recipeSearchService.searchRecommended(userDetails.id()));
     }
 }

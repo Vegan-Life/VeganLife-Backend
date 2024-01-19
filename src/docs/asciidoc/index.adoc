@@ -31,3 +31,5 @@ include::{docdir}/src/docs/asciidoc/post-like.adoc[]
 include::{docdir}/src/docs/asciidoc/comment.adoc[]
 
 include::{docdir}/src/docs/asciidoc/comment-like.adoc[]
+
+include::{docdir}/src/docs/asciidoc/recipe.adoc[]
