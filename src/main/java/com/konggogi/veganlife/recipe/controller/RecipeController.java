@@ -39,9 +39,10 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecipeDetailsResponse> getRecipeDetails(@PathVariable Long id) {
+    public ResponseEntity<RecipeDetailsResponse> getRecipeDetails(
+            @PathVariable("id") Long recipeId, UserDetailsImpl userDetails) {
 
-        return ResponseEntity.ok(recipeSearchService.search(id));
+        return ResponseEntity.ok(recipeSearchService.search(recipeId, userDetails.id()));
     }
 
     @PostMapping
