@@ -1,0 +1,64 @@
+= Recipe Like API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+
+== 레시피 좋아요 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recipe-like-add/request-headers.adoc[]
+
+include::{snippets}/recipe-like-add/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recipe-like-add/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/recipe-like-add-member-not-found/http-response.adoc[]
+
+include::{snippets}/recipe-like-add-recipe-not-found/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/recipe-like-add-duplicate/http-response.adoc[]
+
+== 레시피 좋아요 취소 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recipe-like-remove/request-headers.adoc[]
+
+include::{snippets}/recipe-like-remove/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recipe-like-remove/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/recipe-like-add-member-not-found/http-response.adoc[]
+
+include::{snippets}/recipe-like-add-recipe-not-found/http-response.adoc[]
+
+==== 409 CONFLICT
+
+include::{snippets}/recipe-like-remove-duplicate/http-response.adoc[]

@@ -18,6 +18,7 @@ import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
 import com.konggogi.veganlife.recipe.domain.RecipeIngredient;
+import com.konggogi.veganlife.recipe.domain.RecipeLike;
 import com.konggogi.veganlife.recipe.domain.RecipeType;
 import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapper;
 import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapperImpl;
@@ -28,6 +29,7 @@ import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +46,7 @@ public class RecipeSearchServiceTest {
 
     @Mock MemberQueryService memberQueryService;
     @Mock RecipeQueryService recipeQueryService;
+    @Mock RecipeLikeQueryService recipeLikeQueryService;
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
     @InjectMocks RecipeSearchService recipeSearchService;
 
@@ -86,16 +89,18 @@ public class RecipeSearchServiceTest {
     }
 
     @Test
-    @DisplayName("레시피 상세 조회 테스트")
-    void searchTest() {
+    @DisplayName("레시피 상세 조회 테스트 - 사용자가 좋아요를 누른 레시피")
+    void searchLikedTest() {
 
         Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
+        RecipeLike recipeLike = new RecipeLike(1L, recipe, member);
 
         given(recipeQueryService.search(1L)).willReturn(recipe);
+        given(recipeLikeQueryService.searchByRecipeIdAndMemberId(1L, 1L))
+                .willReturn(Optional.of(recipeLike));
 
-        RecipeDetailsResponse response = recipeSearchService.search(1L);
+        RecipeDetailsResponse response = recipeSearchService.search(1L, 1L);
 
-        assertThat(response.isLiked()).isEqualTo(false);
         assertThat(response.name()).isEqualTo("표고버섯 탕수");
         assertThat(response.recipeTypes()).hasSize(1);
         assertThat(response.recipeTypes().get(0)).isEqualTo(VegetarianType.LACTO);
@@ -106,6 +111,32 @@ public class RecipeSearchServiceTest {
                 .containsAll(
                         recipe.getIngredients().stream().map(RecipeIngredient::getName).toList());
         assertThat(response.descriptions()).allMatch(Objects::nonNull);
+        assertThat(response.isLiked()).isTrue();
+    }
+
+    @Test
+    @DisplayName("레시피 상세 조회 테스트 - 사용자가 좋아요를 누르지 않은 레시피")
+    void searchNotLikedTest() {
+
+        Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
+
+        given(recipeQueryService.search(1L)).willReturn(recipe);
+        given(recipeLikeQueryService.searchByRecipeIdAndMemberId(1L, 1L))
+                .willReturn(Optional.empty());
+
+        RecipeDetailsResponse response = recipeSearchService.search(1L, 1L);
+
+        assertThat(response.name()).isEqualTo("표고버섯 탕수");
+        assertThat(response.recipeTypes()).hasSize(1);
+        assertThat(response.recipeTypes().get(0)).isEqualTo(VegetarianType.LACTO);
+        assertThat(response.imageUrls())
+                .containsAll(
+                        recipe.getRecipeImages().stream().map(RecipeImage::getImageUrl).toList());
+        assertThat(response.ingredients())
+                .containsAll(
+                        recipe.getIngredients().stream().map(RecipeIngredient::getName).toList());
+        assertThat(response.descriptions()).allMatch(Objects::nonNull);
+        assertThat(response.isLiked()).isFalse();
     }
 
     @Test
@@ -115,7 +146,7 @@ public class RecipeSearchServiceTest {
         given(recipeQueryService.search(1L))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
 
-        assertThatThrownBy(() -> recipeSearchService.search(1L))
+        assertThatThrownBy(() -> recipeSearchService.search(1L, 1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_RECIPE.getDescription());
     }

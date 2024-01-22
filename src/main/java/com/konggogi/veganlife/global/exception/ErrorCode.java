@@ -57,7 +57,11 @@ public enum ErrorCode {
     ALREADY_COMMENT_UNLIKED("COMMENT_LIKE_002", "좋아요가 되어 있지 않은 댓글입니다."),
 
     // recipe
-    NOT_FOUND_RECIPE("RECIPE_001", "레시피를 찾을 수 없습니다.");
+    NOT_FOUND_RECIPE("RECIPE_001", "레시피를 찾을 수 없습니다."),
+
+    // recipe-like
+    ALREADY_RECIPE_LIKED("RECIPE_LIKE_001", "좋아요가 되어 있는 레시피입니다."),
+    ALREADY_RECIPE_UNLIKED("RECIPE_LIKE_002", "좋아요가 되어 있지 않은 레시피입니다.");
 
     private final String code;
     private final String description;

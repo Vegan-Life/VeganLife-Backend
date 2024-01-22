@@ -119,7 +119,7 @@ public class RecipeControllerTest extends RestDocsTest {
         Recipe recipe = createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get());
         RecipeDetailsResponse response = recipeMapper.toRecipeDetailsResponse(recipe, false);
 
-        given(recipeSearchService.search(anyLong())).willReturn(response);
+        given(recipeSearchService.search(anyLong(), anyLong())).willReturn(response);
 
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
@@ -147,7 +147,7 @@ public class RecipeControllerTest extends RestDocsTest {
     @DisplayName("레시피 상세 조회 API - 레시피 not found 예외")
     void getRecipeDetailsNotFoundExceptionTest() throws Exception {
 
-        given(recipeSearchService.search(anyLong()))
+        given(recipeSearchService.search(anyLong(), anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
 
         ResultActions perform =

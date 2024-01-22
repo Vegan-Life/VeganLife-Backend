@@ -28,6 +28,8 @@ public class RecipeSearchService {
 
     private final MemberQueryService memberQueryService;
     private final RecipeQueryService recipeQueryService;
+    private final RecipeLikeQueryService recipeLikeQueryService;
+
     private final RecipeMapper recipeMapper;
 
     public Page<RecipeResponse> searchAll(VegetarianType vegetarianType, Pageable pageable) {
@@ -37,10 +39,10 @@ public class RecipeSearchService {
                 .map(recipeMapper::toRecipeResponse);
     }
 
-    public RecipeDetailsResponse search(Long id) {
+    public RecipeDetailsResponse search(Long recipeId, Long memberId) {
 
-        // TODO: 사용자가 좋아요를 눌렀는지 확인하는 로직 추가
-        return recipeMapper.toRecipeDetailsResponse(recipeQueryService.search(id), false);
+        return recipeMapper.toRecipeDetailsResponse(
+                recipeQueryService.search(recipeId), isLikedRecipe(recipeId, memberId));
     }
 
     public List<RecipeResponse> searchRecommended(Long memberId) {
@@ -73,5 +75,10 @@ public class RecipeSearchService {
                 .stream()
                 .map(n -> PageRequest.of(n, PAGE_SIZE))
                 .toList();
+    }
+
+    private boolean isLikedRecipe(Long recipeId, Long memberId) {
+
+        return recipeLikeQueryService.searchByRecipeIdAndMemberId(recipeId, memberId).isPresent();
     }
 }
