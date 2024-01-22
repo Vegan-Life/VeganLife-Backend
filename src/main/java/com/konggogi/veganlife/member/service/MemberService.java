@@ -42,7 +42,7 @@ public class MemberService {
 
     public MemberLoginDto login(String email) {
         Member member = addIfNotPresent(email);
-        String accessToken = jwtProvider.createToken(email);
+        String accessToken = jwtProvider.createAccessToken(email);
         String refreshToken = jwtProvider.createRefreshToken(email);
         refreshTokenService.addOrUpdate(member.getId(), refreshToken);
         return memberMapper.toMemberLoginDto(member, accessToken, refreshToken);

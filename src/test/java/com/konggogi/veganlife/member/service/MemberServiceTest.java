@@ -65,7 +65,7 @@ class MemberServiceTest {
         String refreshToken = "refreshToken";
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.empty());
         given(memberRepository.save(any(Member.class))).willReturn(member);
-        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createAccessToken(anyString())).willReturn(accessToken);
         given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
         doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when
@@ -84,7 +84,7 @@ class MemberServiceTest {
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
         given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(member));
-        given(jwtProvider.createToken(anyString())).willReturn(accessToken);
+        given(jwtProvider.createAccessToken(anyString())).willReturn(accessToken);
         given(jwtProvider.createRefreshToken(anyString())).willReturn(refreshToken);
         doNothing().when(refreshTokenService).addOrUpdate(anyLong(), anyString());
         // when

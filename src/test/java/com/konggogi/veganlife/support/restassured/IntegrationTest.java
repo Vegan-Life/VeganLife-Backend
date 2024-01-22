@@ -42,6 +42,6 @@ public class IntegrationTest {
 
     protected String getAccessToken() {
 
-        return jwtProvider.createToken(member.getEmail());
+        return jwtProvider.createAccessToken(member.getEmail());
     }
 }
