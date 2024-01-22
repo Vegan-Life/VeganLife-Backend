@@ -10,7 +10,7 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-== 액세스 토큰 재발급 API
+== 토큰 재발급 API
 
 === Request
 
@@ -30,16 +30,8 @@ include::{snippets}/reissue-token/http-response.adoc[]
 
 ==== 401 UNAUTHORIZED
 
-include::{snippets}/reissue-token-invalid-token/http-response.adoc[]
-
 include::{snippets}/reissue-token-not-found-user-info/http-response.adoc[]
-
-==== 404 NOT FOUND
-
-include::{snippets}/reissue-token-not-found-member/http-response.adoc[]
-
-include::{snippets}/reissue-token-not-found-token/http-response.adoc[]
 
 ==== 400 BAD REQUEST
 
-include::{snippets}/reissue-token-mismatch/http-response.adoc[]
+include::{snippets}/reissue-token-not-found-match-token/http-response.adoc[]
