@@ -32,7 +32,7 @@ public class JwtProvider {
         key = jwtUtils.getSignInKey();
     }
 
-    public String createToken(String email) {
+    public String createAccessToken(String email) {
         return createToken(email, TOKEN_EXPIRATION);
     }
 
