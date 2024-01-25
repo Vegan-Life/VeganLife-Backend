@@ -5,5 +5,6 @@ public enum NotificationType {
     INTAKE_OVER_30,
     INTAKE_OVER_60,
     COMMENT,
-    COMMENT_LIKE
+    COMMENT_LIKE,
+    MENTION
 }
