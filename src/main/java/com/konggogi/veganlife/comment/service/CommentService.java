@@ -41,6 +41,7 @@ public class CommentService {
         Post post = postQueryService.search(postId);
         post.addComment(comment);
         commentNotifyService.notifyAddCommentIfNotAuthor(memberId, postId);
+        commentNotifyService.notifyMention(postId, memberId, commentAddRequest.content());
         return comment;
     }
 

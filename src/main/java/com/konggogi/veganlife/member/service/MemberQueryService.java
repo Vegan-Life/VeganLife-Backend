@@ -34,6 +34,10 @@ public class MemberQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
     }
 
+    public Optional<Member> searchByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname);
+    }
+
     public Optional<RefreshToken> searchRefreshToken(Long memberId) {
         return refreshTokenRepository.findByMemberId(memberId);
     }
