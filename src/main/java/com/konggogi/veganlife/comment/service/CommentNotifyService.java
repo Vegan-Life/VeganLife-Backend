@@ -45,13 +45,16 @@ public class CommentNotifyService {
                 .forEach(
                         nickname ->
                                 notifyIfParticipantMentioned(
-                                        nickname, participants, commentAuthor, post));
+                                        nickname, participants, commentAuthor, post.getMember()));
     }
 
     private void notifyIfParticipantMentioned(
-            String nickname, List<Member> participants, Member commentAuthor, Post post) {
+            String mentionedNickname,
+            List<Member> participants,
+            Member commentAuthor,
+            Member postAuthor) {
         memberQueryService
-                .searchByNickname(nickname)
+                .searchByNickname(mentionedNickname)
                 .ifPresent(
                         mentionedMember -> {
                             if (participants.contains(mentionedMember)
@@ -61,7 +64,7 @@ public class CommentNotifyService {
                                         NotificationType.MENTION,
                                         NotificationMessage.MENTION.getMessage(
                                                 commentAuthor.getNickname(),
-                                                post.getMember().getNickname()));
+                                                postAuthor.getNickname()));
                             }
                         });
     }
