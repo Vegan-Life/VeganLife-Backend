@@ -83,6 +83,17 @@ class MemberQueryServiceTest {
     }
 
     @Test
+    @DisplayName("회원 닉네임으로 Member 조회")
+    void searchByNicknameTest() {
+        // given
+        given(memberRepository.findByNickname(anyString())).willReturn(Optional.of(member));
+        // when
+        memberQueryService.searchByNickname(member.getNickname());
+        // then
+        then(memberRepository).should().findByNickname(eq(member.getNickname()));
+    }
+
+    @Test
     @DisplayName("회원 Id로 RefreshToken 조회")
     void searchRefreshToken() {
         // given
