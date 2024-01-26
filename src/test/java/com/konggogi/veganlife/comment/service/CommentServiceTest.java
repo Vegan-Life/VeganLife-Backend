@@ -3,8 +3,7 @@ package com.konggogi.veganlife.comment.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -58,6 +57,7 @@ class CommentServiceTest {
         given(commentMapper.toEntity(member, commentAddRequest)).willReturn(comment);
         given(postQueryService.search(anyLong())).willReturn(post);
         doNothing().when(commentNotifyService).notifyAddCommentIfNotAuthor(anyLong(), anyLong());
+        doNothing().when(commentNotifyService).notifyMention(anyLong(), anyLong(), anyString());
         // when
         Comment savedComment = commentService.add(member.getId(), post.getId(), commentAddRequest);
         // then
