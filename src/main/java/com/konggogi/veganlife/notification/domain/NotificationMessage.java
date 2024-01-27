@@ -26,6 +26,14 @@ public enum NotificationMessage implements MessageFormatter {
         public String getMessage(String commentLikeMember, String commentAuthor) {
             return String.format(this.getMessage(), commentLikeMember, commentAuthor);
         }
+    },
+
+    // mention
+    MENTION("%s님이 %s님의 게시글에 언급을 했습니다!") {
+        @Override
+        public String getMessage(String commentAuthor, String postAuthor) {
+            return String.format(this.getMessage(), commentAuthor, postAuthor);
+        }
     };
 
     private final String message;

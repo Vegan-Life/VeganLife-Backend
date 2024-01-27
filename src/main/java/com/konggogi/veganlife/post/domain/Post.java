@@ -6,7 +6,9 @@ import com.konggogi.veganlife.global.domain.TimeStamped;
 import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -99,5 +101,12 @@ public class Post extends TimeStamped {
     private void updateTags(List<PostTag> tags) {
         this.tags.clear();
         tags.forEach(this::addPostTag);
+    }
+
+    public List<Member> getAllParticipants() {
+        Set<Member> participants = new HashSet<>();
+        participants.add(this.member);
+        participants.addAll(this.comments.stream().map(Comment::getMember).toList());
+        return new ArrayList<>(participants);
     }
 }
