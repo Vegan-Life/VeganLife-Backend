@@ -3,8 +3,8 @@ package com.konggogi.veganlife.member.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.controller.dto.response.CalorieIntakeResponse;
+import com.konggogi.veganlife.member.controller.dto.response.DailyIntakeResponse;
 import com.konggogi.veganlife.member.controller.dto.response.RecommendNutrientsResponse;
-import com.konggogi.veganlife.member.controller.dto.response.TodayIntakeResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.NutrientsMapper;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -38,12 +38,12 @@ public class NutrientsController {
     }
 
     @GetMapping("/nutrients/day")
-    public ResponseEntity<TodayIntakeResponse> getDailyIntake(
+    public ResponseEntity<DailyIntakeResponse> getDailyIntake(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         IntakeNutrients intakeNutrients =
                 nutrientsSearchService.searchDailyIntakeNutrients(userDetails.id(), date);
-        return ResponseEntity.ok(nutrientsMapper.toTodayIntakeResponse(intakeNutrients));
+        return ResponseEntity.ok(nutrientsMapper.toDailyIntakeResponse(intakeNutrients));
     }
 
     @GetMapping("/nutrients/week")
