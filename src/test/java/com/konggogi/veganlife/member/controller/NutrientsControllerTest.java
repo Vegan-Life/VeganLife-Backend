@@ -19,7 +19,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.member.service.NutrientsQueryService;
+import com.konggogi.veganlife.member.service.NutrientsSearchService;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
@@ -35,7 +35,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(NutrientsController.class)
 class NutrientsControllerTest extends RestDocsTest {
     @MockBean MemberQueryService memberQueryService;
-    @MockBean NutrientsQueryService nutrientsQueryService;
+    @MockBean NutrientsSearchService nutrientsSearchService;
 
     @Test
     @DisplayName("권장 섭취량 조회 API")
@@ -83,7 +83,7 @@ class NutrientsControllerTest extends RestDocsTest {
     void getTodayIntakeTest() throws Exception {
         // given
         IntakeNutrients intakeNutrients = new IntakeNutrients(200, 50, 40, 30);
-        given(nutrientsQueryService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
                 .willReturn(intakeNutrients);
         // when
         ResultActions perform =
@@ -113,7 +113,7 @@ class NutrientsControllerTest extends RestDocsTest {
     @DisplayName("금일 섭취량 조회 API - 없는 회원 예외 발생")
     void getTodayIntakeNotMemberTest() throws Exception {
         // given
-        given(nutrientsQueryService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
@@ -139,10 +139,10 @@ class NutrientsControllerTest extends RestDocsTest {
         int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
         int totalCalorie = caloriePerMealType * 4 * days;
         given(
-                        nutrientsQueryService.searchWeeklyIntakeCalories(
+                        nutrientsSearchService.searchWeeklyIntakeCalories(
                                 anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(caloriesOfMealTypes);
-        given(nutrientsQueryService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
+        given(nutrientsSearchService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -175,7 +175,7 @@ class NutrientsControllerTest extends RestDocsTest {
     void getWeeklyIntakeNotMemberTest() throws Exception {
         // given
         given(
-                        nutrientsQueryService.searchWeeklyIntakeCalories(
+                        nutrientsSearchService.searchWeeklyIntakeCalories(
                                 anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
@@ -202,9 +202,9 @@ class NutrientsControllerTest extends RestDocsTest {
         }
         int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
         int totalCalorie = caloriePerMealType * 4 * weeks;
-        given(nutrientsQueryService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willReturn(caloriesOfMealTypes);
-        given(nutrientsQueryService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
+        given(nutrientsSearchService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -235,7 +235,7 @@ class NutrientsControllerTest extends RestDocsTest {
     @DisplayName("월간 섭취량 조회 API - 없는 회원 예외 발생")
     void getMonthlyIntakeNotMemberTest() throws Exception {
         // given
-        given(nutrientsQueryService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
@@ -260,9 +260,9 @@ class NutrientsControllerTest extends RestDocsTest {
         }
         int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
         int totalCalorie = caloriePerMealType * 4 * months;
-        given(nutrientsQueryService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willReturn(caloriesOfMealTypes);
-        given(nutrientsQueryService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
+        given(nutrientsSearchService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -293,7 +293,7 @@ class NutrientsControllerTest extends RestDocsTest {
     @DisplayName("연간 섭취량 조회 API - 없는 회원 예외 발생")
     void getYearlyIntakeNotMemberTest() throws Exception {
         // given
-        given(nutrientsQueryService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
+        given(nutrientsSearchService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
