@@ -8,7 +8,7 @@ import com.konggogi.veganlife.member.controller.dto.response.TodayIntakeResponse
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.NutrientsMapper;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.member.service.NutrientsQueryService;
+import com.konggogi.veganlife.member.service.NutrientsSearchService;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/members")
 public class NutrientsController {
     private final MemberQueryService memberQueryService;
-    private final NutrientsQueryService nutrientsQueryService;
+    private final NutrientsSearchService nutrientsSearchService;
     private final NutrientsMapper nutrientsMapper;
 
     @GetMapping("/nutrients")
@@ -42,7 +42,7 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         IntakeNutrients intakeNutrients =
-                nutrientsQueryService.searchDailyIntakeNutrients(userDetails.id(), date);
+                nutrientsSearchService.searchDailyIntakeNutrients(userDetails.id(), date);
         return ResponseEntity.ok(nutrientsMapper.toTodayIntakeResponse(intakeNutrients));
     }
 
@@ -52,9 +52,9 @@ public class NutrientsController {
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         List<CaloriesOfMealType> mealCalories =
-                nutrientsQueryService.searchWeeklyIntakeCalories(
+                nutrientsSearchService.searchWeeklyIntakeCalories(
                         userDetails.id(), startDate, endDate);
-        int totalCalorie = nutrientsQueryService.calcTotalCalorie(mealCalories);
+        int totalCalorie = nutrientsSearchService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
     }
@@ -65,8 +65,8 @@ public class NutrientsController {
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
         List<CaloriesOfMealType> mealCalories =
-                nutrientsQueryService.searchMonthlyIntakeCalories(userDetails.id(), startDate);
-        int totalCalorie = nutrientsQueryService.calcTotalCalorie(mealCalories);
+                nutrientsSearchService.searchMonthlyIntakeCalories(userDetails.id(), startDate);
+        int totalCalorie = nutrientsSearchService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
     }
@@ -77,8 +77,8 @@ public class NutrientsController {
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
         List<CaloriesOfMealType> mealCalories =
-                nutrientsQueryService.searchYearlyIntakeCalories(userDetails.id(), startDate);
-        int totalCalorie = nutrientsQueryService.calcTotalCalorie(mealCalories);
+                nutrientsSearchService.searchYearlyIntakeCalories(userDetails.id(), startDate);
+        int totalCalorie = nutrientsSearchService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(
                 nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
     }
