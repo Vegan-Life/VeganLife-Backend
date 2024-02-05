@@ -37,8 +37,8 @@ public class NutrientsController {
         return ResponseEntity.ok(nutrientsMapper.toRecommendNutrientsResponse(member));
     }
 
-    @GetMapping("/nutrients/today")
-    public ResponseEntity<TodayIntakeResponse> getTodayIntake(
+    @GetMapping("/nutrients/day")
+    public ResponseEntity<TodayIntakeResponse> getDailyIntake(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         IntakeNutrients intakeNutrients =
