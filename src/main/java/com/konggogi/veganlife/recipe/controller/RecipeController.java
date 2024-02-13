@@ -61,4 +61,10 @@ public class RecipeController {
 
         return ResponseEntity.ok(recipeSearchService.searchRecommended(userDetails.id()));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<RecipeResponse>> getRecipeListByKeyword(String keyword, Pageable pageable) {
+
+        return ResponseEntity.ok(recipeSearchService.searchAllByKeyword(keyword, pageable));
+    }
 }
