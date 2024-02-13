@@ -43,4 +43,10 @@ public class RecipeQueryService {
 
         return recipeRepository.countByRecipeType(vegetarianType);
     }
+
+
+    public Page<Recipe> searchAllByKeyword(String keyword, Pageable pageable) {
+
+        return recipeRepository.findAllByKeyword(keyword, pageable);
+    }
 }

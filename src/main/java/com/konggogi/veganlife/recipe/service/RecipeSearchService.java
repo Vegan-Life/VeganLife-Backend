@@ -39,6 +39,13 @@ public class RecipeSearchService {
                 .map(recipeMapper::toRecipeResponse);
     }
 
+    public Page<RecipeResponse> searchAllByKeyword(String keyword, Pageable pageable) {
+
+        return recipeQueryService
+                .searchAllByKeyword(keyword, pageable)
+                .map(recipeMapper::toRecipeResponse);
+    }
+
     public RecipeDetailsResponse search(Long recipeId, Long memberId) {
 
         return recipeMapper.toRecipeDetailsResponse(
