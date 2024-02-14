@@ -59,7 +59,7 @@ public class RecipeControllerTest extends RestDocsTest {
     @MockBean RecipeService recipeService;
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
 
-    private final Member member = MemberFixture.DEFAULT_M.get();
+    private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
 
     @Test
     @DisplayName("레시피 목록 조회 API")
@@ -68,15 +68,17 @@ public class RecipeControllerTest extends RestDocsTest {
         List<RecipeResponse> recipe =
                 List.of(
                         recipeMapper.toRecipeResponse(
-                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get())),
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get()), true),
                         recipeMapper.toRecipeResponse(
-                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get())),
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get()), false),
                         recipeMapper.toRecipeResponse(
-                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get())));
+                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get()), false));
         Page<RecipeResponse> response =
                 PageableExecutionUtils.getPage(recipe, Pageable.ofSize(20), recipe::size);
 
-        given(recipeSearchService.searchAll(any(VegetarianType.class), any(Pageable.class)))
+        given(
+                        recipeSearchService.searchAll(
+                                any(VegetarianType.class), any(Pageable.class), anyLong()))
                 .willReturn(response);
 
         ResultActions perform =
@@ -95,8 +97,13 @@ public class RecipeControllerTest extends RestDocsTest {
                         jsonPath("$.content.[0].thumbnailUrl").value(recipe.get(0).thumbnailUrl()))
                 .andExpect(jsonPath("$.content.[0].recipeTypes.size()").value(1))
                 .andExpect(
-                        jsonPath("$.content.[0].recipeTypes[0]")
-                                .value(VegetarianType.LACTO.name()));
+                        jsonPath("$.content.[0].recipeTypes[0]").value(VegetarianType.LACTO.name()))
+                .andExpect(jsonPath("$.content.[0].author.id").value(member.getId()))
+                .andExpect(jsonPath("$.content.[0].author.nickname").value(member.getNickname()))
+                .andExpect(
+                        jsonPath("$.content.[0].author.vegetarianType")
+                                .value(member.getVegetarianType().name()))
+                .andExpect(jsonPath("$.content.[0].isLiked").value(true));
 
         perform.andDo(print())
                 .andDo(
@@ -125,13 +132,18 @@ public class RecipeControllerTest extends RestDocsTest {
                 mockMvc.perform(get("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
 
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.isLiked").value(false))
                 .andExpect(jsonPath("$.name").value("표고버섯 탕수"))
                 .andExpect(jsonPath("$.recipeTypes.size()").value(1))
                 .andExpect(jsonPath("$.recipeTypes[0]").value(VegetarianType.LACTO.name()))
                 .andExpect(jsonPath("$.imageUrls.size()").value(3))
                 .andExpect(jsonPath("$.ingredients.size()").value(3))
-                .andExpect(jsonPath("$.descriptions.size()").value(3));
+                .andExpect(jsonPath("$.descriptions.size()").value(3))
+                .andExpect(jsonPath("$.author.id").value(member.getId()))
+                .andExpect(jsonPath("$.author.nickname").value(member.getNickname()))
+                .andExpect(
+                        jsonPath("$.author.vegetarianType")
+                                .value(member.getVegetarianType().name()))
+                .andExpect(jsonPath("$.isLiked").value(false));
 
         perform.andDo(print())
                 .andDo(
@@ -233,11 +245,11 @@ public class RecipeControllerTest extends RestDocsTest {
         List<RecipeResponse> response =
                 List.of(
                         recipeMapper.toRecipeResponse(
-                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get())),
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get()), false),
                         recipeMapper.toRecipeResponse(
-                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get())),
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get()), true),
                         recipeMapper.toRecipeResponse(
-                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get())));
+                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get()), true));
 
         given(recipeSearchService.searchRecommended(1L)).willReturn(response);
 
