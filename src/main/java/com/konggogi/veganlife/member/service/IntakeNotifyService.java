@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntakeNotifyService {
     private final NotificationService notificationService;
     private final MemberQueryService memberQueryService;
-    private final NutrientsSearchService nutrientsSearchService;
+    private final IntakeNutrientsService intakeNutrientsService;
     private final NotificationRepository notificationRepository;
 
     public void notifyIfOverIntake(Long memberId) {
         Member member = memberQueryService.search(memberId);
         IntakeNutrients intakeNutrients =
-                nutrientsSearchService.searchDailyIntakeNutrients(memberId, LocalDate.now());
+                intakeNutrientsService.searchDailyIntakeNutrients(memberId, LocalDate.now());
         int dailyAMR = member.getAMR();
         int todayIntakeCalorie = intakeNutrients.calorie();
         int overCalorie = todayIntakeCalorie - dailyAMR;
