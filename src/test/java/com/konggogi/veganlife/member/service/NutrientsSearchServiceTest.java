@@ -2,9 +2,10 @@ package com.konggogi.veganlife.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
@@ -17,6 +18,7 @@ import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
@@ -36,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class NutrientsSearchServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock MealLogRepository mealLogRepository;
+    @Mock MealLogQueryService mealLogQueryService;
     @InjectMocks NutrientsSearchService nutrientsSearchService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final List<MealData> mealData =
@@ -48,28 +51,20 @@ class NutrientsSearchServiceTest {
     private List<MealLog> mealLogs;
 
     @Test
-    @DisplayName("금일 섭취량 조회")
+    @DisplayName("일일 섭취량 조회")
     void searchDailyIntakeNutrientsTest() {
         // given
-        Long memberId = member.getId();
         Meal meal = meals.get(0);
-        mealLogs =
-                List.of(
-                        MealLogFixture.BREAKFAST.getWithDate(
-                                LocalDate.now(), meals, mealImages, member),
-                        MealLogFixture.LUNCH.getWithDate(
-                                LocalDate.now(), meals, mealImages, member));
+        LocalDate date = LocalDate.of(2024, 02, 15);
+        mealLogs = createMealLogs(date);
         int expectedSize = meals.size() * mealLogs.size();
-        LocalDate date = mealLogs.get(0).getCreatedAt().toLocalDate();
-        LocalDateTime startDate = date.atStartOfDay();
-        LocalDateTime endDate = date.atTime(LocalTime.MAX);
 
-        given(memberQueryService.search(memberId)).willReturn(member);
-        given(mealLogRepository.findAllByMemberIdAndCreatedAtBetween(memberId, startDate, endDate))
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(mealLogQueryService.searchByDateAndMember(any(LocalDate.class), any(Member.class)))
                 .willReturn(mealLogs);
         // when
         IntakeNutrients intakeNutrients =
-                nutrientsSearchService.searchDailyIntakeNutrients(memberId, date);
+                nutrientsSearchService.searchDailyIntakeNutrients(member.getId(), date);
         // then
         assertThat(intakeNutrients.calorie()).isEqualTo(meal.getCalorie() * expectedSize);
         assertThat(intakeNutrients.carbs()).isEqualTo(meal.getCarbs() * expectedSize);
@@ -78,19 +73,21 @@ class NutrientsSearchServiceTest {
     }
 
     @Test
-    @DisplayName("금일 섭취량 조회시 없는 회원이면 예외 발생")
-    void searchDailyIntakeNutrientsNotMemberTest() {
+    @DisplayName("일일 섭취량 조회 - Not Found Member")
+    void searchDailyIntakeNutrientsNotFoundMemberTest() {
         // given
-        Long memberId = member.getId();
-        given(memberQueryService.search(memberId))
+        given(memberQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
         assertThatThrownBy(
                         () ->
                                 nutrientsSearchService.searchDailyIntakeNutrients(
-                                        memberId, LocalDate.now()))
+                                        member.getId(), any(LocalDate.class)))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        then(mealLogQueryService)
+                .should(never())
+                .searchByDateAndMember(any(LocalDate.class), eq(member));
     }
 
     @Test

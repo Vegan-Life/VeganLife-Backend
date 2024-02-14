@@ -79,8 +79,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("금일 섭취량 조회 API")
-    void getTodayIntakeTest() throws Exception {
+    @DisplayName("일일 섭취량 조회 API")
+    void getDailyIntakeTest() throws Exception {
         // given
         IntakeNutrients intakeNutrients = new IntakeNutrients(200, 50, 40, 30);
         given(nutrientsSearchService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
@@ -88,9 +88,9 @@ class NutrientsControllerTest extends RestDocsTest {
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        get("/api/v1/members/nutrients/today")
+                        get("/api/v1/members/nutrients/day")
                                 .headers(authorizationHeader())
-                                .queryParam("startDate", "2024-01-01"));
+                                .queryParam("date", "2024-01-01"));
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.calorie").value(intakeNutrients.calorie()))
@@ -101,30 +101,30 @@ class NutrientsControllerTest extends RestDocsTest {
         perform.andDo(print())
                 .andDo(
                         document(
-                                "today-nutrients",
+                                "daily-nutrients",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc()),
-                                queryParameters(
-                                        parameterWithName("startDate").description("조회할 날짜"))));
+                                queryParameters(parameterWithName("date").description("조회할 날짜"))));
     }
 
     @Test
-    @DisplayName("금일 섭취량 조회 API - 없는 회원 예외 발생")
-    void getTodayIntakeNotMemberTest() throws Exception {
+    @DisplayName("일일 섭취량 조회 API - 없는 회원 예외 발생")
+    void getDailyIntakeNotMemberTest() throws Exception {
         // given
         given(nutrientsSearchService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        get("/api/v1/members/nutrients/today")
+                        get("/api/v1/members/nutrients/day")
                                 .headers(authorizationHeader())
-                                .queryParam("startDate", "2024-01-01"));
+                                .queryParam("date", "2024-01-01"));
         // then
         perform.andExpect(status().isNotFound());
 
-        perform.andDo(print()).andDo(document("today-nutrients-not-found", getDocumentResponse()));
+        perform.andDo(print())
+                .andDo(document("daily-nutrients-not-found-member", getDocumentResponse()));
     }
 
     @Test
