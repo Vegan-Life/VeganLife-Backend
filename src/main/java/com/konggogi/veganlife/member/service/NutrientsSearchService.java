@@ -92,16 +92,11 @@ public class NutrientsSearchService {
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
-        int totalCalorie = 0;
-        int totalCarbs = 0;
-        int totalProtein = 0;
-        int totalFat = 0;
-        for (Meal meal : meals) {
-            totalCalorie += meal.getCalorie();
-            totalCarbs += meal.getCarbs();
-            totalProtein += meal.getProtein();
-            totalFat += meal.getFat();
-        }
+        int totalCalorie = meals.stream().mapToInt(Meal::getCalorie).sum();
+        int totalCarbs = meals.stream().mapToInt(Meal::getCarbs).sum();
+        int totalProtein = meals.stream().mapToInt(Meal::getProtein).sum();
+        int totalFat = meals.stream().mapToInt(Meal::getFat).sum();
+
         return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
