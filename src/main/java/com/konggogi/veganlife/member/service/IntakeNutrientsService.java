@@ -5,6 +5,8 @@ import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.meallog.service.MealLogQueryService;
+import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.time.*;
@@ -18,14 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NutrientsQueryService {
+public class IntakeNutrientsService {
     private final MemberQueryService memberQueryService;
     private final MealLogRepository mealLogRepository;
+    private final MealLogQueryService mealLogQueryService;
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
-        memberQueryService.search(memberId);
-        List<Meal> meals = findAllMealOfMealLog(memberId, date, date);
-        return sumIntakeNutrients(meals);
+        Member member = memberQueryService.search(memberId);
+        return sumIntakeNutrients(searchAllMealByMemberAndCreatedAt(member, date));
     }
 
     public List<CaloriesOfMealType> searchWeeklyIntakeCalories(
@@ -75,8 +77,8 @@ public class NutrientsQueryService {
                         Integer::sum);
     }
 
-    private List<Meal> findAllMealOfMealLog(Long memberId, LocalDate startDate, LocalDate endDate) {
-        return findMealLog(memberId, startDate, endDate).stream()
+    private List<Meal> searchAllMealByMemberAndCreatedAt(Member member, LocalDate date) {
+        return mealLogQueryService.searchByDateAndMember(date, member).stream()
                 .map(MealLog::getMeals)
                 .flatMap(Collection::stream)
                 .toList();
@@ -90,16 +92,11 @@ public class NutrientsQueryService {
     }
 
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
-        int totalCalorie = 0;
-        int totalCarbs = 0;
-        int totalProtein = 0;
-        int totalFat = 0;
-        for (Meal meal : meals) {
-            totalCalorie += meal.getCalorie();
-            totalCarbs += meal.getCarbs();
-            totalProtein += meal.getProtein();
-            totalFat += meal.getFat();
-        }
+        int totalCalorie = meals.stream().mapToInt(Meal::getCalorie).sum();
+        int totalCarbs = meals.stream().mapToInt(Meal::getCarbs).sum();
+        int totalProtein = meals.stream().mapToInt(Meal::getProtein).sum();
+        int totalFat = meals.stream().mapToInt(Meal::getFat).sum();
+
         return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
