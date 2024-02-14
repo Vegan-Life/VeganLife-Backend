@@ -5,6 +5,8 @@ import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.meallog.service.MealLogQueryService;
+import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.time.*;
@@ -21,11 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class NutrientsSearchService {
     private final MemberQueryService memberQueryService;
     private final MealLogRepository mealLogRepository;
+    private final MealLogQueryService mealLogQueryService;
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
-        memberQueryService.search(memberId);
-        List<Meal> meals = findAllMealOfMealLog(memberId, date, date);
-        return sumIntakeNutrients(meals);
+        Member member = memberQueryService.search(memberId);
+        return sumIntakeNutrients(searchAllMealByMemberAndCreatedAt(member, date));
     }
 
     public List<CaloriesOfMealType> searchWeeklyIntakeCalories(
@@ -75,8 +77,8 @@ public class NutrientsSearchService {
                         Integer::sum);
     }
 
-    private List<Meal> findAllMealOfMealLog(Long memberId, LocalDate startDate, LocalDate endDate) {
-        return findMealLog(memberId, startDate, endDate).stream()
+    private List<Meal> searchAllMealByMemberAndCreatedAt(Member member, LocalDate date) {
+        return mealLogQueryService.searchByDateAndMember(date, member).stream()
                 .map(MealLog::getMeals)
                 .flatMap(Collection::stream)
                 .toList();
