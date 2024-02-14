@@ -35,11 +35,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class NutrientsSearchServiceTest {
+class IntakeNutrientsServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock MealLogRepository mealLogRepository;
     @Mock MealLogQueryService mealLogQueryService;
-    @InjectMocks NutrientsSearchService nutrientsSearchService;
+    @InjectMocks IntakeNutrientsService intakeNutrientsService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final List<MealData> mealData =
             List.of(
@@ -64,7 +64,7 @@ class NutrientsSearchServiceTest {
                 .willReturn(mealLogs);
         // when
         IntakeNutrients intakeNutrients =
-                nutrientsSearchService.searchDailyIntakeNutrients(member.getId(), date);
+                intakeNutrientsService.searchDailyIntakeNutrients(member.getId(), date);
         // then
         assertThat(intakeNutrients.calorie()).isEqualTo(meal.getCalorie() * expectedSize);
         assertThat(intakeNutrients.carbs()).isEqualTo(meal.getCarbs() * expectedSize);
@@ -81,7 +81,7 @@ class NutrientsSearchServiceTest {
         // when, then
         assertThatThrownBy(
                         () ->
-                                nutrientsSearchService.searchDailyIntakeNutrients(
+                                intakeNutrientsService.searchDailyIntakeNutrients(
                                         member.getId(), any(LocalDate.class)))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
@@ -106,7 +106,7 @@ class NutrientsSearchServiceTest {
                 .willReturn(mealLogs);
         // when
         List<CaloriesOfMealType> caloriesOfMealTypes =
-                nutrientsSearchService.searchWeeklyIntakeCalories(memberId, startDate, endDate);
+                intakeNutrientsService.searchWeeklyIntakeCalories(memberId, startDate, endDate);
         // then
         assertThat(caloriesOfMealTypes).hasSize(7);
         assertThat(caloriesOfMealTypes.get(0).breakfast())
@@ -127,7 +127,7 @@ class NutrientsSearchServiceTest {
         // when, then
         assertThatThrownBy(
                         () ->
-                                nutrientsSearchService.searchWeeklyIntakeCalories(
+                                intakeNutrientsService.searchWeeklyIntakeCalories(
                                         memberId, LocalDate.now(), LocalDate.now()))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
@@ -146,7 +146,7 @@ class NutrientsSearchServiceTest {
                         * 4
                         * caloriesOfMealTypes.size();
         // when
-        int totalCalorie = nutrientsSearchService.calcTotalCalorie(caloriesOfMealTypes);
+        int totalCalorie = intakeNutrientsService.calcTotalCalorie(caloriesOfMealTypes);
         // then
         assertThat(totalCalorie).isEqualTo(expectedCalorie);
     }
@@ -165,7 +165,7 @@ class NutrientsSearchServiceTest {
                 .willReturn(mealLogs);
         // when
         List<CaloriesOfMealType> caloriesOfMealTypes =
-                nutrientsSearchService.searchMonthlyIntakeCalories(
+                intakeNutrientsService.searchMonthlyIntakeCalories(
                         memberId, LocalDate.of(2023, 12, 1));
         // then
         assertThat(caloriesOfMealTypes.get(0).breakfast())
@@ -186,7 +186,7 @@ class NutrientsSearchServiceTest {
         // when, then
         assertThatThrownBy(
                         () ->
-                                nutrientsSearchService.searchMonthlyIntakeCalories(
+                                intakeNutrientsService.searchMonthlyIntakeCalories(
                                         memberId, LocalDate.now()))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
@@ -206,7 +206,7 @@ class NutrientsSearchServiceTest {
                 .willReturn(mealLogs);
         // when
         List<CaloriesOfMealType> caloriesOfMealTypes =
-                nutrientsSearchService.searchYearlyIntakeCalories(
+                intakeNutrientsService.searchYearlyIntakeCalories(
                         memberId, LocalDate.of(2023, 1, 1));
         // then
         assertThat(caloriesOfMealTypes.get(0).breakfast())
@@ -227,7 +227,7 @@ class NutrientsSearchServiceTest {
         // when, then
         assertThatThrownBy(
                         () ->
-                                nutrientsSearchService.searchYearlyIntakeCalories(
+                                intakeNutrientsService.searchYearlyIntakeCalories(
                                         memberId, LocalDate.now()))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());

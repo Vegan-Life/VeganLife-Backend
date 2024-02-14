@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class IntakeNotifyServiceTest {
     @Mock NotificationService notificationService;
     @Mock MemberQueryService memberQueryService;
-    @Mock NutrientsSearchService nutrientsSearchService;
+    @Mock IntakeNutrientsService intakeNutrientsService;
     @Mock NotificationRepository notificationRepository;
     @InjectMocks IntakeNotifyService intakeNotifyService;
 
@@ -43,7 +43,7 @@ class IntakeNotifyServiceTest {
         IntakeNutrients intakeNutrients =
                 IntakeNutrientsFixture.DEFAULT.getOverCalorieOfMember(member, 1.3f);
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(nutrientsSearchService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
+        given(intakeNutrientsService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
                 .willReturn(intakeNutrients);
         given(
                         notificationRepository.findByDateAndType(
@@ -70,7 +70,7 @@ class IntakeNotifyServiceTest {
         IntakeNutrients intakeNutrients =
                 IntakeNutrientsFixture.DEFAULT.getOverCalorieOfMember(member, 1.6f);
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(nutrientsSearchService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
+        given(intakeNutrientsService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
                 .willReturn(intakeNutrients);
         given(
                         notificationRepository.findByDateAndType(
@@ -98,7 +98,7 @@ class IntakeNotifyServiceTest {
                 IntakeNutrientsFixture.DEFAULT.getOverCalorieOfMember(member, 1.6f);
         Notification notification = NotificationFixture.INTAKE_OVER_60.get(member);
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(nutrientsSearchService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
+        given(intakeNutrientsService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
                 .willReturn(intakeNutrients);
         given(
                         notificationRepository.findByDateAndType(
@@ -122,7 +122,7 @@ class IntakeNotifyServiceTest {
         IntakeNutrients intakeNutrients =
                 IntakeNutrientsFixture.DEFAULT.getOverCalorieOfMember(member, 1f);
         given(memberQueryService.search(anyLong())).willReturn(member);
-        given(nutrientsSearchService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
+        given(intakeNutrientsService.searchDailyIntakeNutrients(memberId, LocalDate.now()))
                 .willReturn(intakeNutrients);
         // when, then
         assertDoesNotThrow(() -> intakeNotifyService.notifyIfOverIntake(memberId));
