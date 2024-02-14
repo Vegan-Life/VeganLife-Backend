@@ -40,7 +40,7 @@ public class NutrientsController {
     @GetMapping("/nutrients/day")
     public ResponseEntity<DailyIntakeResponse> getDailyIntake(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         IntakeNutrients intakeNutrients =
                 nutrientsSearchService.searchDailyIntakeNutrients(userDetails.id(), date);
         return ResponseEntity.ok(nutrientsMapper.toDailyIntakeResponse(intakeNutrients));
