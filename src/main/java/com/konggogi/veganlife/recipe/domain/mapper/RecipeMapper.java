@@ -28,7 +28,8 @@ public interface RecipeMapper {
             source = "recipe.recipeTypes",
             target = "recipeTypes",
             qualifiedByName = "recipeTypeToVegetarianType")
-    RecipeResponse toRecipeResponse(Recipe recipe);
+    @Mapping(source = "recipe.member", target = "author")
+    RecipeResponse toRecipeResponse(Recipe recipe, boolean isLiked);
 
     @Mapping(
             source = "recipe.recipeTypes",
@@ -46,10 +47,12 @@ public interface RecipeMapper {
             source = "recipe.descriptions",
             target = "descriptions",
             qualifiedByName = "recipeDescriptionToString")
+    @Mapping(source = "recipe.member", target = "author")
     RecipeDetailsResponse toRecipeDetailsResponse(Recipe recipe, boolean isLiked);
 
     default Recipe toEntity(RecipeAddRequest request, Member member) {
 
+        // TODO: 이 로직이 매핑 로직인지, 서비스 로직인지 모호함, 리팩토링 단계에서 추가적으로 고민
         Recipe recipe = Recipe.builder().name(request.name()).member(member).build();
 
         List<RecipeType> recipeTypes =
@@ -72,6 +75,7 @@ public interface RecipeMapper {
                                                 idx + 1, request.descriptions().get(idx), recipe))
                         .toList();
 
+        // TODO: update 내부에서 Recipe와 Recipe 하위 엔티티의 관계를 설정하도록 수정
         recipe.update(recipeTypes, recipeImages, ingredients, descriptions);
 
         return recipe;
