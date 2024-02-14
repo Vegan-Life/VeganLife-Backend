@@ -5,9 +5,10 @@ import com.konggogi.veganlife.member.domain.VegetarianType;
 import java.util.List;
 
 public record RecipeDetailsResponse(
-        boolean isLiked,
         String name,
         List<VegetarianType> recipeTypes,
         List<String> imageUrls,
         List<String> ingredients,
-        List<String> descriptions) {}
+        List<String> descriptions,
+        RecipeAuthorResponse author,
+        boolean isLiked) {}

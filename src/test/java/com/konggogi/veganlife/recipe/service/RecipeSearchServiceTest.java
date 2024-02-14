@@ -69,7 +69,7 @@ public class RecipeSearchServiceTest {
                 .willReturn(result);
 
         Page<RecipeResponse> response =
-                recipeSearchService.searchAll(VegetarianType.OVO, Pageable.ofSize(20));
+                recipeSearchService.searchAll(VegetarianType.OVO, Pageable.ofSize(20), 1L);
 
         assertThat(response.getNumberOfElements()).isEqualTo(2);
         assertThat(response.getContent().get(0).thumbnailUrl())

@@ -32,18 +32,27 @@ public class RecipeSearchService {
 
     private final RecipeMapper recipeMapper;
 
-    public Page<RecipeResponse> searchAll(VegetarianType vegetarianType, Pageable pageable) {
+    public Page<RecipeResponse> searchAll(
+            VegetarianType vegetarianType, Pageable pageable, Long memberId) {
 
+        // TODO: 조회하는 레시피의 개수만큼 좋아요를 했는지 확인하는 쿼리 발생, 개선이 필요하다.
         return recipeQueryService
                 .searchAllByRecipeType(vegetarianType, pageable)
-                .map(recipeMapper::toRecipeResponse);
+                .map(
+                        recipe ->
+                                recipeMapper.toRecipeResponse(
+                                        recipe, isLikedRecipe(recipe.getId(), memberId)));
     }
 
-    public Page<RecipeResponse> searchAllByKeyword(String keyword, Pageable pageable) {
+    public Page<RecipeResponse> searchAllByKeyword(
+            String keyword, Pageable pageable, Long memberId) {
 
         return recipeQueryService
                 .searchAllByKeyword(keyword, pageable)
-                .map(recipeMapper::toRecipeResponse);
+                .map(
+                        recipe ->
+                                recipeMapper.toRecipeResponse(
+                                        recipe, isLikedRecipe(recipe.getId(), memberId)));
     }
 
     public RecipeDetailsResponse search(Long recipeId, Long memberId) {
@@ -56,7 +65,12 @@ public class RecipeSearchService {
 
         Member member = memberQueryService.search(memberId);
 
-        return getRecommendRecipes(member).stream().map(recipeMapper::toRecipeResponse).toList();
+        return getRecommendRecipes(member).stream()
+                .map(
+                        recipe ->
+                                recipeMapper.toRecipeResponse(
+                                        recipe, isLikedRecipe(recipe.getId(), memberId)))
+                .toList();
     }
 
     // TODO: 랜덤 조회를 위해 5개의 쿼리가 발생, 성능 측정 필요

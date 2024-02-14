@@ -33,9 +33,12 @@ public class RecipeController {
 
     @GetMapping
     public ResponseEntity<Page<RecipeResponse>> getRecipeList(
-            VegetarianType vegetarianType, Pageable pageable) {
+            VegetarianType vegetarianType,
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return ResponseEntity.ok(recipeSearchService.searchAll(vegetarianType, pageable));
+        return ResponseEntity.ok(
+                recipeSearchService.searchAll(vegetarianType, pageable, userDetails.id()));
     }
 
     @GetMapping("/{id}")
@@ -64,8 +67,11 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<RecipeResponse>> getRecipeListByKeyword(
-            String keyword, Pageable pageable) {
+            String keyword,
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return ResponseEntity.ok(recipeSearchService.searchAllByKeyword(keyword, pageable));
+        return ResponseEntity.ok(
+                recipeSearchService.searchAllByKeyword(keyword, pageable, userDetails.id()));
     }
 }
