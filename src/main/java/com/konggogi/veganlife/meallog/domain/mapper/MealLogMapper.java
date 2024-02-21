@@ -36,6 +36,9 @@ public interface MealLogMapper {
     @Named("mealImageToImageUrl")
     static String mealImageToImageUrl(MealImage mealImage) {
 
+        if (mealImage == null) {
+            return null;
+        }
         return mealImage.getImageUrl();
     }
 }
