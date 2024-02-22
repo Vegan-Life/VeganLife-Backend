@@ -8,21 +8,17 @@ import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
+import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
+import jakarta.persistence.Tuple;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
-import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +53,7 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 저장 테스트")
     void mealLogSaveTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData);
+        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
         // when
         MealLog result = mealLogRepository.save(mealLog);
         // then
@@ -70,31 +66,6 @@ public class MealLogRepositoryTest {
                 .allMatch(Objects::nonNull);
         assertThat(result.getMealImages().stream().map(MealImage::getMealLog))
                 .allMatch(Objects::nonNull);
-    }
-
-    @Test
-    @DisplayName("회원 Id와 날짜로 MealLog 조회")
-    void findAllByMemberIdAndModifiedAtBetweenTest() {
-        // given
-        Long memberId = member.getId();
-        List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
-        List<MealImage> mealImages =
-                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-        MealLog mealLog =
-                MealLogFixture.BREAKFAST.getWithDate(LocalDate.now(), meals, mealImages, member);
-        MealLog savedMealLog = mealLogRepository.save(mealLog);
-
-        LocalDate date = savedMealLog.getCreatedAt().toLocalDate();
-        LocalDateTime startDate = date.atStartOfDay();
-        LocalDateTime endDate = date.atTime(LocalTime.MAX);
-        // when
-        List<MealLog> mealLogs =
-                mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
-                        memberId, startDate, endDate);
-
-        // then
-        ListAssert<MealLog> mealLogListAssert = assertThat(mealLogs).hasSize(1);
-        assertThat(mealLogs).extracting(MealLog::getMember).containsOnly(member);
     }
 
     @Test
@@ -127,7 +98,7 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 수정 테스트 - 연관된 자식 엔티티를 삭제하고 새로 삽입한다")
     void mealLogUpdateTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData);
+        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
         mealLogRepository.saveAndFlush(mealLog);
         // when
         List<Meal> modifiedMeals = new ArrayList<>();
@@ -171,10 +142,10 @@ public class MealLogRepositoryTest {
     @DisplayName("회원의 MealLog 모두 삭제")
     void deleteAllByMemberIdTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData);
+        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
         Member otherMember = MemberFixture.DEFAULT_F.get();
         memberRepository.save(otherMember);
-        MealLog otherMealLog = createMealLog(otherMember, mealData);
+        MealLog otherMealLog = createMealLog(otherMember, mealData, null, MealLogFixture.BREAKFAST);
         mealLogRepository.save(mealLog);
         mealLogRepository.save(otherMealLog);
         // when
@@ -184,10 +155,94 @@ public class MealLogRepositoryTest {
         assertThat(mealLogRepository.findById(mealLog.getId())).isEmpty();
     }
 
-    private MealLog createMealLog(Member member, List<MealData> mealData) {
+    @Test
+    @DisplayName("회원 id와 날짜에 해당하는 MealLog를 MealType별로 합산")
+    void sumCaloriesOfMealTypeByMemberIdAndCreatedAtTest() {
+        // given
+        LocalDate date = LocalDate.of(2024, 2, 22);
+        Arrays.stream(MealLogFixture.values())
+                .forEach(
+                        mealType -> {
+                            MealLog mealLog = createMealLog(member, mealData, date, mealType);
+                            mealLogRepository.save(mealLog);
+                        });
+        // when
+        List<Tuple> totalCaloriesOfMealTypes =
+                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAt(member.getId(), date);
+        Map<MealType, Integer> caloriesOfMealTypeMap =
+                toCaloriesOfMealTypeMap(totalCaloriesOfMealTypes);
+        // then
+        int expectedCalorie =
+                MealFixture.DEFAULT.get(mealData.get(0)).getCalorie() * mealData.size();
+        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST_SNACK)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH_SNACK)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER_SNACK)).isEqualTo(expectedCalorie);
+    }
+
+    @Test
+    @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
+    void sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetweenTest() {
+        // given
+        LocalDate startDate = LocalDate.of(2024, 2, 18);
+        LocalDate endDate = LocalDate.of(2024, 2, 24);
+        startDate
+                .datesUntil(endDate.plusDays(1))
+                .forEach(
+                        date -> {
+                            Arrays.stream(MealLogFixture.values())
+                                    .forEach(
+                                            mealType -> {
+                                                MealLog mealLog =
+                                                        createMealLog(
+                                                                member, mealData, date, mealType);
+                                                mealLogRepository.save(mealLog);
+                                            });
+                        });
+        // when
+        List<Tuple> totalCaloriesOfMealTypes =
+                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
+                        member.getId(), startDate, endDate);
+        Map<MealType, Integer> caloriesOfMealTypeMap =
+                toCaloriesOfMealTypeMap(totalCaloriesOfMealTypes);
+        // then
+        int expectedCalorie =
+                MealFixture.DEFAULT.get(mealData.get(0)).getCalorie() * mealData.size() * 7;
+        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST_SNACK)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH_SNACK)).isEqualTo(expectedCalorie);
+        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER_SNACK)).isEqualTo(expectedCalorie);
+    }
+
+    private MealLog createMealLog(
+            Member member,
+            List<MealData> mealData,
+            LocalDate date,
+            MealLogFixture mealTypeOfFixture) {
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
-                IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-        return MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+                IntStream.range(0, mealData.size())
+                        .mapToObj(idx -> MealImageFixture.DEFAULT.get())
+                        .toList();
+
+        if (date != null) {
+            return mealTypeOfFixture.getWithDate(date, meals, mealImages, member);
+        } else {
+            return mealTypeOfFixture.get(meals, mealImages, member);
+        }
+    }
+
+    private Map<MealType, Integer> toCaloriesOfMealTypeMap(List<Tuple> totalCaloriesOfMealTypes) {
+        Map<MealType, Integer> caloriesOfMealTypeMap = new EnumMap<>(MealType.class);
+        for (Tuple tuple : totalCaloriesOfMealTypes) {
+            MealType mealType = tuple.get("mealType", MealType.class);
+            Integer totalCalories = tuple.get("totalCalories", Long.class).intValue();
+            caloriesOfMealTypeMap.put(mealType, totalCalories);
+        }
+        return caloriesOfMealTypeMap;
     }
 }

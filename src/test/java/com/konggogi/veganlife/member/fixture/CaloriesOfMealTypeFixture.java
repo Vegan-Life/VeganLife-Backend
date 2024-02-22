@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.member.fixture;
 
 
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 
 public enum CaloriesOfMealTypeFixture {
     DEFAULT(10, 10, 10, 10);
@@ -17,11 +17,11 @@ public enum CaloriesOfMealTypeFixture {
         this.snack = snack;
     }
 
-    public CaloriesOfMealType get() {
-        return new CaloriesOfMealType(breakfast, lunch, dinner, snack);
+    public IntakeCalorie get() {
+        return new IntakeCalorie(breakfast, lunch, dinner, snack);
     }
 
-    public CaloriesOfMealType getWithIntake(int intake) {
-        return new CaloriesOfMealType(intake, intake, intake, intake);
+    public IntakeCalorie getWithIntake(int intake) {
+        return new IntakeCalorie(intake, intake, intake, intake);
     }
 }

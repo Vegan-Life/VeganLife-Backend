@@ -20,7 +20,7 @@ import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.IntakeNutrientsService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
@@ -39,7 +39,7 @@ class NutrientsControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("권장 섭취량 조회 API")
-    void getMemberDailyNutrientsTest() throws Exception {
+    void getRecommendNutrientsTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
         given(memberQueryService.search(anyLong())).willReturn(member);
@@ -63,8 +63,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("권장 섭취량 조회 API - 없는 회원 예외 발생")
-    void getNotMemberDailyNutrientsTest() throws Exception {
+    @DisplayName("권장 섭취량 조회 API - Not Found Member")
+    void getRecommendNutrientsNotFoundMemberTest() throws Exception {
         // given
         given(memberQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
@@ -109,8 +109,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("일일 섭취량 조회 API - 없는 회원 예외 발생")
-    void getDailyIntakeNotMemberTest() throws Exception {
+    @DisplayName("일일 섭취량 조회 API - Not Found Member")
+    void getDailyIntakeNotFoundMemberTest() throws Exception {
         // given
         given(intakeNutrientsService.searchDailyIntakeNutrients(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
@@ -129,19 +129,19 @@ class NutrientsControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("주간 섭취량 조회 API")
-    void getWeeklyIntakeTest() throws Exception {
+    void getWeeklyIntakeCalorieTest() throws Exception {
         // given
-        List<CaloriesOfMealType> caloriesOfMealTypes = new ArrayList<>();
+        List<IntakeCalorie> intakeCalories = new ArrayList<>();
         int days = 7;
         for (int i = 0; i < days; i++) {
-            caloriesOfMealTypes.add(CaloriesOfMealTypeFixture.DEFAULT.get());
+            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.get());
         }
-        int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
-        int totalCalorie = caloriePerMealType * 4 * days;
+        int calorieOfMealType = intakeCalories.get(0).breakfast();
+        int totalCalorie = (calorieOfMealType * 4) * days;
         given(
                         intakeNutrientsService.searchWeeklyIntakeCalories(
                                 anyLong(), any(LocalDate.class), any(LocalDate.class)))
-                .willReturn(caloriesOfMealTypes);
+                .willReturn(intakeCalories);
         given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
@@ -153,10 +153,10 @@ class NutrientsControllerTest extends RestDocsTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(caloriePerMealType));
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorieOfMealType));
 
         perform.andDo(print())
                 .andDo(
@@ -171,8 +171,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("주간 섭취량 조회 API - 없는 회원 예외 발생")
-    void getWeeklyIntakeNotMemberTest() throws Exception {
+    @DisplayName("주간 섭취량 조회 API - Not Found Member")
+    void getWeeklyIntakeCalorieNotFoundMemberTest() throws Exception {
         // given
         given(
                         intakeNutrientsService.searchWeeklyIntakeCalories(
@@ -193,17 +193,17 @@ class NutrientsControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("월간 섭취량 조회 API")
-    void getMonthlyIntakeTest() throws Exception {
+    void getMonthlyIntakeCalorieTest() throws Exception {
         // given
-        List<CaloriesOfMealType> caloriesOfMealTypes = new ArrayList<>();
-        int weeks = 6;
+        List<IntakeCalorie> intakeCalories = new ArrayList<>();
+        int weeks = 5;
         for (int i = 0; i < weeks; i++) {
-            caloriesOfMealTypes.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(100));
+            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(100));
         }
-        int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
-        int totalCalorie = caloriePerMealType * 4 * weeks;
+        int calorieOfMealType = intakeCalories.get(0).breakfast();
+        int totalCalorie = (calorieOfMealType * 4) * weeks;
         given(intakeNutrientsService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
-                .willReturn(caloriesOfMealTypes);
+                .willReturn(intakeCalories);
         given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
@@ -214,10 +214,10 @@ class NutrientsControllerTest extends RestDocsTest {
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(caloriePerMealType));
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorieOfMealType))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorieOfMealType));
 
         perform.andDo(print())
                 .andDo(
@@ -232,8 +232,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("월간 섭취량 조회 API - 없는 회원 예외 발생")
-    void getMonthlyIntakeNotMemberTest() throws Exception {
+    @DisplayName("월간 섭취량 조회 API - Not Found Member")
+    void getMonthlyIntakeCalorieNotFoundMemberTest() throws Exception {
         // given
         given(intakeNutrientsService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
@@ -251,17 +251,17 @@ class NutrientsControllerTest extends RestDocsTest {
 
     @Test
     @DisplayName("연간 섭취량 조회 API")
-    void getYearlyIntakeTest() throws Exception {
+    void getYearlyIntakeCalorieTest() throws Exception {
         // given
-        List<CaloriesOfMealType> caloriesOfMealTypes = new ArrayList<>();
+        List<IntakeCalorie> intakeCalories = new ArrayList<>();
         int months = 12;
         for (int i = 0; i < months; i++) {
-            caloriesOfMealTypes.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(300));
+            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(300));
         }
-        int caloriePerMealType = caloriesOfMealTypes.get(0).breakfast();
+        int caloriePerMealType = intakeCalories.get(0).breakfast();
         int totalCalorie = caloriePerMealType * 4 * months;
         given(intakeNutrientsService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
-                .willReturn(caloriesOfMealTypes);
+                .willReturn(intakeCalories);
         given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
@@ -290,8 +290,8 @@ class NutrientsControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("연간 섭취량 조회 API - 없는 회원 예외 발생")
-    void getYearlyIntakeNotMemberTest() throws Exception {
+    @DisplayName("연간 섭취량 조회 API - Not Found Member")
+    void getYearlyIntakeCalorieNotFoundMemberTest() throws Exception {
         // given
         given(intakeNutrientsService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
