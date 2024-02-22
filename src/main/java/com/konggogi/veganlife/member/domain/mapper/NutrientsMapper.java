@@ -5,7 +5,7 @@ import com.konggogi.veganlife.member.controller.dto.response.CalorieIntakeRespon
 import com.konggogi.veganlife.member.controller.dto.response.DailyIntakeResponse;
 import com.konggogi.veganlife.member.controller.dto.response.RecommendNutrientsResponse;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.util.List;
 import org.mapstruct.Mapper;
@@ -18,7 +18,7 @@ public interface NutrientsMapper {
     @Mapping(target = "dailyCalorie", source = "member.AMR")
     RecommendNutrientsResponse toRecommendNutrientsResponse(Member member);
 
-    @Mapping(source = "caloriesOfMealTypes", target = "periodicCalorie")
+    @Mapping(source = "intakeCalories", target = "periodicCalorie")
     CalorieIntakeResponse toCalorieIntakeResponse(
-            int totalCalorie, List<CaloriesOfMealType> caloriesOfMealTypes);
+            int totalCalorie, List<IntakeCalorie> intakeCalories);
 }

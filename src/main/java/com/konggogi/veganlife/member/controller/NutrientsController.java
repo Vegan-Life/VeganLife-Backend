@@ -9,7 +9,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.NutrientsMapper;
 import com.konggogi.veganlife.member.service.IntakeNutrientsService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import java.time.LocalDate;
 import java.util.List;
@@ -51,7 +51,7 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        List<CaloriesOfMealType> mealCalories =
+        List<IntakeCalorie> mealCalories =
                 intakeNutrientsService.searchWeeklyIntakeCalories(
                         userDetails.id(), startDate, endDate);
         int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
@@ -64,7 +64,7 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
-        List<CaloriesOfMealType> mealCalories =
+        List<IntakeCalorie> mealCalories =
                 intakeNutrientsService.searchMonthlyIntakeCalories(userDetails.id(), startDate);
         int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(
@@ -76,7 +76,7 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
-        List<CaloriesOfMealType> mealCalories =
+        List<IntakeCalorie> mealCalories =
                 intakeNutrientsService.searchYearlyIntakeCalories(userDetails.id(), startDate);
         int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
         return ResponseEntity.ok(

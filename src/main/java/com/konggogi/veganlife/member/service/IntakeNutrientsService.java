@@ -4,15 +4,17 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
-import com.konggogi.veganlife.meallog.repository.MealLogRepository;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import java.time.*;
+import jakarta.persistence.Tuple;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.YearMonth;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,50 +24,59 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class IntakeNutrientsService {
     private final MemberQueryService memberQueryService;
-    private final MealLogRepository mealLogRepository;
     private final MealLogQueryService mealLogQueryService;
+    private final MealLogMapper mealLogMapper;
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
         Member member = memberQueryService.search(memberId);
         return sumIntakeNutrients(searchAllMealByMemberAndCreatedAt(member, date));
     }
 
-    public List<CaloriesOfMealType> searchWeeklyIntakeCalories(
+    public List<IntakeCalorie> searchWeeklyIntakeCalories(
             Long memberId, LocalDate startDate, LocalDate endDate) {
         memberQueryService.search(memberId);
         return startDate
                 .datesUntil(endDate.plusDays(1))
                 .map(
                         date -> {
-                            List<MealLog> mealLogs = findMealLog(memberId, date, date);
-                            return sumCalorieByMealType(mealLogs);
+                            return aggregateDailyCaloriesOfMealType(memberId, date);
                         })
                 .toList();
     }
 
-    public List<CaloriesOfMealType> searchMonthlyIntakeCalories(
-            Long memberId, LocalDate startDate) {
+    public List<IntakeCalorie> searchMonthlyIntakeCalories(Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
         startDate = YearMonth.from(startDate).atDay(1);
         LocalDate endDate = YearMonth.from(startDate).atEndOfMonth();
         return getStartDatesOfWeeks(startDate, endDate).stream()
-                .map(startDayOfWeek -> calcWeekCalories(memberId, startDayOfWeek))
+                .map(
+                        startDateOfWeek -> {
+                            LocalDate endDateOfWeek = startDateOfWeek.plusDays(6);
+                            return aggregateCaloriesOfMealTypeForPeriod(
+                                    memberId, startDateOfWeek, endDateOfWeek);
+                        })
                 .toList();
     }
 
-    public List<CaloriesOfMealType> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
+    public List<IntakeCalorie> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
         int year = startDate.getYear();
         startDate = LocalDate.of(year, 1, 1);
         LocalDate endDate = LocalDate.of(year, 12, 31);
         return startDate
                 .datesUntil(endDate.plusDays(1), Period.ofMonths(1))
-                .map(startDayOfMonth -> calcMonthCalories(memberId, startDayOfMonth))
+                .map(
+                        startDateOfMonth -> {
+                            LocalDate endDateOfMonth =
+                                    YearMonth.from(startDateOfMonth).atEndOfMonth();
+                            return aggregateCaloriesOfMealTypeForPeriod(
+                                    memberId, startDateOfMonth, endDateOfMonth);
+                        })
                 .toList();
     }
 
-    public int calcTotalCalorie(List<CaloriesOfMealType> caloriesOfMealTypes) {
-        return caloriesOfMealTypes.parallelStream()
+    public int calcTotalCalorie(List<IntakeCalorie> intakeCalories) {
+        return intakeCalories.parallelStream()
                 .reduce(
                         0,
                         (accumulator, mealCalorie) ->
@@ -84,45 +95,36 @@ public class IntakeNutrientsService {
                 .toList();
     }
 
-    private List<MealLog> findMealLog(Long memberId, LocalDate startDate, LocalDate endDate) {
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-        return mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
-                memberId, startDateTime, endDateTime);
-    }
-
     private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
         int totalCalorie = meals.stream().mapToInt(Meal::getCalorie).sum();
         int totalCarbs = meals.stream().mapToInt(Meal::getCarbs).sum();
         int totalProtein = meals.stream().mapToInt(Meal::getProtein).sum();
         int totalFat = meals.stream().mapToInt(Meal::getFat).sum();
-
         return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
-    private CaloriesOfMealType sumCalorieByMealType(List<MealLog> mealLogs) {
-        Map<MealType, Integer> caloriesByMealTypeGroup = calcCaloriesByMealTypeGroup(mealLogs);
-        int snackTotalCalorie = sumSnackTotalCalorie(caloriesByMealTypeGroup);
-        return new CaloriesOfMealType(
-                caloriesByMealTypeGroup.getOrDefault(MealType.BREAKFAST, 0),
-                caloriesByMealTypeGroup.getOrDefault(MealType.LUNCH, 0),
-                caloriesByMealTypeGroup.getOrDefault(MealType.DINNER, 0),
-                snackTotalCalorie);
+    private IntakeCalorie aggregateDailyCaloriesOfMealType(Long memberId, LocalDate date) {
+        List<Tuple> caloriesOfMeals =
+                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(memberId, date);
+        return createCaloriesOfMealType(caloriesOfMeals);
     }
 
-    private Map<MealType, Integer> calcCaloriesByMealTypeGroup(List<MealLog> mealLogs) {
-        return mealLogs.stream()
-                .flatMap(
-                        mealLog ->
-                                mealLog.getMeals().stream()
-                                        .map(
-                                                meal ->
-                                                        new AbstractMap.SimpleEntry<>(
-                                                                mealLog.getMealType(),
-                                                                meal.getCalorie())))
-                .collect(
-                        Collectors.groupingBy(
-                                Map.Entry::getKey, Collectors.summingInt(Map.Entry::getValue)));
+    private IntakeCalorie aggregateCaloriesOfMealTypeForPeriod(
+            Long memberId, LocalDate startDate, LocalDate endDate) {
+        List<Tuple> caloriesOfMeals =
+                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                        memberId, startDate, endDate);
+        return createCaloriesOfMealType(caloriesOfMeals);
+    }
+
+    private IntakeCalorie createCaloriesOfMealType(List<Tuple> caloriesOfMealTypeTuples) {
+        Map<MealType, Integer> totalCaloriesOfMealTypeMap =
+                mealLogMapper.toTotalCaloriesOfMealTypeMap(caloriesOfMealTypeTuples);
+        return new IntakeCalorie(
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.BREAKFAST, 0),
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.LUNCH, 0),
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.DINNER, 0),
+                sumSnackTotalCalorie(totalCaloriesOfMealTypeMap));
     }
 
     private int sumSnackTotalCalorie(Map<MealType, Integer> caloriesByType) {
@@ -138,17 +140,5 @@ public class IntakeNutrientsService {
         return startDayOfFirstWeek
                 .datesUntil(lastDayOfLastWeek.plusDays(1), Period.ofWeeks(1))
                 .toList();
-    }
-
-    private CaloriesOfMealType calcWeekCalories(Long memberId, LocalDate startDayOfWeek) {
-        LocalDate endDayOfWeek = startDayOfWeek.plusDays(6);
-        List<MealLog> mealLogs = findMealLog(memberId, startDayOfWeek, endDayOfWeek);
-        return sumCalorieByMealType(mealLogs);
-    }
-
-    private CaloriesOfMealType calcMonthCalories(Long memberId, LocalDate startDayOfMonth) {
-        LocalDate endDayOfMonth = YearMonth.from(startDayOfMonth).atEndOfMonth();
-        List<MealLog> mealLogs = findMealLog(memberId, startDayOfMonth, endDayOfMonth);
-        return sumCalorieByMealType(mealLogs);
     }
 }

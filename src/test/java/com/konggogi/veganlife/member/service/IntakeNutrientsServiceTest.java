@@ -14,18 +14,22 @@ import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
+import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
-import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import java.time.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,8 +41,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class IntakeNutrientsServiceTest {
     @Mock MemberQueryService memberQueryService;
-    @Mock MealLogRepository mealLogRepository;
     @Mock MealLogQueryService mealLogQueryService;
+    @Mock MealLogMapper mealLogMapper;
     @InjectMocks IntakeNutrientsService intakeNutrientsService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final List<MealData> mealData =
@@ -82,7 +86,7 @@ class IntakeNutrientsServiceTest {
         assertThatThrownBy(
                         () ->
                                 intakeNutrientsService.searchDailyIntakeNutrients(
-                                        member.getId(), any(LocalDate.class)))
+                                        member.getId(), LocalDate.of(2024, 2, 24)))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(mealLogQueryService)
@@ -91,146 +95,102 @@ class IntakeNutrientsServiceTest {
     }
 
     @Test
-    @DisplayName("주간 섭취량 조회")
+    @DisplayName("주간 섭취 칼로리 조회")
     void searchWeeklyIntakeCalorieTest() {
         // given
-        Long memberId = member.getId();
-        Meal meal = meals.get(0);
-        LocalDate startDate = LocalDate.of(2023, 12, 17);
-        LocalDate endDate = LocalDate.of(2023, 12, 23);
-        List<MealLog> mealLogs = createMealLogs(startDate);
-        given(memberQueryService.search(memberId)).willReturn(member);
+        LocalDate startDate = LocalDate.of(2023, 2, 18);
+        LocalDate endDate = LocalDate.of(2023, 2, 24);
+        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size();
+        Map<MealType, Integer> totalCaloriesOfMealType =
+                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .willReturn(mealLogs);
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
+                                anyLong(), any(LocalDate.class)))
+                .willReturn(new ArrayList<>());
+        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
+                .willReturn(totalCaloriesOfMealType);
         // when
-        List<CaloriesOfMealType> caloriesOfMealTypes =
-                intakeNutrientsService.searchWeeklyIntakeCalories(memberId, startDate, endDate);
+        List<IntakeCalorie> intakeCalories =
+                intakeNutrientsService.searchWeeklyIntakeCalories(
+                        member.getId(), startDate, endDate);
         // then
-        assertThat(caloriesOfMealTypes).hasSize(7);
-        assertThat(caloriesOfMealTypes.get(0).breakfast())
-                .isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).lunch()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).dinner()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).snack())
-                .isEqualTo(meal.getCalorie() * meals.size() * 3);
+
+        assertThat(intakeCalories).hasSize(7);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
     }
 
     @Test
-    @DisplayName("주간 섭취량 조회시 없는 회원이면 예외 발생")
-    void searchWeeklyIntakeNutrientsNotMemberTest() {
-        // given
-        Long memberId = member.getId();
-        given(memberQueryService.search(memberId))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                intakeNutrientsService.searchWeeklyIntakeCalories(
-                                        memberId, LocalDate.now(), LocalDate.now()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-    }
-
-    @Test
-    @DisplayName("총 섭취한 칼로리 계산")
+    @DisplayName("칼로리 합산")
     void calcTotalCalorieTest() {
         // given
-        List<CaloriesOfMealType> caloriesOfMealTypes =
+        List<IntakeCalorie> intakeCalories =
                 List.of(
                         CaloriesOfMealTypeFixture.DEFAULT.get(),
                         CaloriesOfMealTypeFixture.DEFAULT.get());
         int expectedCalorie =
-                CaloriesOfMealTypeFixture.DEFAULT.get().breakfast()
-                        * 4
-                        * caloriesOfMealTypes.size();
+                CaloriesOfMealTypeFixture.DEFAULT.get().breakfast() * 4 * intakeCalories.size();
         // when
-        int totalCalorie = intakeNutrientsService.calcTotalCalorie(caloriesOfMealTypes);
+        int totalCalorie = intakeNutrientsService.calcTotalCalorie(intakeCalories);
         // then
         assertThat(totalCalorie).isEqualTo(expectedCalorie);
     }
 
     @Test
-    @DisplayName("월간 섭취량 조회")
+    @DisplayName("월간 섭취 칼로리 조회")
     void searchMonthlyIntakeCaloriesTest() {
         // given
-        Long memberId = member.getId();
-        Meal meal = meals.get(0);
-        List<MealLog> mealLogs = createMealLogs(LocalDate.now());
-        given(memberQueryService.search(memberId)).willReturn(member);
+        LocalDate startDate = LocalDate.of(2023, 2, 18);
+        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size() * 5;
+        Map<MealType, Integer> totalCaloriesOfMealType =
+                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .willReturn(mealLogs);
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .willReturn(new ArrayList<>());
+        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
+                .willReturn(totalCaloriesOfMealType);
         // when
-        List<CaloriesOfMealType> caloriesOfMealTypes =
-                intakeNutrientsService.searchMonthlyIntakeCalories(
-                        memberId, LocalDate.of(2023, 12, 1));
+        List<IntakeCalorie> intakeCalories =
+                intakeNutrientsService.searchMonthlyIntakeCalories(member.getId(), startDate);
         // then
-        assertThat(caloriesOfMealTypes.get(0).breakfast())
-                .isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).lunch()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).dinner()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).snack())
-                .isEqualTo(meal.getCalorie() * meals.size() * 3);
+
+        assertThat(intakeCalories).hasSize(5);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
     }
 
     @Test
-    @DisplayName("월간 섭취량 조회 시 없는 회원 예외 발생")
-    void searchMonthlyIntakeCaloriesNotMemberTest() {
-        // given
-        Long memberId = member.getId();
-        given(memberQueryService.search(memberId))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                intakeNutrientsService.searchMonthlyIntakeCalories(
-                                        memberId, LocalDate.now()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
-    }
-
-    @Test
-    @DisplayName("연간 섭취량 조회")
+    @DisplayName("연간 섭취 칼로리 조회")
     void searchYearlyIntakeCaloriesTest() {
         // given
-        Long memberId = member.getId();
-        Meal meal = meals.get(0);
-        List<MealLog> mealLogs = createMealLogs(LocalDate.now());
-        given(memberQueryService.search(memberId)).willReturn(member);
+        LocalDate startDate = LocalDate.of(2023, 2, 18);
+        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size() * 5;
+        Map<MealType, Integer> totalCaloriesOfMealType =
+                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogRepository.findAllByMemberIdAndCreatedAtBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .willReturn(mealLogs);
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .willReturn(new ArrayList<>());
+        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
+                .willReturn(totalCaloriesOfMealType);
         // when
-        List<CaloriesOfMealType> caloriesOfMealTypes =
-                intakeNutrientsService.searchYearlyIntakeCalories(
-                        memberId, LocalDate.of(2023, 1, 1));
+        List<IntakeCalorie> intakeCalories =
+                intakeNutrientsService.searchYearlyIntakeCalories(member.getId(), startDate);
         // then
-        assertThat(caloriesOfMealTypes.get(0).breakfast())
-                .isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).lunch()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).dinner()).isEqualTo(meal.getCalorie() * meals.size());
-        assertThat(caloriesOfMealTypes.get(0).snack())
-                .isEqualTo(meal.getCalorie() * meals.size() * 3);
-    }
 
-    @Test
-    @DisplayName("연간 섭취량 조회 시 없는 회원 예외 발생")
-    void searchYearlyIntakeCaloriesNotMemberTest() {
-        // given
-        Long memberId = member.getId();
-        given(memberQueryService.search(memberId))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                intakeNutrientsService.searchYearlyIntakeCalories(
-                                        memberId, LocalDate.now()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+        assertThat(intakeCalories).hasSize(12);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
     }
 
     private List<MealLog> createMealLogs(LocalDate date) {
@@ -241,5 +201,20 @@ class IntakeNutrientsServiceTest {
                 MealLogFixture.BREAKFAST_SNACK.getWithDate(date, meals, mealImages, member),
                 MealLogFixture.LUNCH_SNACK.getWithDate(date, meals, mealImages, member),
                 MealLogFixture.DINNER_SNACK.getWithDate(date, meals, mealImages, member));
+    }
+
+    private Map<MealType, Integer> createCalorieOfMealTypeMap(int totalCalorieOfMealType) {
+        Map<MealType, Integer> totalCaloriesOfMealType =
+                new HashMap<>() {
+                    {
+                        put(MealType.BREAKFAST, totalCalorieOfMealType);
+                        put(MealType.LUNCH, totalCalorieOfMealType);
+                        put(MealType.DINNER, totalCalorieOfMealType);
+                        put(MealType.BREAKFAST_SNACK, totalCalorieOfMealType);
+                        put(MealType.LUNCH_SNACK, totalCalorieOfMealType);
+                        put(MealType.DINNER_SNACK, totalCalorieOfMealType);
+                    }
+                };
+        return totalCaloriesOfMealType;
     }
 }

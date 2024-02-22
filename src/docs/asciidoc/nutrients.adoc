@@ -54,7 +54,7 @@ include::{snippets}/daily-nutrients/http-response.adoc[]
 
 include::{snippets}/daily-nutrients-not-found-member/http-response.adoc[]
 
-== 주간 섭취량 조회 API
+== 주간 섭취 칼로리 조회 API
 
 === Request
 
@@ -79,7 +79,7 @@ include::{snippets}/weekly-intake/http-response.adoc[]
 
 include::{snippets}/weekly-intake-not-found/http-response.adoc[]
 
-== 월간 섭취량 조회 API
+== 월간 섭취 칼로리 조회 API
 
 === Request
 
@@ -96,7 +96,7 @@ include::{snippets}/monthly-intake/http-request.adoc[]
 === Response
 
 ==== 200 OK
-각 주차별 합산된 칼로리 값
+각 주차별 합산된 칼로리 값 (월별 주(week) 개수가 다를 수 있음)
 
 include::{snippets}/monthly-intake/http-response.adoc[]
 
@@ -104,7 +104,7 @@ include::{snippets}/monthly-intake/http-response.adoc[]
 
 include::{snippets}/monthly-intake-not-found/http-response.adoc[]
 
-== 연간 섭취량 조회 API
+== 연간 섭취 칼로리 조회 API
 
 === Request
 

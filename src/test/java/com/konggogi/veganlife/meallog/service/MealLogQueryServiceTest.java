@@ -1,7 +1,8 @@
 package com.konggogi.veganlife.meallog.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
@@ -16,7 +17,9 @@ import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.fixture.MemberFixture;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -34,7 +37,7 @@ public class MealLogQueryServiceTest {
     @Mock MealLogRepository mealLogRepository;
     @InjectMocks MealLogQueryService mealLogQueryService;
 
-    Member member = Member.builder().email("test123@test.com").build();
+    Member member = MemberFixture.DEFAULT_F.getWithId(1L);
     List<MealData> mealData =
             List.of(
                     MealDataFixture.TOTAL_AMOUNT.get(1L, member),
@@ -90,5 +93,40 @@ public class MealLogQueryServiceTest {
         assertThatThrownBy(() -> mealLogQueryService.search(1L))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_MEAL_LOG.getDescription());
+    }
+
+    @Test
+    @DisplayName("회원 id와 날짜에 해당하는 MealLog를 MealType별로 합산")
+    void sumCaloriesOfMealTypeByMemberIdAndDateTest() {
+        // given
+        LocalDate date = LocalDate.of(2024, 2, 24);
+        given(
+                        mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAt(
+                                anyLong(), any(LocalDate.class)))
+                .willReturn(new ArrayList<>());
+
+        // when, then
+        assertThatNoException()
+                .isThrownBy(
+                        () ->
+                                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
+                                        member.getId(), date));
+    }
+
+    @Test
+    @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
+    void sumCaloriesOfMealTypeByMemberIdAndDateBetweenTest() {
+        LocalDate startDate = LocalDate.of(2024, 2, 18);
+        LocalDate endDate = LocalDate.of(2024, 2, 24);
+        given(
+                        mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                .willReturn(new ArrayList<>());
+
+        assertThatNoException()
+                .isThrownBy(
+                        () ->
+                                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                                        member.getId(), startDate, endDate));
     }
 }
