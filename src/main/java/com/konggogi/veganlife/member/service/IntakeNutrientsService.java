@@ -4,6 +4,7 @@ package com.konggogi.veganlife.member.service;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntakeNutrientsService {
     private final MemberQueryService memberQueryService;
     private final MealLogQueryService mealLogQueryService;
+    private final MealLogMapper mealLogMapper;
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
         Member member = memberQueryService.search(memberId);
@@ -116,17 +118,13 @@ public class IntakeNutrientsService {
     }
 
     private IntakeCalorie createCaloriesOfMealType(List<Tuple> caloriesOfMealTypeTuples) {
-        Map<MealType, Integer> caloriesOfMealTypeMap = new EnumMap<>(MealType.class);
-        for (Tuple tuple : caloriesOfMealTypeTuples) {
-            MealType mealType = tuple.get("mealType", MealType.class);
-            Integer totalCalories = tuple.get("totalCalories", Long.class).intValue();
-            caloriesOfMealTypeMap.put(mealType, totalCalories);
-        }
+        Map<MealType, Integer> totalCaloriesOfMealTypeMap =
+                mealLogMapper.toTotalCaloriesOfMealTypeMap(caloriesOfMealTypeTuples);
         return new IntakeCalorie(
-                caloriesOfMealTypeMap.getOrDefault(MealType.BREAKFAST, 0),
-                caloriesOfMealTypeMap.getOrDefault(MealType.LUNCH, 0),
-                caloriesOfMealTypeMap.getOrDefault(MealType.DINNER, 0),
-                sumSnackTotalCalorie(caloriesOfMealTypeMap));
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.BREAKFAST, 0),
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.LUNCH, 0),
+                totalCaloriesOfMealTypeMap.getOrDefault(MealType.DINNER, 0),
+                sumSnackTotalCalorie(totalCaloriesOfMealTypeMap));
     }
 
     private int sumSnackTotalCalorie(Map<MealType, Integer> caloriesByType) {
