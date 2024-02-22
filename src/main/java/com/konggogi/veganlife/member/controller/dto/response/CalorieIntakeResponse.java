@@ -1,8 +1,7 @@
 package com.konggogi.veganlife.member.controller.dto.response;
 
 
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import java.util.List;
 
-public record CalorieIntakeResponse(
-        Integer totalCalorie, List<CaloriesOfMealType> periodicCalorie) {}
+public record CalorieIntakeResponse(Integer totalCalorie, List<IntakeCalorie> periodicCalorie) {}

@@ -6,7 +6,7 @@ import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.service.dto.CaloriesOfMealType;
+import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import jakarta.persistence.Tuple;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ public class IntakeNutrientsService {
         return sumIntakeNutrients(searchAllMealByMemberAndCreatedAt(member, date));
     }
 
-    public List<CaloriesOfMealType> searchWeeklyIntakeCalories(
+    public List<IntakeCalorie> searchWeeklyIntakeCalories(
             Long memberId, LocalDate startDate, LocalDate endDate) {
         memberQueryService.search(memberId);
         return startDate
@@ -42,8 +42,7 @@ public class IntakeNutrientsService {
                 .toList();
     }
 
-    public List<CaloriesOfMealType> searchMonthlyIntakeCalories(
-            Long memberId, LocalDate startDate) {
+    public List<IntakeCalorie> searchMonthlyIntakeCalories(Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
         startDate = YearMonth.from(startDate).atDay(1);
         LocalDate endDate = YearMonth.from(startDate).atEndOfMonth();
@@ -57,7 +56,7 @@ public class IntakeNutrientsService {
                 .toList();
     }
 
-    public List<CaloriesOfMealType> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
+    public List<IntakeCalorie> searchYearlyIntakeCalories(Long memberId, LocalDate startDate) {
         memberQueryService.search(memberId);
         int year = startDate.getYear();
         startDate = LocalDate.of(year, 1, 1);
@@ -74,8 +73,8 @@ public class IntakeNutrientsService {
                 .toList();
     }
 
-    public int calcTotalCalorie(List<CaloriesOfMealType> caloriesOfMealTypes) {
-        return caloriesOfMealTypes.parallelStream()
+    public int calcTotalCalorie(List<IntakeCalorie> intakeCalories) {
+        return intakeCalories.parallelStream()
                 .reduce(
                         0,
                         (accumulator, mealCalorie) ->
@@ -102,13 +101,13 @@ public class IntakeNutrientsService {
         return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
-    private CaloriesOfMealType aggregateDailyCaloriesOfMealType(Long memberId, LocalDate date) {
+    private IntakeCalorie aggregateDailyCaloriesOfMealType(Long memberId, LocalDate date) {
         List<Tuple> caloriesOfMeals =
                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(memberId, date);
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
-    private CaloriesOfMealType aggregateCaloriesOfMealTypeForPeriod(
+    private IntakeCalorie aggregateCaloriesOfMealTypeForPeriod(
             Long memberId, LocalDate startDate, LocalDate endDate) {
         List<Tuple> caloriesOfMeals =
                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
@@ -116,14 +115,14 @@ public class IntakeNutrientsService {
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
-    private CaloriesOfMealType createCaloriesOfMealType(List<Tuple> caloriesOfMealTypeTuples) {
+    private IntakeCalorie createCaloriesOfMealType(List<Tuple> caloriesOfMealTypeTuples) {
         Map<MealType, Integer> caloriesOfMealTypeMap = new EnumMap<>(MealType.class);
         for (Tuple tuple : caloriesOfMealTypeTuples) {
             MealType mealType = tuple.get("mealType", MealType.class);
             Integer totalCalories = tuple.get("totalCalories", Long.class).intValue();
             caloriesOfMealTypeMap.put(mealType, totalCalories);
         }
-        return new CaloriesOfMealType(
+        return new IntakeCalorie(
                 caloriesOfMealTypeMap.getOrDefault(MealType.BREAKFAST, 0),
                 caloriesOfMealTypeMap.getOrDefault(MealType.LUNCH, 0),
                 caloriesOfMealTypeMap.getOrDefault(MealType.DINNER, 0),
