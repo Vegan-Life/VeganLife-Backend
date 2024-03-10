@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.member.service;
 
 
-import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
@@ -29,7 +28,14 @@ public class IntakeNutrientsService {
 
     public IntakeNutrients searchDailyIntakeNutrients(Long memberId, LocalDate date) {
         Member member = memberQueryService.search(memberId);
-        return sumIntakeNutrients(searchAllMealByMemberAndCreatedAt(member, date));
+        List<MealLog> mealLogs = mealLogQueryService.searchByDateAndMember(date, member);
+        IntakeNutrients totalIntakeNutrients = new IntakeNutrients(0, 0, 0, 0);
+        for (MealLog mealLog : mealLogs) {
+            IntakeNutrients intakeNutrients = mealLog.getTotalIntakeNutrients();
+            totalIntakeNutrients = totalIntakeNutrients.add(intakeNutrients);
+        }
+
+        return totalIntakeNutrients;
     }
 
     public List<IntakeCalorie> searchWeeklyIntakeCalories(
@@ -86,21 +92,6 @@ public class IntakeNutrientsService {
                                         + mealCalorie.dinner()
                                         + mealCalorie.snack(),
                         Integer::sum);
-    }
-
-    private List<Meal> searchAllMealByMemberAndCreatedAt(Member member, LocalDate date) {
-        return mealLogQueryService.searchByDateAndMember(date, member).stream()
-                .map(MealLog::getMeals)
-                .flatMap(Collection::stream)
-                .toList();
-    }
-
-    private IntakeNutrients sumIntakeNutrients(List<Meal> meals) {
-        int totalCalorie = meals.stream().mapToInt(Meal::getCalorie).sum();
-        int totalCarbs = meals.stream().mapToInt(Meal::getCarbs).sum();
-        int totalProtein = meals.stream().mapToInt(Meal::getProtein).sum();
-        int totalFat = meals.stream().mapToInt(Meal::getFat).sum();
-        return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
     private IntakeCalorie aggregateDailyCaloriesOfMealTypeForDay(Long memberId, LocalDate date) {
