@@ -82,10 +82,10 @@ jobs:
         mkdir -p ~/.ssh/
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
         chmod 600 ~/.ssh/veganlife-dev.key
-        cat >>~/.ssh/config << END
+        cat >>~/.ssh/config <<END
         Host veganlife-dev
           HostName $SSH_HOST
-          User $SSH_USER
+          User $SSH_USERNAME
           IdentityFile ~/.ssh/veganlife-dev.key
           StrictHostKeyChecking no
         END
