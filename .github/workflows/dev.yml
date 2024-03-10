@@ -104,6 +104,7 @@ jobs:
       - name: Move to Workspace
         run: |
           ssh veganlife-dev 'cd veganlife-dev'
+          ssh veganlife-dev 'ls -al'
 
       - name: Docker Compose Down
         run: |
