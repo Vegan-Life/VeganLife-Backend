@@ -4,18 +4,7 @@ package com.konggogi.veganlife.meallog.domain;
 import com.konggogi.veganlife.global.domain.TimeStamped;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
@@ -26,6 +15,11 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(
+        name = "meal_log",
+        indexes = {
+            @Index(name = "idx_meal_log_on_member_created_at", columnList = "member_id, createdAt")
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MealLog extends TimeStamped {
 
