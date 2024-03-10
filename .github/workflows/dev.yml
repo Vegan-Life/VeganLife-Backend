@@ -77,7 +77,23 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
-    - name: SSH connection
+    - name: Configure SSH
       run: |
-        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}/${{ secrets.SSH_HOST }}
-        ls -al
+        mkdir -p ~/.ssh/
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
+        chmod 600 ~/.ssh/veganlife-dev.key
+        cat >>~/.ssh/config << END
+        Host veganlife-dev
+          HostName $SSH_HOST
+          User $SSH_USER
+          IdentityFile ~/.ssh/veganlife-dev.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: SSH Connection Test
+      run: |
+        ssh veganlife-dev 'ls -al'
