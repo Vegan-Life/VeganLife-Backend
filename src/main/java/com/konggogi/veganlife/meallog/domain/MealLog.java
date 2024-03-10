@@ -72,7 +72,6 @@ public class MealLog extends TimeStamped {
     }
 
     public IntakeNutrients getTotalIntakeNutrients() {
-        // TODO: reduce를 사용했을 때와 성능 비교해보기
         return new IntakeNutrients(
                 calculateTotal(Meal::getCalorie, meals),
                 calculateTotal(Meal::getCarbs, meals),
@@ -81,7 +80,6 @@ public class MealLog extends TimeStamped {
     }
 
     private int calculateTotal(ToIntFunction<Meal> func, List<Meal> meals) {
-
         return meals.stream().mapToInt(func).sum();
     }
 }
