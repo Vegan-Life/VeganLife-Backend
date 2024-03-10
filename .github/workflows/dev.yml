@@ -78,6 +78,7 @@ jobs:
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
   deploy:
+    needs: build
     name: Deploy Server via SSH
     runs-on: ubuntu-latest
 
