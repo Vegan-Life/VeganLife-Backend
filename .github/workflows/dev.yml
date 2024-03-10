@@ -104,10 +104,20 @@ jobs:
 
     steps:
       - name: Health Check
-        uses: jtalk/url-health-check-ation@v3
-        with:
-          url: DEV_HEALTHCHECK_URL
-          max-attempts: 10
-          retry-delay: 3s
+        run: |
+          attempt_count=10
+          for ((i=1; i<=$attempt_count; i++)); do
+              response=$(curl -IsS --max-time 5 "$DEV_HEALTHCHECK_URL" | head -n 1 | cut -d$' ' -f2)
+              if [ "$response" == "200" ]; then
+                  echo "헬스 체크 성공 - HTTP 상태코드: $response"
+                  exit 0
+              else
+                  echo "헬스 체크 실패 - HTTP 상태코드: $response"
+              fi
+              sleep 3
+          done
+
+          echo "헬스 체크 $attempt_count회 시도 중 실패"
+          exit 1
         env:
           DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
