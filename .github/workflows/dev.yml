@@ -96,3 +96,18 @@ jobs:
         run: |
           echo "Clear"
           ssh veganlife-dev 'docker system prune -a'
+
+  healthcheck:
+    needs: [build, deploy]
+    name: Server Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Health Check
+        uses: jtalk/url-health-check-ation@v3
+        with:
+          url: DEV_HEALTHCHECK_URL
+          max-attempts: 10
+          retry-delay: 3s
+        env:
+          DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
