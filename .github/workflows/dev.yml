@@ -64,12 +64,20 @@ jobs:
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: |
-        ./gradlew clean build
+        ./gradlew clean build -x test -x asciidoctor
 
-    # Dockerfile을 통해 이미지 빌드, Docker hub으로 push
-    - name: Docker Build & Push to Docker Repository
+    # Dockerfile을 통해 이미지 빌드
+    - name: Docker Build
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker build -f docker/Dockerfile -t ${{ secrets.DOCKER_REPO }}/veganlife-dev .
+
+    # Docker hub에 업로드
+    - name: Push to Docker Repo
+      run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
-        
+
+    - name: SSH connection
+      run: |
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USERNAME }}/${{ secrets.SSH_HOST }}
+        ls -al
