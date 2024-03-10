@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class TotalCalorieOfMealType {
     private MealType mealType;
     private Integer totalCalorie;
+
+    public TotalCalorieOfMealType(MealType mealType, Integer totalCalorie) {
+        this.mealType = mealType;
+        this.totalCalorie = totalCalorie;
+    }
 }
