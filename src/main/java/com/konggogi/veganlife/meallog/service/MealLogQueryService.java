@@ -6,8 +6,9 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
-import jakarta.persistence.Tuple;
+import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,13 +33,9 @@ public class MealLogQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
     }
 
-    public List<Tuple> sumCaloriesOfMealTypeByMemberIdAndDate(Long memberId, LocalDate date) {
-        return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAt(memberId, date);
-    }
-
-    public List<Tuple> sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-            Long memberId, LocalDate startDate, LocalDate endDate) {
+    public List<TotalCalorieOfMealType> sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                memberId, startDate, endDate);
+                memberId, startDateTime, endDateTime);
     }
 }

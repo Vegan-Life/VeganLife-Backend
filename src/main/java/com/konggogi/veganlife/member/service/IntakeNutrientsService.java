@@ -9,7 +9,7 @@ import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
-import jakarta.persistence.Tuple;
+import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.YearMonth;
@@ -39,7 +39,7 @@ public class IntakeNutrientsService {
                 .datesUntil(endDate.plusDays(1))
                 .map(
                         date -> {
-                            return aggregateDailyCaloriesOfMealType(memberId, date);
+                            return aggregateDailyCaloriesOfMealTypeForDay(memberId, date);
                         })
                 .toList();
     }
@@ -103,23 +103,25 @@ public class IntakeNutrientsService {
         return new IntakeNutrients(totalCalorie, totalCarbs, totalProtein, totalFat);
     }
 
-    private IntakeCalorie aggregateDailyCaloriesOfMealType(Long memberId, LocalDate date) {
-        List<Tuple> caloriesOfMeals =
-                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(memberId, date);
+    private IntakeCalorie aggregateDailyCaloriesOfMealTypeForDay(Long memberId, LocalDate date) {
+        List<TotalCalorieOfMealType> caloriesOfMeals =
+                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                        memberId, date.atStartOfDay(), date.atTime(23, 59, 59));
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
     private IntakeCalorie aggregateCaloriesOfMealTypeForPeriod(
             Long memberId, LocalDate startDate, LocalDate endDate) {
-        List<Tuple> caloriesOfMeals =
+        List<TotalCalorieOfMealType> caloriesOfMeals =
                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                        memberId, startDate, endDate);
+                        memberId, startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
-    private IntakeCalorie createCaloriesOfMealType(List<Tuple> caloriesOfMealTypeTuples) {
+    private IntakeCalorie createCaloriesOfMealType(
+            List<TotalCalorieOfMealType> caloriesOfMealTypeTuples) {
         Map<MealType, Integer> totalCaloriesOfMealTypeMap =
-                mealLogMapper.toTotalCaloriesOfMealTypeMap(caloriesOfMealTypeTuples);
+                mealLogMapper.toTotalCalorieOfMealTypeMap(caloriesOfMealTypeTuples);
         return new IntakeCalorie(
                 totalCaloriesOfMealTypeMap.getOrDefault(MealType.BREAKFAST, 0),
                 totalCaloriesOfMealTypeMap.getOrDefault(MealType.LUNCH, 0),
