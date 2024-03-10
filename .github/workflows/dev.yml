@@ -51,6 +51,13 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
+    - name: Send Notification to Discord - Failure
+      if: failure()  # 배포 성공 시에만 실행
+      run: |
+        curl -X POST -H 'Content-Type: application/json' -d '{"content": "Build 과정에서 문제가 발생했습니다.🥺"}' $DISCORD_WEBHOOK_URL
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   deploy:
     needs: build
     name: Deploy Server via SSH
@@ -97,6 +104,13 @@ jobs:
           echo "Clear"
           ssh veganlife-dev 'docker system prune -a'
 
+      - name: Send Notification to Discord - Failure
+        if: failure()  # 배포 성공 시에만 실행
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{"content": "배포 과정에서 문제가 발생했습니다.🥺"}' $DISCORD_WEBHOOK_URL
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   healthcheck:
     needs: [build, deploy]
     name: Server Health Check
@@ -121,3 +135,17 @@ jobs:
           exit 1
         env:
           DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
+
+      - name: Send Notification to Discord - Success
+        if: success()  # 배포 성공 시에만 실행
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{"content": "배포가 성공적으로 완료되었습니다!😄"}' $DISCORD_WEBHOOK_URL
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Notification to Discord - Failure
+        if: failure()  # 배포 성공 시에만 실행
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{"content": "Health Check 과정에서 문제가 발생했습니다.🥺"}' $DISCORD_WEBHOOK_URL
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
