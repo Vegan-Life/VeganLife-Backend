@@ -1,0 +1,149 @@
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches: [ "develop", "infra-270-1" ]
+
+# 코드의 내용을 이 파일을 실행하여 action을 수행하는 주체(Github Actions에서 사용하는 VM)가 읽을 수 있도록 허용합니다.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and Push to Docker Repository
+    runs-on: ubuntu-latest
+
+    steps:
+    # 지정한 저장소(현재 REPO)에서 코드를 워크플로우 환경으로 가져오도록 하는 github action
+    - uses: actions/checkout@v3
+
+    # jdk 배포판 설정
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: "corretto"
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+    - name: Grant execute permission for gradlew
+      run: | 
+        chmod +x gradlew
+
+    - name: Build with Gradle Wrapper
+      env:
+        MARIA_URL: ${{ secrets.MARIA_URL }}
+        MARIA_USER: ${{ secrets.MARIA_USER }}
+        MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      run: |
+        ./gradlew clean build
+
+    # Dockerfile을 통해 이미지 빌드
+    - name: Docker Build
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build -f docker/Dockerfile -t ${{ secrets.DOCKER_REPO }}/veganlife-dev .
+
+    # Docker hub에 업로드
+    - name: Push to Docker Repo
+      run: |
+        docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
+
+    - name: Send Notification to Discord - Failure
+      uses: sarisia/actions-status-discord@v1.14.0
+      if: failure()  # 배포 성공 시에만 실행
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+
+  deploy:
+    needs: build
+    name: Deploy Server via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure SSH
+        run: |
+          echo "Configure SSH"
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
+          chmod 600 ~/.ssh/veganlife-dev.key
+          cat >>~/.ssh/config <<END
+          Host veganlife-dev
+            HostName $SSH_HOST
+            User $SSH_USERNAME
+            IdentityFile ~/.ssh/veganlife-dev.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Docker Compose Down
+        # home 기준 실행파일의 상대경로를 적어주어야 한다.
+        run: |
+          echo "Docker Compose Down"
+          ssh veganlife-dev 'docker compose -f veganlife-dev/docker-compose.yml down --rmi all'
+
+      - name: Set Docker Networks
+        run: |
+          echo "Set Docker Networks"
+          ssh veganlife-dev 'docker network rm deploy'
+          ssh veganlife-dev 'docker network create deploy'
+
+      - name: Docker Compose Up
+        run: |
+          echo "Docker Compose Up"
+          ssh veganlife-dev 'docker compose -f veganlife-dev/docker-compose.yml up -d'
+
+      - name: Clear
+        run: |
+          echo "Clear"
+          ssh veganlife-dev 'docker system prune -a'
+
+      - name: Send Notification to Discord - Failure
+        uses: sarisia/actions-status-discord@v1.14.0
+        if: failure()  # 배포 성공 시에만 실행
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+
+  healthcheck:
+    needs: [build, deploy]
+    name: Server Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Health Check
+        run: |
+          attempt_count=10
+          for ((i=1; i<=$attempt_count; i++)); do
+              response=$(curl -IsS --max-time 5 "$DEV_HEALTHCHECK_URL" | head -n 1 | cut -d$' ' -f2)
+              if [ "$response" == "200" ]; then
+                  echo "헬스 체크 성공 - HTTP 상태코드: $response"
+                  exit 0
+              else
+                  echo "헬스 체크 실패 - HTTP 상태코드: $response"
+              fi
+              sleep 3
+          done
+
+          echo "헬스 체크 $attempt_count회 시도 중 실패"
+          exit 1
+        env:
+          DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
+
+      - name: Send Notification to Discord - Success
+        uses: sarisia/actions-status-discord@v1.14.0
+        if: success()  # 배포 성공 시에만 실행
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Notification to Discord - Failure
+        uses: sarisia/actions-status-discord@v1.14.0
+        if: failure()  # 배포 성공 시에만 실행
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
