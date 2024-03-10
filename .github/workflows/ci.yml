@@ -40,7 +40,7 @@ jobs:
         MARIA_USER: ${{ secrets.MARIA_USER }}
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      run: sudo ./gradlew clean build --stacktrace
+      run: ./gradlew clean build --stacktrace
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
