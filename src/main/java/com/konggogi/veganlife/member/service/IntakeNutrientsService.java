@@ -81,19 +81,6 @@ public class IntakeNutrientsService {
                 .toList();
     }
 
-    public int calcTotalCalorie(List<IntakeCalorie> intakeCalories) {
-        return intakeCalories.parallelStream()
-                .reduce(
-                        0,
-                        (accumulator, mealCalorie) ->
-                                accumulator
-                                        + mealCalorie.breakfast()
-                                        + mealCalorie.lunch()
-                                        + mealCalorie.dinner()
-                                        + mealCalorie.snack(),
-                        Integer::sum);
-    }
-
     private IntakeCalorie aggregateDailyCaloriesOfMealTypeForDay(Long memberId, LocalDate date) {
         List<TotalCalorieOfMealType> caloriesOfMeals =
                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
