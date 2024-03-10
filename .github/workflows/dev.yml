@@ -38,7 +38,7 @@ jobs:
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: |
-        ./gradlew clean build -x test -x asciidoctor
+        ./gradlew clean build
 
     # Dockerfile을 통해 이미지 빌드
     - name: Docker Build
