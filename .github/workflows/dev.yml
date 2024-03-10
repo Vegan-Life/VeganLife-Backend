@@ -35,8 +35,8 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
+    name: Build and Push to Docker Repository
     runs-on: ubuntu-latest
 
     steps:
@@ -77,23 +77,47 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
-    - name: Configure SSH
-      run: |
-        mkdir -p ~/.ssh/
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
-        chmod 600 ~/.ssh/veganlife-dev.key
-        cat >>~/.ssh/config <<END
-        Host veganlife-dev
-          HostName $SSH_HOST
-          User $SSH_USERNAME
-          IdentityFile ~/.ssh/veganlife-dev.key
-          StrictHostKeyChecking no
-        END
-      env:
-        SSH_HOST: ${{ secrets.SSH_HOST }}
-        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  deploy:
+    name: Deploy Server via SSH
+    runs-on: ubuntu-latest
 
-    - name: SSH Connection Test
-      run: |
-        ssh veganlife-dev 'ls -al'
+    steps:
+      - name: Configure SSH
+        run: |
+          echo "Configure SSH"
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
+          chmod 600 ~/.ssh/veganlife-dev.key
+          cat >>~/.ssh/config <<END
+          Host veganlife-dev
+            HostName $SSH_HOST
+            User $SSH_USERNAME
+            IdentityFile ~/.ssh/veganlife-dev.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Move to Workspace
+        run: |
+          ssh veganlife-dev 'cd veganlife-dev'
+
+      - name: Docker Compose Down
+        run: |
+          echo "Docker Compose Down"
+          ssh veganlife-dev 'docker compose down --rmi all'
+
+      - name: Set Docker Networks
+        run: |
+          echo "Set Docker Networks"
+          ssh veganlife-dev 'docker network rm deploy'
+          ssh veganlife-dev 'docker network create deploy'
+
+      - name: Docker Compose Up
+        run: |
+          echo "Docker Compose Up"
+          ssh veganlife-dev 'cd veganlife-dev'
+          ssh veganlife-dev 'docker compose up -d'
+
