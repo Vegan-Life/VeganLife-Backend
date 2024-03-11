@@ -16,7 +16,7 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -30,14 +30,6 @@ jobs:
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-
-    - name: Check file permissions
-      run: ls -al
-
-    - name: Grant permissions for this directory
-      run: |
-        chmod -R 777 .
-        ls -al
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -68,7 +60,7 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
