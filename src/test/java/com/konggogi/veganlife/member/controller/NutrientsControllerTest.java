@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
+import com.konggogi.veganlife.member.fixture.IntakeCalorieFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.IntakeNutrientsService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -134,15 +134,13 @@ class NutrientsControllerTest extends RestDocsTest {
         List<IntakeCalorie> intakeCalories = new ArrayList<>();
         int days = 7;
         for (int i = 0; i < days; i++) {
-            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.get());
+            intakeCalories.add(IntakeCalorieFixture.DEFAULT.get());
         }
-        int calorieOfMealType = intakeCalories.get(0).breakfast();
-        int totalCalorie = (calorieOfMealType * 4) * days;
+        int calorie = intakeCalories.get(0).breakfast();
         given(
                         intakeNutrientsService.searchWeeklyIntakeCalories(
                                 anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(intakeCalories);
-        given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -152,11 +150,11 @@ class NutrientsControllerTest extends RestDocsTest {
                                 .queryParam("endDate", "2023-12-23"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorieOfMealType));
+                .andExpect(jsonPath("$.totalCalorie").value((calorie * 4) * days))
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorie));
 
         perform.andDo(print())
                 .andDo(
@@ -198,13 +196,11 @@ class NutrientsControllerTest extends RestDocsTest {
         List<IntakeCalorie> intakeCalories = new ArrayList<>();
         int weeks = 5;
         for (int i = 0; i < weeks; i++) {
-            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(100));
+            intakeCalories.add(IntakeCalorieFixture.DEFAULT.getWithIntake(100));
         }
-        int calorieOfMealType = intakeCalories.get(0).breakfast();
-        int totalCalorie = (calorieOfMealType * 4) * weeks;
+        int calorie = intakeCalories.get(0).breakfast();
         given(intakeNutrientsService.searchMonthlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willReturn(intakeCalories);
-        given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -213,11 +209,11 @@ class NutrientsControllerTest extends RestDocsTest {
                                 .queryParam("startDate", "2023-12-01"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorieOfMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorieOfMealType));
+                .andExpect(jsonPath("$.totalCalorie").value((calorie * 4) * weeks))
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorie));
 
         perform.andDo(print())
                 .andDo(
@@ -256,13 +252,11 @@ class NutrientsControllerTest extends RestDocsTest {
         List<IntakeCalorie> intakeCalories = new ArrayList<>();
         int months = 12;
         for (int i = 0; i < months; i++) {
-            intakeCalories.add(CaloriesOfMealTypeFixture.DEFAULT.getWithIntake(300));
+            intakeCalories.add(IntakeCalorieFixture.DEFAULT.getWithIntake(300));
         }
-        int caloriePerMealType = intakeCalories.get(0).breakfast();
-        int totalCalorie = caloriePerMealType * 4 * months;
+        int calorie = intakeCalories.get(0).breakfast();
         given(intakeNutrientsService.searchYearlyIntakeCalories(anyLong(), any(LocalDate.class)))
                 .willReturn(intakeCalories);
-        given(intakeNutrientsService.calcTotalCalorie(anyList())).willReturn(totalCalorie);
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -271,11 +265,11 @@ class NutrientsControllerTest extends RestDocsTest {
                                 .queryParam("startDate", "2023-01-01"));
         // then
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalCalorie").value(totalCalorie))
-                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(caloriePerMealType))
-                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(caloriePerMealType));
+                .andExpect(jsonPath("$.totalCalorie").value(calorie * 4 * months))
+                .andExpect(jsonPath("$.periodicCalorie[0].breakfast").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].lunch").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].dinner").value(calorie))
+                .andExpect(jsonPath("$.periodicCalorie[0].snack").value(calorie));
 
         perform.andDo(print())
                 .andDo(

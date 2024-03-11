@@ -16,33 +16,33 @@ import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.domain.Member;
-import com.konggogi.veganlife.member.fixture.CaloriesOfMealTypeFixture;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
+import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class IntakeNutrientsServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock MealLogQueryService mealLogQueryService;
-    @Mock MealLogMapper mealLogMapper;
+    @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
     @InjectMocks IntakeNutrientsService intakeNutrientsService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final List<MealData> mealData =
@@ -100,16 +100,14 @@ class IntakeNutrientsServiceTest {
         // given
         LocalDate startDate = LocalDate.of(2023, 2, 18);
         LocalDate endDate = LocalDate.of(2023, 2, 24);
-        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size();
-        Map<MealType, Integer> totalCaloriesOfMealType =
-                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        int totalCalorie = 10;
+        List<TotalCalorieOfMealType> totalCalorieOfMealTypes =
+                createTotalCalorieOfMealTypes(totalCalorie);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
-                                anyLong(), any(LocalDate.class)))
-                .willReturn(new ArrayList<>());
-        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
-                .willReturn(totalCaloriesOfMealType);
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchWeeklyIntakeCalories(
@@ -117,26 +115,10 @@ class IntakeNutrientsServiceTest {
         // then
 
         assertThat(intakeCalories).hasSize(7);
-        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
-    }
-
-    @Test
-    @DisplayName("칼로리 합산")
-    void calcTotalCalorieTest() {
-        // given
-        List<IntakeCalorie> intakeCalories =
-                List.of(
-                        CaloriesOfMealTypeFixture.DEFAULT.get(),
-                        CaloriesOfMealTypeFixture.DEFAULT.get());
-        int expectedCalorie =
-                CaloriesOfMealTypeFixture.DEFAULT.get().breakfast() * 4 * intakeCalories.size();
-        // when
-        int totalCalorie = intakeNutrientsService.calcTotalCalorie(intakeCalories);
-        // then
-        assertThat(totalCalorie).isEqualTo(expectedCalorie);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorie * 3);
     }
 
     @Test
@@ -144,26 +126,22 @@ class IntakeNutrientsServiceTest {
     void searchMonthlyIntakeCaloriesTest() {
         // given
         LocalDate startDate = LocalDate.of(2023, 2, 18);
-        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size() * 5;
-        Map<MealType, Integer> totalCaloriesOfMealType =
-                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        int totalCalorie = 10;
+        List<TotalCalorieOfMealType> totalCalorieOfMealTypes =
+                createTotalCalorieOfMealTypes(totalCalorie);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
                         mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
-                .willReturn(new ArrayList<>());
-        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
-                .willReturn(totalCaloriesOfMealType);
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchMonthlyIntakeCalories(member.getId(), startDate);
         // then
-
-        assertThat(intakeCalories).hasSize(5);
-        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorie * 3);
     }
 
     @Test
@@ -171,26 +149,23 @@ class IntakeNutrientsServiceTest {
     void searchYearlyIntakeCaloriesTest() {
         // given
         LocalDate startDate = LocalDate.of(2023, 2, 18);
-        int totalCalorieOfMealType = meals.get(0).getCalorie() * meals.size() * 5;
-        Map<MealType, Integer> totalCaloriesOfMealType =
-                createCalorieOfMealTypeMap(totalCalorieOfMealType);
+        int totalCalorie = 10;
+        List<TotalCalorieOfMealType> totalCalorieOfMealTypes =
+                createTotalCalorieOfMealTypes(totalCalorie);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
                         mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
-                .willReturn(new ArrayList<>());
-        given(mealLogMapper.toTotalCaloriesOfMealTypeMap(any(List.class)))
-                .willReturn(totalCaloriesOfMealType);
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchYearlyIntakeCalories(member.getId(), startDate);
         // then
-
         assertThat(intakeCalories).hasSize(12);
-        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorieOfMealType);
-        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorieOfMealType * 3);
+        assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).dinner()).isEqualTo(totalCalorie);
+        assertThat(intakeCalories.get(0).snack()).isEqualTo(totalCalorie * 3);
     }
 
     private List<MealLog> createMealLogs(LocalDate date) {
@@ -203,18 +178,11 @@ class IntakeNutrientsServiceTest {
                 MealLogFixture.DINNER_SNACK.getWithDate(date, meals, mealImages, member));
     }
 
-    private Map<MealType, Integer> createCalorieOfMealTypeMap(int totalCalorieOfMealType) {
-        Map<MealType, Integer> totalCaloriesOfMealType =
-                new HashMap<>() {
-                    {
-                        put(MealType.BREAKFAST, totalCalorieOfMealType);
-                        put(MealType.LUNCH, totalCalorieOfMealType);
-                        put(MealType.DINNER, totalCalorieOfMealType);
-                        put(MealType.BREAKFAST_SNACK, totalCalorieOfMealType);
-                        put(MealType.LUNCH_SNACK, totalCalorieOfMealType);
-                        put(MealType.DINNER_SNACK, totalCalorieOfMealType);
-                    }
-                };
-        return totalCaloriesOfMealType;
+    private List<TotalCalorieOfMealType> createTotalCalorieOfMealTypes(int totalCalorie) {
+        List<TotalCalorieOfMealType> totalCalorieOfMealTypes = new ArrayList<>();
+        for (MealType mealType : MealType.values()) {
+            totalCalorieOfMealTypes.add(new TotalCalorieOfMealType(mealType, totalCalorie));
+        }
+        return totalCalorieOfMealTypes;
     }
 }
