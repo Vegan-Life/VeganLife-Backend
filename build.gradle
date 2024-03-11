@@ -88,6 +88,7 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:5.3.2'
 
     //QueryDSL
+    implementation 'com.querydsl:querydsl-core:5.0.0'
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
@@ -167,19 +168,4 @@ private excludedClassFilesForReport(classDirectories) {
                 ])
             })
     )
-}
-
-//Querydsl setting
-def querydslDir = layout.buildDirectory.dir("/generated/querydsl")
-
-tasks.withType(JavaCompile).configureEach {
-    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
-}
-
-sourceSets {
-    main.java.srcDirs += [ querydslDir ]
-}
-
-clean {
-    delete file(querydslDir)
 }
