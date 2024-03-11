@@ -171,16 +171,6 @@ private excludedClassFilesForReport(classDirectories) {
 }
 
 //Querydsl setting
-def querydslDir = layout.buildDirectory.dir("/generated/querydsl")
-
-tasks.withType(JavaCompile) {
-    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
-}
-
-sourceSets {
-    main.java.srcDirs += [ querydslDir ]
-}
-
 clean {
-    delete file(querydslDir)
+    delete file('src/main/generated')
 }
