@@ -51,12 +51,10 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        List<IntakeCalorie> mealCalories =
+        List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchWeeklyIntakeCalories(
                         userDetails.id(), startDate, endDate);
-        int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
-        return ResponseEntity.ok(
-                nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
+        return ResponseEntity.ok(nutrientsMapper.toCalorieIntakeResponse(intakeCalories));
     }
 
     @GetMapping("/nutrients/month")
@@ -64,11 +62,9 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
-        List<IntakeCalorie> mealCalories =
+        List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchMonthlyIntakeCalories(userDetails.id(), startDate);
-        int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
-        return ResponseEntity.ok(
-                nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
+        return ResponseEntity.ok(nutrientsMapper.toCalorieIntakeResponse(intakeCalories));
     }
 
     @GetMapping("/nutrients/year")
@@ -76,10 +72,8 @@ public class NutrientsController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd")
                     LocalDate startDate) {
-        List<IntakeCalorie> mealCalories =
+        List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchYearlyIntakeCalories(userDetails.id(), startDate);
-        int totalCalorie = intakeNutrientsService.calcTotalCalorie(mealCalories);
-        return ResponseEntity.ok(
-                nutrientsMapper.toCalorieIntakeResponse(totalCalorie, mealCalories));
+        return ResponseEntity.ok(nutrientsMapper.toCalorieIntakeResponse(intakeCalories));
     }
 }

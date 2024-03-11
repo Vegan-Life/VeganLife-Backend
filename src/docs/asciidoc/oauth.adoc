@@ -14,10 +14,6 @@ endif::[]
 
 === Request
 
-==== Header
-
-include::{snippets}/login/request-headers.adoc[]
-
 ==== Path Variable
 
 include::{snippets}/login/path-parameters.adoc[]

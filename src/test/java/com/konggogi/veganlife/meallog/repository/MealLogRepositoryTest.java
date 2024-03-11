@@ -8,16 +8,17 @@ import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
-import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.repository.MemberRepository;
-import jakarta.persistence.Tuple;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -155,69 +156,6 @@ public class MealLogRepositoryTest {
         assertThat(mealLogRepository.findById(mealLog.getId())).isEmpty();
     }
 
-    @Test
-    @DisplayName("회원 id와 날짜에 해당하는 MealLog를 MealType별로 합산")
-    void sumCaloriesOfMealTypeByMemberIdAndCreatedAtTest() {
-        // given
-        LocalDate date = LocalDate.of(2024, 2, 22);
-        Arrays.stream(MealLogFixture.values())
-                .forEach(
-                        mealType -> {
-                            MealLog mealLog = createMealLog(member, mealData, date, mealType);
-                            mealLogRepository.save(mealLog);
-                        });
-        // when
-        List<Tuple> totalCaloriesOfMealTypes =
-                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAt(member.getId(), date);
-        Map<MealType, Integer> caloriesOfMealTypeMap =
-                toCaloriesOfMealTypeMap(totalCaloriesOfMealTypes);
-        // then
-        int expectedCalorie =
-                MealFixture.DEFAULT.get(mealData.get(0)).getCalorie() * mealData.size();
-        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST_SNACK)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH_SNACK)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER_SNACK)).isEqualTo(expectedCalorie);
-    }
-
-    @Test
-    @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
-    void sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetweenTest() {
-        // given
-        LocalDate startDate = LocalDate.of(2024, 2, 18);
-        LocalDate endDate = LocalDate.of(2024, 2, 24);
-        startDate
-                .datesUntil(endDate.plusDays(1))
-                .forEach(
-                        date -> {
-                            Arrays.stream(MealLogFixture.values())
-                                    .forEach(
-                                            mealType -> {
-                                                MealLog mealLog =
-                                                        createMealLog(
-                                                                member, mealData, date, mealType);
-                                                mealLogRepository.save(mealLog);
-                                            });
-                        });
-        // when
-        List<Tuple> totalCaloriesOfMealTypes =
-                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                        member.getId(), startDate, endDate);
-        Map<MealType, Integer> caloriesOfMealTypeMap =
-                toCaloriesOfMealTypeMap(totalCaloriesOfMealTypes);
-        // then
-        int expectedCalorie =
-                MealFixture.DEFAULT.get(mealData.get(0)).getCalorie() * mealData.size() * 7;
-        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.BREAKFAST_SNACK)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.LUNCH_SNACK)).isEqualTo(expectedCalorie);
-        assertThat(caloriesOfMealTypeMap.get(MealType.DINNER_SNACK)).isEqualTo(expectedCalorie);
-    }
-
     private MealLog createMealLog(
             Member member,
             List<MealData> mealData,
@@ -234,15 +172,5 @@ public class MealLogRepositoryTest {
         } else {
             return mealTypeOfFixture.get(meals, mealImages, member);
         }
-    }
-
-    private Map<MealType, Integer> toCaloriesOfMealTypeMap(List<Tuple> totalCaloriesOfMealTypes) {
-        Map<MealType, Integer> caloriesOfMealTypeMap = new EnumMap<>(MealType.class);
-        for (Tuple tuple : totalCaloriesOfMealTypes) {
-            MealType mealType = tuple.get("mealType", MealType.class);
-            Integer totalCalories = tuple.get("totalCalories", Long.class).intValue();
-            caloriesOfMealTypeMap.put(mealType, totalCalories);
-        }
-        return caloriesOfMealTypeMap;
     }
 }

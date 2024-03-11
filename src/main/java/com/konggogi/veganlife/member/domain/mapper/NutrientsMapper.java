@@ -18,7 +18,8 @@ public interface NutrientsMapper {
     @Mapping(target = "dailyCalorie", source = "member.AMR")
     RecommendNutrientsResponse toRecommendNutrientsResponse(Member member);
 
-    @Mapping(source = "intakeCalories", target = "periodicCalorie")
-    CalorieIntakeResponse toCalorieIntakeResponse(
-            int totalCalorie, List<IntakeCalorie> intakeCalories);
+    default CalorieIntakeResponse toCalorieIntakeResponse(List<IntakeCalorie> intakeCalories) {
+        int totalCalorie = intakeCalories.stream().mapToInt(IntakeCalorie::getTotalCalorie).sum();
+        return new CalorieIntakeResponse(totalCalorie, intakeCalories);
+    }
 }

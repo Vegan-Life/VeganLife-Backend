@@ -19,6 +19,7 @@ import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,37 +97,19 @@ public class MealLogQueryServiceTest {
     }
 
     @Test
-    @DisplayName("회원 id와 날짜에 해당하는 MealLog를 MealType별로 합산")
-    void sumCaloriesOfMealTypeByMemberIdAndDateTest() {
-        // given
-        LocalDate date = LocalDate.of(2024, 2, 24);
-        given(
-                        mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAt(
-                                anyLong(), any(LocalDate.class)))
-                .willReturn(new ArrayList<>());
-
-        // when, then
-        assertThatNoException()
-                .isThrownBy(
-                        () ->
-                                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
-                                        member.getId(), date));
-    }
-
-    @Test
     @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
     void sumCaloriesOfMealTypeByMemberIdAndDateBetweenTest() {
-        LocalDate startDate = LocalDate.of(2024, 2, 18);
-        LocalDate endDate = LocalDate.of(2024, 2, 24);
+        LocalDateTime startDateTime = LocalDate.of(2024, 2, 18).atStartOfDay();
+        LocalDateTime endDateTime = LocalDate.of(2024, 2, 24).atTime(23, 59, 59);
         given(
                         mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(new ArrayList<>());
 
         assertThatNoException()
                 .isThrownBy(
                         () ->
                                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                        member.getId(), startDate, endDate));
+                                        member.getId(), startDateTime, endDateTime));
     }
 }
