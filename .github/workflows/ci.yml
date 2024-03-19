@@ -42,7 +42,7 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: ./gradlew clean test spotlessCheck
 
-    - name: Send Notification to Discord - Success
+    - name: Send Notification to Discord
       uses: sarisia/actions-status-discord@v1.14.0
       if: always()  # 배포 결과 Discord 전송
       with:
