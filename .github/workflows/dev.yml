@@ -51,13 +51,6 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
-    - name: Send Notification to Discord - Failure
-      uses: sarisia/actions-status-discord@v1.14.0
-      if: failure()  # 배포 성공 시에만 실행
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-
   deploy:
     needs: build
     name: Deploy Server via SSH
@@ -104,13 +97,6 @@ jobs:
           echo "Clear"
           ssh veganlife-dev 'docker system prune -a'
 
-      - name: Send Notification to Discord - Failure
-        uses: sarisia/actions-status-discord@v1.14.0
-        if: failure()  # 배포 성공 시에만 실행
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-
   healthcheck:
     needs: [build, deploy]
     name: Server Health Check
@@ -138,12 +124,6 @@ jobs:
 
       - name: Send Notification to Discord - Success
         uses: sarisia/actions-status-discord@v1.14.0
-        if: success()  # 배포 성공 시에만 실행
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-      - name: Send Notification to Discord - Failure
-        uses: sarisia/actions-status-discord@v1.14.0
-        if: failure()  # 배포 성공 시에만 실행
+        if: always()  # 배포 결과 Discord 전송
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
