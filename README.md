@@ -7,11 +7,12 @@
     - [⏲️ 개발 기간](#개발-기간) <br/>
     - [👪 팀원](#팀원) <br/>
     - [📃 산출물](#산출물) <br/>
+    - [🗄️ 서비스 아키텍처](#서비스-아키텍처) <br/>
     - [⚒️ 주요 기능](#주요-기능) <br/>
-    - [📱 유저 인터페이스](#유저-인터페이스) <br/>
-    - [🗄️ 서버 아키텍처](#서버-아키텍처) <br/>
-    - [🛠️ 기술 스택](#기술-스택) <br/>
     - [💡 문제 해결](#문제-해결) <br/>
+    - [📱 유저 인터페이스](#유저-인터페이스) <br/>
+    - [🛠️ 기술 스택](#기술-스택) <br/>
+    
 
 <br/>
 
@@ -43,10 +44,17 @@
 
 <br/>
 
+## 🗄️서비스 아키텍처
+<p align="center">
+  <img src="https://github.com/Vegan-Life/VeganLife-Backend/assets/47537803/06bd6bbe-c585-4b34-8b2e-624a68c07742" width="80%" />
+</p>
+
+<br/>
+
 ## ⚒️주요 기능
 ### **식단 기록**
 - 식사 종류별 식단 기록 등록
-  - 식품 데이터셋을 통해 식품 정보 검색
+  - 식품 데이터셋 기반의 식품 정보 검색
 - 나만의 식품 정보 등록 
 ### **섭취 정보**
 -  식단 기록의 음식 영양소를 기반으로 일일/주간/월간/연간 섭취량 조회
@@ -64,6 +72,14 @@
 
 <br/>
 
+## 💡문제 해결
+#### [🔗 QueryDsl+복합 인덱스를 사용한 섭취량 조회 API 성능 2배 개선](https://yeon-dev.tistory.com/246)
+#### [🔗 테스트 데이터 삽입 이후 발생하는 슬로우 쿼리 해결](https://publish.obsidian.md/ssoscode/Programming/Spring+JPA/issues/%EC%9D%B8%EB%8D%B1%EC%8A%A4%EB%A5%BC+%EC%83%9D%EC%84%B1%ED%96%88%EC%A7%80%EB%A7%8C%2C+%EC%9D%B4%EB%A5%BC+%ED%99%9C%EC%9A%A9%ED%95%98%EC%A7%80+%EB%AA%BB%ED%95%98%EB%8A%94+%EB%AC%B8%EC%A0%9C)
+#### [🔗 EC2 요금 절감을 위한 노력](https://publish.obsidian.md/ssoscode/Programming/Infra/AWS/issues/EC2+%EB%8B%A4%EC%9A%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EB%93%9C)
+#### [ㄴ🔗 Jenkins ➡️ Github Actions 마이그레이션](https://publish.obsidian.md/ssoscode/Programming/Infra/AWS/issues/Jenkins+%E2%9E%A1%EF%B8%8F+Github+Actions)
+
+<br/>
+
 ## 📱유저 인터페이스
 <details>
 <summary>상세 화면 확인</summary>
@@ -71,13 +87,6 @@
   <img src="https://github.com/Vegan-Life/VeganLife-Backend/assets/47537803/6125fee2-c33b-4a3b-837f-69eea4204c63"/>
 </p>
 </details>
-
-<br/>
-
-## 🗄️서버 아키텍처
-<p align="center">
-  <img src="https://github.com/Vegan-Life/VeganLife-Backend/assets/47537803/06bd6bbe-c585-4b34-8b2e-624a68c07742" width="80%" />
-</p>
 
 <br/>
 
@@ -89,7 +98,7 @@
 ![SpringJPA](https://img.shields.io/badge/spring_data_jpa-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 
 **데이터베이스** <br/>
-![RDS](https://img.shields.io/badge/Amazon_RDS-527FFF.svg?&style=for-the-badge&logo=Amazon%20RDS&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545.svg?&style=for-the-badge&logo=MariaDB&logoColor=white              )
 
 **인프라** <br/>
 ![AWS](https://img.shields.io/badge/AWS-232F3E.svg?&style=for-the-badge&logo=Amazon%20AWS&logoColor=white)
@@ -105,8 +114,3 @@
 ![Notion](https://img.shields.io/badge/Notion-000000.svg?style=for-the-badge&logo=notion&logoColor=white)
 
 <br/>
-
-## 💡문제 해결
-### [🔗 QueryDsl+복합 인덱스를 사용한 섭취량 조회 API 성능 2배 개선](https://yeon-dev.tistory.com/246)
-
-
