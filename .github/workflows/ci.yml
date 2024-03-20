@@ -34,16 +34,19 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Gradle Compile
-      run: ./gradlew compileJava
-
     - name: Build with Gradle Wrapper
       env:
         MARIA_URL: ${{ secrets.MARIA_URL }}
         MARIA_USER: ${{ secrets.MARIA_USER }}
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      run: ./gradlew clean build --stacktrace
+      run: ./gradlew clean test spotlessCheck
+
+    - name: Send Notification to Discord
+      uses: sarisia/actions-status-discord@v1.14.0
+      if: always()  # 배포 결과 Discord 전송
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
