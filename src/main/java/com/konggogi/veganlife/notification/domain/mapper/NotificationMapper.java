@@ -2,6 +2,7 @@ package com.konggogi.veganlife.notification.domain.mapper;
 
 
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.notification.controller.dto.response.NotificationResponse;
 import com.konggogi.veganlife.notification.domain.Notification;
 import com.konggogi.veganlife.notification.domain.NotificationType;
 import com.konggogi.veganlife.notification.service.dto.NotificationData;
@@ -14,4 +15,6 @@ public interface NotificationMapper {
     Notification toEntity(Member member, NotificationType type, String message);
 
     NotificationData toNotificationData(Notification notification);
+
+    NotificationResponse toNotificationResponse(Notification notification);
 }
