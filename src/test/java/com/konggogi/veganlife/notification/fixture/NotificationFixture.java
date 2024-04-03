@@ -6,7 +6,7 @@ import com.konggogi.veganlife.notification.domain.Notification;
 import com.konggogi.veganlife.notification.domain.NotificationMessage;
 import com.konggogi.veganlife.notification.domain.NotificationType;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.util.ReflectionUtils;
 
 public enum NotificationFixture {
@@ -14,7 +14,11 @@ public enum NotificationFixture {
     INTAKE_OVER_30(
             NotificationType.INTAKE_OVER_30, NotificationMessage.OVER_INTAKE.getMessage(100)),
     INTAKE_OVER_60(
-            NotificationType.INTAKE_OVER_60, NotificationMessage.OVER_INTAKE.getMessage(100));
+            NotificationType.INTAKE_OVER_60, NotificationMessage.OVER_INTAKE.getMessage(100)),
+    MENTION(NotificationType.MENTION, NotificationMessage.MENTION.getMessage("test1", "test2")),
+    COMMENT_LIKE(
+            NotificationType.COMMENT,
+            NotificationMessage.COMMENT_LIKE.getMessage("test1", "test2"));
 
     private final NotificationType type;
     private final String message;
@@ -36,16 +40,16 @@ public enum NotificationFixture {
         return Notification.builder().type(type).message(message).member(member).build();
     }
 
-    public Notification getWithDate(Member member, LocalDate date) {
+    public Notification getWithDate(Member member, LocalDateTime createdAt) {
         Notification notification =
                 Notification.builder().type(type).message(message).member(member).build();
-        return setCreatedAt(notification, date);
+        return setCreatedAt(notification, createdAt);
     }
 
-    private Notification setCreatedAt(Notification notification, LocalDate date) {
+    private Notification setCreatedAt(Notification notification, LocalDateTime createdAt) {
         Field createdAtField = ReflectionUtils.findField(Notification.class, "createdAt");
         ReflectionUtils.makeAccessible(createdAtField);
-        ReflectionUtils.setField(createdAtField, notification, date.atStartOfDay());
+        ReflectionUtils.setField(createdAtField, notification, createdAt);
         return notification;
     }
 }
