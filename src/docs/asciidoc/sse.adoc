@@ -37,3 +37,25 @@ include::{snippets}/sse-subscribe-not-found-emitter/http-response.adoc[]
 ==== 504 SERVICE UNAVAILABLE
 
 include::{snippets}/sse-subscribe-connection-fail/http-response.adoc[]
+
+== 사용자 알림 목록 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/sse-get-notification-list/request-headers.adoc[]
+
+==== Body
+
+include::{snippets}/sse-get-notification-list/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/sse-get-notification-list/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/sse-get-notification-list-member-not-found/http-response.adoc[]
