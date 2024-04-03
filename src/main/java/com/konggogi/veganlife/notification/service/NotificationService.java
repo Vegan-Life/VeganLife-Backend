@@ -15,10 +15,13 @@ import com.konggogi.veganlife.notification.repository.NotificationRepository;
 import com.konggogi.veganlife.notification.service.dto.NotificationData;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+// TODO: SseService, NotificationService 분리
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -47,6 +50,12 @@ public class NotificationService {
                 notificationRepository.save(notificationMapper.toEntity(member, type, message));
         NotificationData notificationData = notificationMapper.toNotificationData(notification);
         sendToClient(member.getId(), notificationData);
+    }
+
+    public Page<Notification> searchByMember(Long memberId, Pageable pageable) {
+
+        Member member = memberQueryService.search(memberId);
+        return notificationRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
     }
 
     private void sendToClient(Long memberId, Object data) {

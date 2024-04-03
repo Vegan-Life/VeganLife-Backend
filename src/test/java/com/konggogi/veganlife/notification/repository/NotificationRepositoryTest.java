@@ -8,7 +8,7 @@ import com.konggogi.veganlife.member.repository.MemberRepository;
 import com.konggogi.veganlife.notification.domain.Notification;
 import com.konggogi.veganlife.notification.domain.NotificationType;
 import com.konggogi.veganlife.notification.fixture.NotificationFixture;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ class NotificationRepositoryTest {
     @Autowired NotificationRepository notificationRepository;
 
     private final Member member = MemberFixture.DEFAULT_M.get();
-    private final LocalDate date = LocalDate.of(2023, 12, 20);
+    private final LocalDateTime date = LocalDateTime.of(2023, 12, 20, 0, 0, 0);
     private final Notification notification = NotificationFixture.SSE.getWithDate(member, date);
 
     @BeforeEach
@@ -40,7 +40,8 @@ class NotificationRepositoryTest {
         Long memberId = member.getId();
         // when
         Optional<Notification> foundNotification =
-                notificationRepository.findByDateAndType(memberId, date, NotificationType.SSE);
+                notificationRepository.findByDateAndType(
+                        memberId, date.toLocalDate(), NotificationType.SSE);
         // then
         assertThat(foundNotification).isPresent();
     }
