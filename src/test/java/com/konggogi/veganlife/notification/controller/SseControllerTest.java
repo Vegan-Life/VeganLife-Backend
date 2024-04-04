@@ -47,7 +47,9 @@ class SseControllerTest extends RestDocsTest {
                     NotificationFixture.COMMENT_LIKE.getWithDate(
                             member, LocalDateTime.now().minusDays(1)),
                     NotificationFixture.INTAKE_OVER_60.getWithDate(
-                            member, LocalDateTime.now().minusDays(2)));
+                            member, LocalDateTime.now().minusDays(2)),
+                    NotificationFixture.COMMENT.getWithDate(
+                            member, LocalDateTime.now().minusDays(5)));
 
     @Test
     @DisplayName("SSE 구독 API")
@@ -138,7 +140,7 @@ class SseControllerTest extends RestDocsTest {
                                 .queryParam("page", "0")
                                 .queryParam("size", "20"));
 
-        perform.andExpect(status().isOk()).andExpect(jsonPath("$.content.size()").value(4));
+        perform.andExpect(status().isOk()).andExpect(jsonPath("$.content.size()").value(5));
 
         perform.andDo(print())
                 .andDo(

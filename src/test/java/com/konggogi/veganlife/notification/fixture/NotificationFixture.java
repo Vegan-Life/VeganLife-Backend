@@ -12,12 +12,13 @@ import org.springframework.util.ReflectionUtils;
 public enum NotificationFixture {
     SSE(NotificationType.SSE, NotificationMessage.SSE_CONNECTION.getMessage()),
     INTAKE_OVER_30(
-            NotificationType.INTAKE_OVER_30, NotificationMessage.OVER_INTAKE.getMessage(100)),
+            NotificationType.INTAKE_OVER_30, NotificationMessage.OVER_INTAKE.getMessage(300)),
     INTAKE_OVER_60(
-            NotificationType.INTAKE_OVER_60, NotificationMessage.OVER_INTAKE.getMessage(100)),
+            NotificationType.INTAKE_OVER_60, NotificationMessage.OVER_INTAKE.getMessage(600)),
     MENTION(NotificationType.MENTION, NotificationMessage.MENTION.getMessage("test1", "test2")),
+    COMMENT(NotificationType.COMMENT, NotificationMessage.ADD_COMMENT.getMessage("test1", "test2")),
     COMMENT_LIKE(
-            NotificationType.COMMENT,
+            NotificationType.COMMENT_LIKE,
             NotificationMessage.COMMENT_LIKE.getMessage("test1", "test2"));
 
     private final NotificationType type;
