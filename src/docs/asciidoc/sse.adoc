@@ -40,6 +40,28 @@ include::{snippets}/sse-subscribe-connection-fail/http-response.adoc[]
 
 == 사용자 알림 목록 조회 API
 
+=== 알림 Type
+
+|===
+|Name|Description
+
+|`+INTAKE_OVER_30+`
+| 칼로리 섭취량 30% 초과
+
+|`+INTAKE_OVER_60+`
+| 칼로리 섭취량 60% 초과
+
+|`+COMMENT+`
+| 댓글 달림
+
+|`+COMMENT_LIKE+`
+| 댓글 좋아요
+
+|`+COMMENT+`
+| 댓글에 사용자 언급
+
+|===
+
 === Request
 
 ==== Header
