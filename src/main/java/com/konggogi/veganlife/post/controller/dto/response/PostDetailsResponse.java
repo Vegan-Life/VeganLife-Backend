@@ -10,6 +10,7 @@ public record PostDetailsResponse(
         Long id,
         String author,
         VegetarianType vegetarianType,
+        String profileImageUrl,
         String title,
         String content,
         LocalDateTime createdAt,
