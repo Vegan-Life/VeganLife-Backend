@@ -107,3 +107,25 @@ include::{snippets}/get-post-containing-my-comments/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/get-post-containing-my-comments-not-found-member/http-response.adoc[]
+
+== 사용자가 스크랩한 레시피 목록 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-liked-recipes/request-headers.adoc[]
+
+==== Query Parameter
+
+include::{snippets}/get-liked-recipes/query-parameters.adoc[]
+
+==== Body
+
+include::{snippets}/get-liked-recipes/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-liked-recipes/http-response.adoc[]
