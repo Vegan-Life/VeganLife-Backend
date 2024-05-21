@@ -114,7 +114,6 @@ class PostControllerTest extends RestDocsTest {
         // given
         Post post = PostFixture.CHALLENGE.getWithId(1L, member);
         Comment comment1 = CommentFixture.DEFAULT.getTopCommentWithId(1L, member, post);
-        Comment subComment = CommentFixture.DEFAULT.getSubCommentWithId(3L, member, post, comment1);
         Comment comment2 = CommentFixture.DEFAULT.getTopCommentWithId(2L, member, post);
         List<String> imageUrls =
                 List.of(
@@ -142,6 +141,7 @@ class PostControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("$.author").value(member.getNickname()))
                 .andExpect(
                         jsonPath("$.vegetarianType").value(member.getVegetarianType().toString()))
+                .andExpect(jsonPath("$.profileImageUrl").value(member.getProfileImageUrl()))
                 .andExpect(jsonPath("$.title").value(post.getTitle()))
                 .andExpect(jsonPath("$.content").value(post.getContent()))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
