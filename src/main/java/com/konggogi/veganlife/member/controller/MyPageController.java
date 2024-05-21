@@ -11,6 +11,8 @@ import com.konggogi.veganlife.member.service.MemberService;
 import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
 import com.konggogi.veganlife.post.domain.mapper.PostMapper;
 import com.konggogi.veganlife.post.service.PostSearchService;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
+import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ public class MyPageController {
     private final MemberQueryService memberQueryService;
     private final MemberService memberService;
     private final PostSearchService postSearchService;
+    private final RecipeSearchService recipeSearchService;
     private final MemberMapper memberMapper;
     private final PostMapper postMapper;
 
@@ -62,5 +65,13 @@ public class MyPageController {
                         .searchByMemberComments(userDetails.id(), pageable)
                         .map(postMapper::toPostSimpleResponse);
         return ResponseEntity.ok(postSimpleResponses);
+    }
+
+    @GetMapping("/me/liked-recipes")
+    public ResponseEntity<Page<RecipeResponse>> getLikedRecipes(
+            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return ResponseEntity.ok(
+                recipeSearchService.searchLikedRecipes(userDetails.id(), pageable));
     }
 }

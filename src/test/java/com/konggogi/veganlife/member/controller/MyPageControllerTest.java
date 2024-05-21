@@ -1,5 +1,6 @@
 package com.konggogi.veganlife.member.controller;
 
+import static com.konggogi.veganlife.member.domain.QMember.member;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,11 +31,26 @@ import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
 import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
+import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
+import com.konggogi.veganlife.recipe.domain.Recipe;
+import com.konggogi.veganlife.recipe.domain.RecipeDescription;
+import com.konggogi.veganlife.recipe.domain.RecipeImage;
+import com.konggogi.veganlife.recipe.domain.RecipeIngredient;
+import com.konggogi.veganlife.recipe.domain.RecipeType;
+import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapper;
+import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapperImpl;
+import com.konggogi.veganlife.recipe.fixture.RecipeDescriptionFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeImageFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeIngredientFixture;
+import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
+import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Spy;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -49,6 +65,8 @@ class MyPageControllerTest extends RestDocsTest {
     @MockBean MemberService memberService;
     @MockBean MemberQueryService memberQueryService;
     @MockBean PostSearchService postSearchService;
+    @MockBean RecipeSearchService recipeSearchService;
+    @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
 
     @Test
     @DisplayName("회원 프로필 조회 API")
@@ -308,5 +326,71 @@ class MyPageControllerTest extends RestDocsTest {
                         document(
                                 "get-post-containing-my-comments-not-found-member",
                                 getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("사용자가 스크랩한 레시피 목록 조회")
+    void getLikedRecipesTest() throws Exception {
+
+        List<RecipeResponse> recipe =
+                List.of(
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get()), true),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get()), false),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get()), false));
+        Page<RecipeResponse> response =
+                PageableExecutionUtils.getPage(recipe, Pageable.ofSize(20), recipe::size);
+
+        // given
+        given(recipeSearchService.searchLikedRecipes(anyLong(), any(Pageable.class)))
+                .willReturn(response);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/me/liked-recipes")
+                                .headers(authorizationHeader())
+                                .queryParam("page", "0")
+                                .queryParam("size", "20"));
+        // then
+        perform.andExpect(status().isOk());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "get-liked-recipes",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(pageDesc(), sizeDesc())));
+    }
+
+    private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
+
+        Member member = MemberFixture.DEFAULT_M.getWithId(1L);
+
+        List<RecipeType> recipeTypes = List.of(recipeType);
+
+        List<RecipeImage> recipeImages =
+                List.of(
+                        RecipeImageFixture.DEFAULT.get(),
+                        RecipeImageFixture.DEFAULT.get(),
+                        RecipeImageFixture.DEFAULT.get());
+
+        List<RecipeIngredient> ingredients =
+                List.of(
+                        RecipeIngredientFixture.DEFAULT.getWithName("표고버섯 5개"),
+                        RecipeIngredientFixture.DEFAULT.getWithName("식용유 500ml"),
+                        RecipeIngredientFixture.DEFAULT.getWithName("시판 탕수육 소스 100ml"));
+
+        List<RecipeDescription> descriptions =
+                List.of(
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(1, "표고버섯을 먹기 좋은 크기로 자릅니다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(2, "표고버섯을 튀깁니다."),
+                        RecipeDescriptionFixture.DEFAULT.getWithDesc(3, "탕수육 소스에 버무립니다."));
+
+        return RecipeFixture.DEFAULT.getWithName(
+                id, name, recipeTypes, recipeImages, ingredients, descriptions, member);
     }
 }

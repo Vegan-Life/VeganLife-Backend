@@ -31,4 +31,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                     + " where r.name like %:keyword%"
                     + " or r.member.nickname like %:keyword%")
     Page<Recipe> findAllByKeyword(String keyword, Pageable pageable);
+
+    @Query(
+            "select r from Recipe r left join RecipeLike rl on r.id = rl.recipe.id where rl.member.id = :memberId")
+    Page<Recipe> findLikedRecipesByMemberId(Long memberId, Pageable pageable);
 }

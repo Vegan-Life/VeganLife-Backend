@@ -19,7 +19,9 @@ endif::[]
 
 include::{snippets}/recipe-like-add/request-headers.adoc[]
 
-include::{snippets}/recipe-like-add/http-request.adoc[]
+==== Path Variable
+
+include::{snippets}/recipe-like-add/path-parameters.adoc[]
 
 === Response
 
@@ -44,6 +46,10 @@ include::{snippets}/recipe-like-add-duplicate/http-response.adoc[]
 ==== Header
 
 include::{snippets}/recipe-like-remove/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/recipe-like-remove/path-parameters.adoc[]
 
 include::{snippets}/recipe-like-remove/http-request.adoc[]
 

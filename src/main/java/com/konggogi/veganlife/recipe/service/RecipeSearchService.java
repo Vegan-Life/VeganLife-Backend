@@ -73,6 +73,13 @@ public class RecipeSearchService {
                 .toList();
     }
 
+    public Page<RecipeResponse> searchLikedRecipes(Long memberId, Pageable pageable) {
+
+        return recipeQueryService
+                .searchLikedRecipesByMemberId(memberId, pageable)
+                .map(recipe -> recipeMapper.toRecipeResponse(recipe, true));
+    }
+
     // TODO: 랜덤 조회를 위해 5개의 쿼리가 발생, 성능 측정 필요
     /** 사용자의 VegetarainType에 해당하는 레시피 중 랜덤으로 4개를 추출한다. */
     private List<Recipe> getRecommendRecipes(Member member) {
