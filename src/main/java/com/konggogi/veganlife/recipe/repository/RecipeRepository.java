@@ -33,6 +33,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     Page<Recipe> findAllByKeyword(String keyword, Pageable pageable);
 
     @Query(
-            "select r from Recipe r left join RecipeLike rl on r.id = rl.recipe.id where rl.member =: memberId")
+            "select r from Recipe r left join RecipeLike rl on r.id = rl.recipe.id where rl.member.id = :memberId")
     Page<Recipe> findLikedRecipesByMemberId(Long memberId, Pageable pageable);
 }
