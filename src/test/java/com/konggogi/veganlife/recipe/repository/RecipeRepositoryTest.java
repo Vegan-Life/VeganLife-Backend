@@ -10,6 +10,7 @@ import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.RecipeDescription;
 import com.konggogi.veganlife.recipe.domain.RecipeImage;
 import com.konggogi.veganlife.recipe.domain.RecipeIngredient;
+import com.konggogi.veganlife.recipe.domain.RecipeLike;
 import com.konggogi.veganlife.recipe.domain.RecipeType;
 import com.konggogi.veganlife.recipe.fixture.RecipeDescriptionFixture;
 import com.konggogi.veganlife.recipe.fixture.RecipeFixture;
@@ -126,6 +127,25 @@ public class RecipeRepositoryTest {
         assertThat(ovoTotal).isEqualTo(3);
         assertThat(lactoTotal).isEqualTo(2);
         assertThat(pescoTotal).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("사용자가 스크랩한 레시피 목록을 조회한다.")
+    void findLikedRecipesByMemberIdTest() {
+
+        Recipe recipe1 =
+                createRecipe(List.of(RecipeTypeFixture.OVO.get(), RecipeTypeFixture.LACTO.get()));
+        Recipe recipe2 =
+                createRecipe(List.of(RecipeTypeFixture.VEGAN.get(), RecipeTypeFixture.LACTO.get()));
+        recipeRepository.save(recipe1);
+        recipeRepository.save(recipe2);
+
+        RecipeLike recipeLike = new RecipeLike(null, recipe1, member);
+        em.persist(recipeLike);
+
+        Pageable pageable = Pageable.ofSize(20);
+        Page<Recipe> found = recipeRepository.findLikedRecipesByMemberId(member.getId(), pageable);
+        assertThat(found).hasSize(1);
     }
 
     private Recipe createRecipe(List<RecipeType> recipeType) {
