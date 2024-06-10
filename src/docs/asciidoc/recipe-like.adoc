@@ -23,6 +23,8 @@ include::{snippets}/recipe-like-add/request-headers.adoc[]
 
 include::{snippets}/recipe-like-add/path-parameters.adoc[]
 
+include::{snippets}/recipe-like-add/http-request.adoc[]
+
 === Response
 
 ==== 200 OK
