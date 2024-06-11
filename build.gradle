@@ -4,12 +4,10 @@ buildscript {
     }
 }
 
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.3'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.diffplug.spotless' version '6.11.0'
     id 'jacoco'
     id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
@@ -32,10 +30,6 @@ configurations {
 
 repositories {
     mavenCentral()
-}
-
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
 }
 
 spotless {
@@ -117,7 +111,7 @@ bootJar {
     dependsOn(':openapi3')
 }
 
-// swagger ui 변환
+// swagger ui
 openapi3 {
     servers = [
             { url = 'http://localhost:8080' },
