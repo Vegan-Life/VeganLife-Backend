@@ -1,3 +1,10 @@
+buildscript {
+    ext {
+        restdocsApiSpecVersion = '0.18.4'
+    }
+}
+
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
@@ -5,6 +12,8 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.diffplug.spotless' version '6.11.0'
     id 'jacoco'
+    id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'com.konggogi'
@@ -59,6 +68,10 @@ dependencies {
     // spring rest docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocsApiSpecVersion}"
+
+    // swagger ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     // RDB
     runtimeOnly 'com.h2database:h2'
@@ -97,21 +110,24 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    outputs.dir snippetsDir
     finalizedBy jacocoTestReport
 }
 
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
+bootJar {
+    dependsOn(':openapi3')
 }
 
-bootJar { // jar의 templates에 문서 복사
-    dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}") {
-        into 'BOOT-INF/classes/templates'
-    }
+// swagger ui 변환
+openapi3 {
+    servers = [
+            { url = 'http://localhost:8080' },
+            { url = 'https://dev.konggogi.store' }
+    ]
+    title = 'Vegan Life API 문서'
+    description = 'Vegan Life API 문서'
+    version = '1.0.0'
+    outputFileNamePrefix = 'Vegan Life - 1.0.0'
+    format = 'yaml'
 }
 
 //jacoco setting
