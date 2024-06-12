@@ -24,3 +24,14 @@ jwt:
   expiration: 7200
   refresh-token:
     expiration: 604800
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  version: 'v1'
+  swagger-ui:
+    operationsSorter: method
+    disable-swagger-default-url: true
+    path: /api/v1/docs/swagger
+  paths-to-match:
+    - /**
