@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.meallog.service.dto;
 
 
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 
 public record MealDataDetailsDto(
@@ -14,4 +13,4 @@ public record MealDataDetailsDto(
         Double carbsPerUnit,
         Double proteinPerUnit,
         Double fatPerUnit,
-        IntakeUnit intakeUnit) {}
+        String intakeUnit) {}

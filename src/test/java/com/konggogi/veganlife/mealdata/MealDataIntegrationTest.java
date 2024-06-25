@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 import com.konggogi.veganlife.support.restassured.IntegrationTest;
 import io.restassured.path.json.JsonPath;
@@ -21,8 +20,7 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("식품 데이터 등록")
     void addMealDataTest() throws Exception {
 
-        MealDataAddRequest request =
-                new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G);
+        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
         given().log()
                 .all()
                 .header(AUTHORIZATION, getAccessToken())
@@ -40,8 +38,7 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("id 기반 식품 데이터 상세 조회")
     void getMealDataDetailsTest() throws Exception {
 
-        MealDataAddRequest request =
-                new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G);
+        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
         addMealData(request);
 
         JsonPath response =
@@ -69,7 +66,7 @@ public class MealDataIntegrationTest extends IntegrationTest {
                 () -> assertThat(response.getDouble("carbsPerUnit")).isEqualTo(40D / 100),
                 () -> assertThat(response.getDouble("proteinPerUnit")).isEqualTo(7D / 100),
                 () -> assertThat(response.getDouble("fatPerUnit")).isEqualTo(3D / 100),
-                () -> assertThat(response.getString("intakeUnit")).isEqualTo(IntakeUnit.G.name()));
+                () -> assertThat(response.getString("intakeUnit")).isEqualTo("g"));
     }
 
     @Test
@@ -78,9 +75,9 @@ public class MealDataIntegrationTest extends IntegrationTest {
 
         List<MealDataAddRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, IntakeUnit.G));
+                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
         for (MealDataAddRequest request : requests) {
             addMealData(request);
         }
@@ -114,9 +111,9 @@ public class MealDataIntegrationTest extends IntegrationTest {
 
         List<MealDataAddRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, IntakeUnit.G));
+                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
         for (MealDataAddRequest request : requests) {
             addMealData(request);
         }
@@ -148,9 +145,9 @@ public class MealDataIntegrationTest extends IntegrationTest {
 
         List<MealDataAddRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, IntakeUnit.G));
+                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
         for (MealDataAddRequest request : requests) {
             addMealData(request);
         }

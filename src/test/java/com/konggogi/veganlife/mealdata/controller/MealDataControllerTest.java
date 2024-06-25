@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
@@ -122,7 +121,7 @@ public class MealDataControllerTest extends RestDocsTest {
                 .andExpect(jsonPath("$.proteinPerUnit").value(result.getProteinPerUnit()))
                 .andExpect(jsonPath("$.fatPerUnit").value(result.getFatPerUnit()))
                 .andExpect(jsonPath("$.carbsPerUnit").value(result.getCarbsPerUnit()))
-                .andExpect(jsonPath("$.intakeUnit").value(result.getIntakeUnit().name()));
+                .andExpect(jsonPath("$.intakeUnit").value(result.getIntakeUnit()));
 
         perform.andDo(print())
                 .andDo(
@@ -153,8 +152,7 @@ public class MealDataControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식품 데이터 등록 API")
     void addMealDataTest() throws Exception {
-        MealDataAddRequest request =
-                new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, IntakeUnit.G);
+        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
 
         ResultActions perform =
                 mockMvc.perform(
@@ -176,8 +174,7 @@ public class MealDataControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식품 데이터 등록 API - Member Not Found 예외")
     void addMealDataTestMemberNotFoundExceptionTest() throws Exception {
-        MealDataAddRequest request =
-                new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, IntakeUnit.G);
+        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .given(mealDataService)

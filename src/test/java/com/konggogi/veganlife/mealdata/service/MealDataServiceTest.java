@@ -9,7 +9,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapperImpl;
@@ -39,8 +38,7 @@ public class MealDataServiceTest {
     @DisplayName("식품 데이터를 등록")
     void addTest() {
 
-        MealDataAddRequest request =
-                new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 3, IntakeUnit.G);
+        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 3, "g");
 
         given(memberQueryService.search(anyLong())).willReturn(member);
 

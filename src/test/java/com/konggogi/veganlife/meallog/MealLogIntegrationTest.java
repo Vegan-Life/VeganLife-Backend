@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
 import com.konggogi.veganlife.mealdata.repository.MealDataRepository;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
@@ -32,9 +31,9 @@ public class MealLogIntegrationTest extends IntegrationTest {
     void setup() {
         List<MealDataAddRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, IntakeUnit.G),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, IntakeUnit.G));
+                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
         requests.stream()
                 .map(request -> mealDataMapper.toEntity(request, member))
                 .forEach(mealDataRepository::save);

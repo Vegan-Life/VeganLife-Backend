@@ -54,8 +54,7 @@ public class MealData extends TimeStamped {
     private Double carbsPerUnit;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private IntakeUnit intakeUnit;
+    private String intakeUnit;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -76,7 +75,7 @@ public class MealData extends TimeStamped {
             Double proteinPerUnit,
             Double fatPerUnit,
             Double carbsPerUnit,
-            IntakeUnit intakeUnit,
+            String intakeUnit,
             OwnerType ownerType,
             Member member) {
         this.id = id;

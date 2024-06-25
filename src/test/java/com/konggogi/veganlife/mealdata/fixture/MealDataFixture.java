@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.mealdata.fixture;
 
 
-import com.konggogi.veganlife.mealdata.domain.IntakeUnit;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 import com.konggogi.veganlife.mealdata.domain.OwnerType;
@@ -9,16 +8,7 @@ import com.konggogi.veganlife.member.domain.Member;
 
 public enum MealDataFixture {
     TOTAL_AMOUNT(
-            "디폴트 음식",
-            MealDataType.TOTAL_AMOUNT,
-            100,
-            100,
-            10D,
-            1D,
-            1D,
-            1D,
-            IntakeUnit.G,
-            OwnerType.ALL),
+            "디폴트 음식", MealDataType.TOTAL_AMOUNT, 100, 100, 10D, 1D, 1D, 1D, "g", OwnerType.ALL),
     AMOUNT_PER_SERVE(
             "디폴트 가공식품",
             MealDataType.AMOUNT_PER_SERVE,
@@ -28,7 +18,7 @@ public enum MealDataFixture {
             1D,
             1D,
             1D,
-            IntakeUnit.G,
+            "g",
             OwnerType.MEMBER);
 
     private String name;
@@ -39,7 +29,7 @@ public enum MealDataFixture {
     private Double proteinPerUnit;
     private Double fatPerUnit;
     private Double carbsPerUnit;
-    private IntakeUnit intakeUnit;
+    private String intakeUnit;
     private OwnerType ownerType;
 
     MealDataFixture(
@@ -51,7 +41,7 @@ public enum MealDataFixture {
             Double proteinPerUnit,
             Double fatPerUnit,
             Double carbsPerUnit,
-            IntakeUnit intakeUnit,
+            String intakeUnit,
             OwnerType ownerType) {
         this.name = name;
         this.type = type;
