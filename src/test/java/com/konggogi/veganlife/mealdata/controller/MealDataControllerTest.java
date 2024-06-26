@@ -9,8 +9,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -20,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
-import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
+import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataUpdateRequest;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.domain.OwnerType;
 import com.konggogi.veganlife.mealdata.domain.mapper.MealDataMapper;
@@ -152,7 +154,8 @@ public class MealDataControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식품 데이터 등록 API")
     void addMealDataTest() throws Exception {
-        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
+        MealDataUpdateRequest request =
+                new MealDataUpdateRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
 
         ResultActions perform =
                 mockMvc.perform(
@@ -174,11 +177,12 @@ public class MealDataControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식품 데이터 등록 API - Member Not Found 예외")
     void addMealDataTestMemberNotFoundExceptionTest() throws Exception {
-        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
+        MealDataUpdateRequest request =
+                new MealDataUpdateRequest("통밀빵", 300, 100, 210, 30, 5, 5, "g");
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .given(mealDataService)
-                .add(any(MealDataAddRequest.class), anyLong());
+                .add(any(MealDataUpdateRequest.class), anyLong());
 
         ResultActions perform =
                 mockMvc.perform(
@@ -190,5 +194,54 @@ public class MealDataControllerTest extends RestDocsTest {
         perform.andExpect(status().isNotFound());
 
         perform.andDo(document("meal-data-add-member-not-found", getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("id에 해당하는 사용자가 소유한 식품 데이터를 삭제할 수 있다.")
+    void removeMealData() throws Exception {
+
+        Long mealDataId = 1L;
+
+        ResultActions perform =
+                mockMvc.perform(
+                        delete("/api/v1/meal-data/{id}", mealDataId)
+                                .headers(authorizationHeader())
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(
+                document(
+                        "meal-data-remove",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestHeaders(authorizationDesc()),
+                        pathParameters(parameterWithName("id").description("삭제할 식품 데이터 id"))));
+    }
+
+    @Test
+    @DisplayName("id에 해당하는 사용자가 소유한 식품 데이터를 수정할 수 있다.")
+    void modifyMealData() throws Exception {
+
+        Long mealDataId = 1L;
+        MealDataUpdateRequest request =
+                new MealDataUpdateRequest("통밀빵", 300, 100, 210, 30, 5, 3, "그램");
+
+        ResultActions perform =
+                mockMvc.perform(
+                        put("/api/v1/meal-data/{id}", mealDataId)
+                                .headers(authorizationHeader())
+                                .content(toJson(request))
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(
+                document(
+                        "meal-data-modify",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestHeaders(authorizationDesc()),
+                        pathParameters(parameterWithName("id").description("삭제할 식품 데이터 id"))));
     }
 }

@@ -4,7 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
+import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataUpdateRequest;
 import com.konggogi.veganlife.mealdata.domain.MealDataType;
 import com.konggogi.veganlife.support.restassured.IntegrationTest;
 import io.restassured.path.json.JsonPath;
@@ -20,7 +20,8 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("식품 데이터 등록")
     void addMealDataTest() throws Exception {
 
-        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
+        MealDataUpdateRequest request =
+                new MealDataUpdateRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
         given().log()
                 .all()
                 .header(AUTHORIZATION, getAccessToken())
@@ -38,7 +39,8 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("id 기반 식품 데이터 상세 조회")
     void getMealDataDetailsTest() throws Exception {
 
-        MealDataAddRequest request = new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
+        MealDataUpdateRequest request =
+                new MealDataUpdateRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g");
         addMealData(request);
 
         JsonPath response =
@@ -73,12 +75,12 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("키워드 기반 식품 데이터 목록 검색")
     void getMealDataListTest() throws Exception {
 
-        List<MealDataAddRequest> requests =
+        List<MealDataUpdateRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
-        for (MealDataAddRequest request : requests) {
+                        new MealDataUpdateRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
+        for (MealDataUpdateRequest request : requests) {
             addMealData(request);
         }
 
@@ -109,12 +111,12 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("키워드 기반 식품 데이터 목록 검색 - 키워드가 없을 경우 빈 리스트 반환")
     void getMealDataListWithoutKeywordTest() throws Exception {
 
-        List<MealDataAddRequest> requests =
+        List<MealDataUpdateRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
-        for (MealDataAddRequest request : requests) {
+                        new MealDataUpdateRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
+        for (MealDataUpdateRequest request : requests) {
             addMealData(request);
         }
 
@@ -143,12 +145,12 @@ public class MealDataIntegrationTest extends IntegrationTest {
     @DisplayName("키워드 기반 식품 데이터 목록 검색 - 검색 결과가 없을 경우 빈 리스트 반환")
     void getMealDataListEmptyListTest() throws Exception {
 
-        List<MealDataAddRequest> requests =
+        List<MealDataUpdateRequest> requests =
                 List.of(
-                        new MealDataAddRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
-                        new MealDataAddRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
-        for (MealDataAddRequest request : requests) {
+                        new MealDataUpdateRequest("통밀빵", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("통밀크래커", 300, 100, 200, 40, 7, 3, "g"),
+                        new MealDataUpdateRequest("가지볶음", 300, 100, 200, 40, 7, 3, "g"));
+        for (MealDataUpdateRequest request : requests) {
             addMealData(request);
         }
 
@@ -173,7 +175,7 @@ public class MealDataIntegrationTest extends IntegrationTest {
                 () -> assertThat(response.getList("content")).isEmpty());
     }
 
-    private void addMealData(MealDataAddRequest request) throws Exception {
+    private void addMealData(MealDataUpdateRequest request) throws Exception {
 
         given().log()
                 .all()
