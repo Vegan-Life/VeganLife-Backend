@@ -1,6 +1,7 @@
 buildscript {
     ext {
         restdocsApiSpecVersion = '0.18.4'
+        set('snippetsDir', file("build/generated-snippets"))
     }
 }
 
@@ -12,6 +13,7 @@ plugins {
     id 'jacoco'
     id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
     id 'org.hidetake.swagger.generator' version '2.18.2'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.konggogi'
@@ -104,11 +106,22 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
     finalizedBy jacocoTestReport
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }
 
 bootJar {
     dependsOn(':openapi3')
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}") {
+        into 'BOOT-INF/classes/templates'
+    }
 }
 
 // swagger ui
@@ -155,15 +168,9 @@ jacocoTestCoverageVerification {
             enabled = true
 
             limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                //minimum = 0.90
-            }
-
-            limit {
                 counter = 'BRANCH'
                 value = 'COVEREDRATIO'
-                //minimum = 0.90
+                minimum = 0.75
             }
         }
     }

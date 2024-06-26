@@ -71,3 +71,41 @@ include::{snippets}/meal-data-details/http-response.adoc[]
 
 ==== 404 NOT FOUND
 include::{snippets}/meal-data-details-not-found/http-response.adoc[]
+
+== 식품 데이터 삭제 수정 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-data-modify/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/meal-data-modify/path-parameters.adoc[]
+
+include::{snippets}/meal-data-modify/http-request.adoc[]
+
+=== Response
+
+==== 201 CREATED
+include::{snippets}/meal-data-modify/http-response.adoc[]
+
+== 식품 데이터 삭제 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/meal-data-remove/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/meal-data-remove/path-parameters.adoc[]
+
+include::{snippets}/meal-data-remove/http-request.adoc[]
+
+=== Response
+
+==== 204 NO CONTENT
+include::{snippets}/meal-data-remove/http-response.adoc[]

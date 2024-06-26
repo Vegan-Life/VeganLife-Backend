@@ -104,4 +104,24 @@ public class MealData extends TimeStamped {
 
         return (double) nutrients / amountPerServe;
     }
+
+    public boolean isOwnedBy(Long memberId) {
+        return member.getId().equals(memberId);
+    }
+
+    public void modify(
+            String name,
+            Integer amount,
+            Integer amountPerServe,
+            Integer caloriePerServe,
+            Integer proteinPerServe,
+            Integer fatPerServe,
+            Integer carbsPerServe,
+            String intakeUnit) {
+        this.name = name;
+        this.amount = amount;
+        this.amountPerServe = amountPerServe;
+        setNutrientsPerUnit(caloriePerServe, carbsPerServe, proteinPerServe, fatPerServe);
+        this.intakeUnit = intakeUnit;
+    }
 }
