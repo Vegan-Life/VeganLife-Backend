@@ -72,7 +72,7 @@ include::{snippets}/meal-data-details/http-response.adoc[]
 ==== 404 NOT FOUND
 include::{snippets}/meal-data-details-not-found/http-response.adoc[]
 
-== 식품 데이터 삭제 수정 API
+== 식품 데이터 수정 API
 
 === Request
 

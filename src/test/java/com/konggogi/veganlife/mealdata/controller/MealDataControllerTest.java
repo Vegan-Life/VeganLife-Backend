@@ -242,6 +242,6 @@ public class MealDataControllerTest extends RestDocsTest {
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestHeaders(authorizationDesc()),
-                        pathParameters(parameterWithName("id").description("삭제할 식품 데이터 id"))));
+                        pathParameters(parameterWithName("id").description("수정할 식품 데이터 id"))));
     }
 }
