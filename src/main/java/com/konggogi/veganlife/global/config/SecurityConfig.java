@@ -50,6 +50,7 @@ public class SecurityConfig {
                         authorize ->
                                 authorize
                                         .requestMatchers(
+                                                new AntPathRequestMatcher("/api/v1/docs"),
                                                 new AntPathRequestMatcher(
                                                         "/api/v1/docs/swagger*/**"),
                                                 new AntPathRequestMatcher("/v3/api-docs/**"),
