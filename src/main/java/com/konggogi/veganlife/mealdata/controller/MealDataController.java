@@ -2,7 +2,7 @@ package com.konggogi.veganlife.mealdata.controller;
 
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
-import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
+import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataUpdateRequest;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
 import com.konggogi.veganlife.mealdata.domain.OwnerType;
@@ -16,9 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,10 +55,29 @@ public class MealDataController {
 
     @PostMapping
     public ResponseEntity<Void> addMealData(
-            @Valid @RequestBody MealDataAddRequest request,
+            @Valid @RequestBody MealDataUpdateRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         mealDataService.add(request, userDetails.id());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeMealData(
+            @PathVariable("id") Long mealDataId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        mealDataService.removeById(mealDataId, userDetails.id());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> modifyMealData(
+            @PathVariable("id") Long mealDataId,
+            @Validated @RequestBody MealDataUpdateRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        mealDataService.modifyById(request, mealDataId, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

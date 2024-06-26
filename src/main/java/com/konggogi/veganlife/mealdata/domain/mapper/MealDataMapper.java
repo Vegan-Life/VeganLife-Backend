@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.mealdata.domain.mapper;
 
 
-import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataAddRequest;
+import com.konggogi.veganlife.mealdata.controller.dto.request.MealDataUpdateRequest;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataDetailsResponse;
 import com.konggogi.veganlife.mealdata.controller.dto.response.MealDataListResponse;
 import com.konggogi.veganlife.mealdata.domain.MealData;
@@ -17,7 +17,7 @@ public interface MealDataMapper {
 
     MealDataDetailsResponse toMealDataDetailsResponse(MealData mealData);
 
-    default MealData toEntity(MealDataAddRequest request, Member member) {
+    default MealData toEntity(MealDataUpdateRequest request, Member member) {
 
         MealData mealData =
                 MealData.builder()

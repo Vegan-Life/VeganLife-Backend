@@ -32,6 +32,7 @@ public enum ErrorCode {
 
     // meal-data
     NOT_FOUND_MEAL_DATA("MEAL_DATA_001", "식품 정보를 찾을 수 없습니다."),
+    MEAL_DATA_ACCESS_DENIED("MEAL_DATA_002", "해당 사용자는 접근할 수 없는 식품 정보입니다."),
 
     // meal-log
     NOT_FOUND_MEAL_LOG("MEAL_LOG_001", "식사 기록을 찾을 수 없습니다."),
