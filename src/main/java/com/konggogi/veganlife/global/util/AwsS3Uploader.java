@@ -9,6 +9,7 @@ import com.konggogi.veganlife.global.exception.FileUploadException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,9 @@ public final class AwsS3Uploader {
     private String cloudfrontDomain;
 
     public List<String> uploadFiles(AwsS3Folders uploadFolder, List<MultipartFile> multipartFiles) {
+        if (multipartFiles == null) {
+            return Collections.emptyList();
+        }
         List<String> fileUrls = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
@@ -38,7 +42,9 @@ public final class AwsS3Uploader {
     }
 
     public String uploadFile(AwsS3Folders uploadFolder, MultipartFile multipartFile) {
-
+        if (multipartFile == null) {
+            return null;
+        }
         String newFileName = uploadFolder.getName() + generateRandomFilename(multipartFile);
 
         ObjectMetadata metadata = new ObjectMetadata();

@@ -38,7 +38,7 @@ public class MealLogController {
     @PostMapping
     public ResponseEntity<Void> addMealLog(
             @Valid @RequestPart MealLogAddRequest request,
-            @RequestPart @Size(max = 5) List<MultipartFile> images,
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         mealLogService.add(request, images, userDetails.id());
@@ -62,7 +62,7 @@ public class MealLogController {
     public ResponseEntity<Void> modifyMealLog(
             @PathVariable Long id,
             @Valid @RequestPart MealLogModifyRequest request,
-            @RequestPart @Size(max = 5) List<MultipartFile> images) {
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images) {
 
         mealLogService.modify(id, request, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();

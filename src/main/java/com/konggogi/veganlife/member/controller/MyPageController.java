@@ -43,10 +43,9 @@ public class MyPageController {
     @PutMapping("/profile")
     public ResponseEntity<MemberProfileResponse> modifyMemberProfile(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestPart @Valid ProfileModifyRequest profileModifyRequest,
-            @RequestPart MultipartFile profileImage) {
-        Member member =
-                memberService.modifyProfile(userDetails.id(), profileModifyRequest, profileImage);
+            @RequestPart @Valid ProfileModifyRequest request,
+            @RequestPart(required = false) MultipartFile image) {
+        Member member = memberService.modifyProfile(userDetails.id(), request, image);
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 

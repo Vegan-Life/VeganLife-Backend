@@ -33,10 +33,10 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostAddResponse> addPost(
-            @RequestPart @Valid PostFormRequest postFormRequest,
-            @RequestPart @Size(max = 5) List<MultipartFile> images,
+            @RequestPart @Valid PostFormRequest request,
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Post post = postService.add(userDetails.id(), postFormRequest, images);
+        Post post = postService.add(userDetails.id(), request, images);
         return ResponseEntity.ok(postMapper.toPostAddResponse(post));
     }
 
@@ -58,10 +58,10 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
-            @RequestPart PostFormRequest postFormRequest,
-            @RequestPart @Size(max = 5) List<MultipartFile> images,
+            @RequestPart PostFormRequest request,
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.modify(userDetails.id(), postId, postFormRequest, images);
+        postService.modify(userDetails.id(), postId, request, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

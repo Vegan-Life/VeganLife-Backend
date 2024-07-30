@@ -34,7 +34,7 @@ public class PostService {
     private final TagMapper tagMapper;
     private final PostImageMapper postImageMapper;
 
-    private AwsS3Uploader awsS3Uploader;
+    private final AwsS3Uploader awsS3Uploader;
 
     public Post add(Long memberId, PostFormRequest postFormRequest, List<MultipartFile> images) {
         Member member = memberQueryService.search(memberId);
