@@ -18,7 +18,9 @@ endif::[]
 
 include::{snippets}/add-post/request-headers.adoc[]
 
-==== Body
+==== Request Part
+
+include::{snippets}/add-post/request-parts.adoc[]
 
 include::{snippets}/add-post/http-request.adoc[]
 
@@ -94,7 +96,9 @@ include::{snippets}/modify-post/request-headers.adoc[]
 
 include::{snippets}/modify-post/path-parameters.adoc[]
 
-==== Body
+==== Request Part
+
+include::{snippets}/modify-post/request-parts.adoc[]
 
 include::{snippets}/modify-post/http-request.adoc[]
 

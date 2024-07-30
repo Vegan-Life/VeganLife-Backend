@@ -18,6 +18,10 @@ endif::[]
 
 include::{snippets}/meal-log-add/request-headers.adoc[]
 
+==== Request Part
+
+include::{snippets}/meal-log-add/request-parts.adoc[]
+
 include::{snippets}/meal-log-add/http-request.adoc[]
 
 === Response
@@ -42,6 +46,10 @@ include::{snippets}/meal-log-modify/request-headers.adoc[]
 ==== Path Variable
 
 include::{snippets}/meal-log-modify/path-parameters.adoc[]
+
+==== Request Part
+
+include::{snippets}/meal-log-modify/request-parts.adoc[]
 
 include::{snippets}/meal-log-modify/http-request.adoc[]
 

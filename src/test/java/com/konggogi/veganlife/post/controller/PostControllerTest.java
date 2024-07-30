@@ -43,7 +43,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(PostController.class)
@@ -58,18 +60,38 @@ class PostControllerTest extends RestDocsTest {
     void addPostTest() throws Exception {
         // given
         Post post = PostFixture.BAKERY.getWithId(1L, member);
-        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
-        PostFormRequest request =
-                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
-        given(postService.add(anyLong(), any(PostFormRequest.class))).willReturn(post);
+        PostFormRequest postFormRequest =
+                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(postFormRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
+        given(postService.add(anyLong(), any(PostFormRequest.class), any())).willReturn(post);
+
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/posts")
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/posts")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(post.getId()))
@@ -81,7 +103,10 @@ class PostControllerTest extends RestDocsTest {
                                 "add-post",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
+                                requestHeaders(authorizationDesc()),
+                                requestParts(
+                                        partWithName("request").description("게시글 추가 DTO"),
+                                        partWithName("images").description("이미지 목록"))));
     }
 
     @Test
@@ -89,19 +114,38 @@ class PostControllerTest extends RestDocsTest {
     void addPostNotMemberTest() throws Exception {
         // given
         Post post = PostFixture.BAKERY.getWithId(1L, member);
-        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
         List<String> tags = List.of("#맛집");
-        PostFormRequest request =
-                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
-        given(postService.add(anyLong(), any(PostFormRequest.class)))
+        PostFormRequest postFormRequest =
+                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(postFormRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
+        given(postService.add(anyLong(), any(PostFormRequest.class), any()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/posts")
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/posts")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 
@@ -241,21 +285,44 @@ class PostControllerTest extends RestDocsTest {
     void modifyPostTest() throws Exception {
         // then
         Post post = PostFixture.BAKERY.get();
-        List<String> imageUrls =
+        List<String> tags = List.of("#맛집");
+        PostFormRequest postFormRequest =
+                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(postFormRequest).getBytes());
+        List<MockMultipartFile> images =
                 List.of(
-                        PostImageFixture.DEFAULT.getImageUrl(),
-                        PostImageFixture.DEFAULT.getImageUrl());
-        List<String> tags = List.of("신사동", "맛집", "비건");
-        PostFormRequest request =
-                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
-        doNothing().when(postService).modify(anyLong(), anyLong(), any(PostFormRequest.class));
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
+        doNothing()
+                .when(postService)
+                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/posts/{postId}", 1L)
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/posts/{postId}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isCreated());
 
@@ -266,7 +333,10 @@ class PostControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc()),
-                                pathParameters(parameterWithName("postId").description("게시글 번호"))));
+                                pathParameters(parameterWithName("postId").description("게시글 번호")),
+                                requestParts(
+                                        partWithName("request").description("게시글 수정 DTO"),
+                                        partWithName("images").description("이미지 파일 목록"))));
     }
 
     @Test
@@ -274,20 +344,44 @@ class PostControllerTest extends RestDocsTest {
     void modifyPostNotFoundMemberTest() throws Exception {
         // then
         Post post = PostFixture.BAKERY.get();
-        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
-        List<String> tags = List.of("신사동", "맛집", "비건");
-        PostFormRequest request =
-                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        List<String> tags = List.of("#맛집");
+        PostFormRequest postFormRequest =
+                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(postFormRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
         doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .when(postService)
-                .modify(anyLong(), anyLong(), any(PostFormRequest.class));
+                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/posts/{postId}", 1L)
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/posts/{postId}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 
@@ -298,22 +392,46 @@ class PostControllerTest extends RestDocsTest {
     @Test
     @DisplayName("게시글 수정 API - 없는 게시글 예외 발생")
     void modifyPostNotFoundPostTest() throws Exception {
-        // then
+        // given
         Post post = PostFixture.BAKERY.get();
-        List<String> imageUrls = List.of(PostImageFixture.DEFAULT.getImageUrl());
-        List<String> tags = List.of("신사동", "맛집", "비건");
-        PostFormRequest request =
-                new PostFormRequest(post.getTitle(), post.getContent(), imageUrls, tags);
+        List<String> tags = List.of("#맛집");
+        PostFormRequest postFormRequest =
+                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(postFormRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
         doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
                 .when(postService)
-                .modify(anyLong(), anyLong(), any(PostFormRequest.class));
+                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/posts/{postId}", 1L)
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/posts/{postId}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 

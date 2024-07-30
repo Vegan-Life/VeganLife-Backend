@@ -38,6 +38,10 @@ include::{snippets}/member-profile-not-found/http-response.adoc[]
 
 include::{snippets}/modify-profile/request-headers.adoc[]
 
+==== Request Part
+
+include::{snippets}/modify-profile/request-parts.adoc[]
+
 ==== Body
 
 include::{snippets}/modify-profile/http-request.adoc[]

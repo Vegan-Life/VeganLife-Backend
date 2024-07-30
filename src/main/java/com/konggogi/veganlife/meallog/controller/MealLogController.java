@@ -6,10 +6,10 @@ import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogModifyRequest;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogDetailsResponse;
 import com.konggogi.veganlife.meallog.controller.dto.response.MealLogListResponse;
-import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
 import com.konggogi.veganlife.meallog.service.MealLogSearchService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +21,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,14 +34,14 @@ public class MealLogController {
 
     private final MealLogService mealLogService;
     private final MealLogSearchService mealLogSearchService;
-    private final MealLogMapper mealLogMapper;
 
     @PostMapping
     public ResponseEntity<Void> addMealLog(
-            @Valid @RequestBody MealLogAddRequest request,
+            @Valid @RequestPart MealLogAddRequest request,
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        mealLogService.add(request, userDetails.id());
+        mealLogService.add(request, images, userDetails.id());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -59,9 +60,11 @@ public class MealLogController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> modifyMealLog(
-            @PathVariable Long id, @Valid @RequestBody MealLogModifyRequest request) {
+            @PathVariable Long id,
+            @Valid @RequestPart MealLogModifyRequest request,
+            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images) {
 
-        mealLogService.modify(id, request);
+        mealLogService.modify(id, request, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

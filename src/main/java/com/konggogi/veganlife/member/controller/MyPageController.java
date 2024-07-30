@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,8 +43,9 @@ public class MyPageController {
     @PutMapping("/profile")
     public ResponseEntity<MemberProfileResponse> modifyMemberProfile(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody @Valid ProfileModifyRequest profileModifyRequest) {
-        Member member = memberService.modifyProfile(userDetails.id(), profileModifyRequest);
+            @RequestPart @Valid ProfileModifyRequest request,
+            @RequestPart(required = false) MultipartFile image) {
+        Member member = memberService.modifyProfile(userDetails.id(), request, image);
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 

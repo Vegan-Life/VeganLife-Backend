@@ -9,13 +9,16 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.amazonaws.HttpMethod;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
@@ -58,6 +61,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(MyPageController.class)
@@ -118,24 +122,41 @@ class MyPageControllerTest extends RestDocsTest {
     void modifyMemberProfileTest() throws Exception {
         // given
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
-        ProfileModifyRequest request =
+        ProfileModifyRequest profileModifyRequest =
                 new ProfileModifyRequest(
                         member.getNickname(),
-                        member.getProfileImageUrl(),
                         member.getVegetarianType(),
                         member.getGender(),
                         member.getBirthYear(),
                         member.getHeight(),
                         member.getWeight());
-        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(profileModifyRequest).getBytes());
+        MockMultipartFile image =
+                new MockMultipartFile(
+                        "image",
+                        "profileImage.png",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "profileImage".getBytes());
+
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class), any()))
                 .willReturn(member);
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/members/profile")
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/members/profile")
+                                .file(image)
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isOk());
 
@@ -145,25 +166,45 @@ class MyPageControllerTest extends RestDocsTest {
                                 "modify-profile",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
+                                requestHeaders(authorizationDesc()),
+                                requestParts(
+                                        partWithName("request").description("회원 프로필 수정 DTO"),
+                                        partWithName("image").description("프로필 이미지 파일"))));
     }
 
     @Test
     @DisplayName("회원 프로필 수정 API - 중복된 닉네임 예외 발생")
     void modifyMemberProfileDuplicatedNicknameTest() throws Exception {
         // given
-        ProfileModifyRequest request =
-                new ProfileModifyRequest(
-                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
+        ProfileModifyRequest profileModifyRequest =
+                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(profileModifyRequest).getBytes());
+        MockMultipartFile image =
+                new MockMultipartFile(
+                        "image",
+                        "profileImage.png",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "profileImage".getBytes());
+
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class), any()))
                 .willThrow(new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME));
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/members/profile")
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/members/profile")
+                                .file(image)
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isConflict());
 
@@ -175,18 +216,35 @@ class MyPageControllerTest extends RestDocsTest {
     @DisplayName("회원 프로필 수정 API - 없는 회원 예외 발생")
     void modifyNotMemberProfileTest() throws Exception {
         // given
-        ProfileModifyRequest request =
-                new ProfileModifyRequest(
-                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class)))
+        ProfileModifyRequest profileModifyRequest =
+                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(profileModifyRequest).getBytes());
+        MockMultipartFile image =
+                new MockMultipartFile(
+                        "image",
+                        "profileImage.png",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "profileImage".getBytes());
+
+        given(memberService.modifyProfile(anyLong(), any(ProfileModifyRequest.class), any()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/members/profile")
-                                .headers(authorizationHeader())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(toJson(request)));
+                        multipart("/api/v1/members/profile")
+                                .file(image)
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
         // then
         perform.andExpect(status().isNotFound());
 

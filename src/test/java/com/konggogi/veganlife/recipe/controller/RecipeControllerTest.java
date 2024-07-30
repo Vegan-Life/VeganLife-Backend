@@ -9,10 +9,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,6 +52,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(RecipeController.class)
@@ -179,20 +182,38 @@ public class RecipeControllerTest extends RestDocsTest {
     @DisplayName("레시피 등록 API")
     void addRecipeTest() throws Exception {
 
-        RecipeAddRequest request =
+        RecipeAddRequest recipeAddRequest =
                 new RecipeAddRequest(
                         "표고버섯 탕수",
                         List.of(VegetarianType.LACTO),
-                        List.of("/image1.png", "/image2.png"),
                         List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
                         List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(recipeAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/recipes")
-                                .headers(authorizationHeader())
-                                .content(toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                        multipart("/api/v1/recipes")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isCreated());
 
@@ -202,31 +223,52 @@ public class RecipeControllerTest extends RestDocsTest {
                                 "recipe-add-recipe",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
+                                requestHeaders(authorizationDesc()),
+                                requestParts(
+                                        partWithName("request").description("레시피 추가 DTO"),
+                                        partWithName("images").description("레시피 이미지 목록"))));
     }
 
     @Test
     @DisplayName("레시피 등록 API 예외 - Member Not Found")
     void addRecipeMemberNotFoundExceptionTest() throws Exception {
 
-        RecipeAddRequest request =
+        RecipeAddRequest recipeAddRequest =
                 new RecipeAddRequest(
                         "표고버섯 탕수",
                         List.of(VegetarianType.LACTO),
-                        List.of("/image1.png", "/image2.png"),
                         List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
                         List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(recipeAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .given(recipeService)
-                .add(any(RecipeAddRequest.class), anyLong());
+                .add(any(RecipeAddRequest.class), any(), anyLong());
 
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/recipes")
-                                .headers(authorizationHeader())
-                                .content(toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                        multipart("/api/v1/recipes")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isNotFound());
 

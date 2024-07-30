@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
 import com.konggogi.veganlife.comment.service.CommentLikeService;
@@ -13,6 +14,8 @@ import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
+import com.konggogi.veganlife.global.util.AwsS3Folders;
+import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
@@ -38,6 +41,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -54,6 +60,7 @@ class MemberServiceTest {
     @Mock JwtProvider jwtProvider;
     @Mock RefreshTokenService refreshTokenService;
     @Spy MemberMapper memberMapper = new MemberMapperImpl();
+    @Mock AwsS3Uploader awsS3Uploader;
     @InjectMocks MemberService memberService;
     private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
@@ -161,16 +168,24 @@ class MemberServiceTest {
     void modifyMemberProfileTest() {
         // given
         ProfileModifyRequest profileRequest =
-                new ProfileModifyRequest(
-                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberRepository.findByNickname(profileRequest.nickname()))
                 .willReturn(Optional.empty());
         given(memberQueryService.search(anyLong())).willReturn(member);
+        MultipartFile profileImage =
+                new MockMultipartFile(
+                        "image",
+                        "profileImage1.png",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "profileImage1.png".getBytes());
+        willReturn("profileImage1.png")
+                .given(awsS3Uploader)
+                .uploadFile(eq(AwsS3Folders.PROFILE), any());
         // when
-        Member updatedMember = memberService.modifyProfile(member.getId(), profileRequest);
+        Member updatedMember =
+                memberService.modifyProfile(member.getId(), profileRequest, profileImage);
         // then
         assertThat(updatedMember.getNickname()).isEqualTo(profileRequest.nickname());
-        assertThat(updatedMember.getProfileImageUrl()).isEqualTo(profileRequest.imageUrl());
         assertThat(updatedMember.getVegetarianType()).isEqualTo(profileRequest.vegetarianType());
         assertThat(updatedMember.getGender()).isEqualTo(profileRequest.gender());
         assertThat(updatedMember.getBirthYear()).isEqualTo(profileRequest.birthYear());
@@ -189,7 +204,6 @@ class MemberServiceTest {
         ProfileModifyRequest request =
                 new ProfileModifyRequest(
                         existingMember.getNickname(),
-                        "imageUrl",
                         VegetarianType.LACTO,
                         Gender.M,
                         1993,
@@ -198,7 +212,7 @@ class MemberServiceTest {
         given(memberRepository.findByNickname(request.nickname()))
                 .willReturn(Optional.of(existingMember));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request))
+        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request, null))
                 .isInstanceOf(DuplicatedNicknameException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
         then(memberRepository).should().findByNickname(anyString());
@@ -211,13 +225,21 @@ class MemberServiceTest {
         // given
         Long memberId = member.getId();
         ProfileModifyRequest request =
-                new ProfileModifyRequest(
-                        "nickname", "imageUrl", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(member.getId()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
+        MultipartFile profileImage =
+                new MockMultipartFile(
+                        "image",
+                        "profileImage1.png",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "profileImage1.png".getBytes());
+        willReturn("profileImage1.png")
+                .given(awsS3Uploader)
+                .uploadFile(eq(AwsS3Folders.PROFILE), any());
         // when, then
-        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request))
+        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request, profileImage))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberRepository).should().findByNickname(anyString());

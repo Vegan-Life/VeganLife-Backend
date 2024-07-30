@@ -50,7 +50,7 @@ public interface RecipeMapper {
     @Mapping(source = "recipe.member", target = "author")
     RecipeDetailsResponse toRecipeDetailsResponse(Recipe recipe, boolean isLiked);
 
-    default Recipe toEntity(RecipeAddRequest request, Member member) {
+    default Recipe toEntity(RecipeAddRequest request, List<String> imageUrls, Member member) {
 
         // TODO: 이 로직이 매핑 로직인지, 서비스 로직인지 모호함, 리팩토링 단계에서 추가적으로 고민
         Recipe recipe = Recipe.builder().name(request.name()).member(member).build();
@@ -60,9 +60,7 @@ public interface RecipeMapper {
                         .map(vegetarianType -> toRecipeType(vegetarianType, recipe))
                         .toList();
         List<RecipeImage> recipeImages =
-                request.imageUrls().stream()
-                        .map(imageUrl -> toRecipeImage(imageUrl, recipe))
-                        .toList();
+                imageUrls.stream().map(imageUrl -> toRecipeImage(imageUrl, recipe)).toList();
         List<RecipeIngredient> ingredients =
                 request.ingredients().stream()
                         .map(ingredient -> toRecipeIngredient(ingredient, recipe))

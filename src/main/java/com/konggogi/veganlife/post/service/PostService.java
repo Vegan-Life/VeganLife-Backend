@@ -1,6 +1,8 @@
 package com.konggogi.veganlife.post.service;
 
 
+import com.konggogi.veganlife.global.util.AwsS3Folders;
+import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
@@ -17,6 +19,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +29,19 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostQueryService postQueryService;
     private final TagRepository tagRepository;
+
     private final PostMapper postMapper;
     private final TagMapper tagMapper;
     private final PostImageMapper postImageMapper;
 
-    public Post add(Long memberId, PostFormRequest postFormRequest) {
+    private final AwsS3Uploader awsS3Uploader;
+
+    public Post add(Long memberId, PostFormRequest postFormRequest, List<MultipartFile> images) {
         Member member = memberQueryService.search(memberId);
         Post post = postMapper.toEntity(member, postFormRequest);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, images);
         mapToPostTag(postFormRequest.tags()).forEach(post::addPostTag);
-        mapToPostImage(postFormRequest.imageUrls()).forEach(post::addPostImage);
+        mapToPostImage(imageUrls).forEach(post::addPostImage);
         return postRepository.save(post);
     }
 
@@ -42,10 +49,15 @@ public class PostService {
         postRepository.setMemberToNull(memberId);
     }
 
-    public void modify(Long memberId, Long postId, PostFormRequest postFormRequest) {
+    public void modify(
+            Long memberId,
+            Long postId,
+            PostFormRequest postFormRequest,
+            List<MultipartFile> multipartFiles) {
         memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
-        List<PostImage> postImages = mapToPostImage(postFormRequest.imageUrls());
+        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, multipartFiles);
+        List<PostImage> postImages = mapToPostImage(imageUrls);
         List<PostTag> tags = mapToPostTag(postFormRequest.tags());
         post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
     }

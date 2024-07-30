@@ -2,7 +2,7 @@ name: Deploy to Amazon EC2
 
 on:
   push:
-    branches: [ "develop", "infra-270-1" ]
+    branches: [ "develop" ]
 
 # 코드의 내용을 이 파일을 실행하여 action을 수행하는 주체(Github Actions에서 사용하는 VM)가 읽고 쓸 수 있도록 허용합니다.
 permissions:
@@ -37,6 +37,9 @@ jobs:
         MARIA_USER: ${{ secrets.MARIA_USER }}
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
       run: |
         ./gradlew clean build
 

@@ -7,8 +7,6 @@ import lombok.Getter;
 public enum ErrorCode {
     // global
     UNHANDLED_ERROR("GLOBAL_999", "Handling 되지 않은 Server Error입니다."),
-
-    // validation
     INVALID_INPUT_VALUE("GLOBAL_001", "RequestBody Validation에 실패했습니다."),
 
     // auth
@@ -61,7 +59,13 @@ public enum ErrorCode {
 
     // recipe-like
     ALREADY_RECIPE_LIKED("RECIPE_LIKE_001", "좋아요가 되어 있는 레시피입니다."),
-    ALREADY_RECIPE_UNLIKED("RECIPE_LIKE_002", "좋아요가 되어 있지 않은 레시피입니다.");
+    ALREADY_RECIPE_UNLIKED("RECIPE_LIKE_002", "좋아요가 되어 있지 않은 레시피입니다."),
+
+    // file-upload
+    MAX_UPLOAD_SIZE_EXCEEDED("FILE_UPLOAD_001", "파일 크기 제한(10MB)을 초과한 파일입니다."),
+    NULL_FILE_NAME("FILE_UPLOAD_002", "파일 이름은 null일 수 없습니다."),
+    INVALID_EXTENSION("FILE_UPLOAD_003", "유효한 이미지 파일 확장자(jpg, png, gif, jpeg)가 아닙니다."),
+    FILE_UPLOAD_ERROR("FILE_UPLOAD_004", "파일을 업로드 하는 중 에러가 발생했습니다.");
 
     private final String code;
     private final String description;
