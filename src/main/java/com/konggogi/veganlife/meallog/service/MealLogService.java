@@ -1,6 +1,8 @@
 package com.konggogi.veganlife.meallog.service;
 
 
+import com.konggogi.veganlife.global.util.AwsS3Folders;
+import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
@@ -19,6 +21,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -35,19 +38,21 @@ public class MealLogService {
     private final MealMapper mealMapper;
     private final MealImageMapper mealImageMapper;
 
-    public void add(MealLogAddRequest request, Long memberId) {
+    private final AwsS3Uploader awsS3Uploader;
+
+    public void add(MealLogAddRequest request, List<MultipartFile> images, Long memberId) {
         MealLog mealLog =
                 mealLogMapper.toEntity(request.mealType(), memberQueryService.search(memberId));
         modifyMeals(request.meals(), mealLog);
-        modifyMealImages(request.imageUrls(), mealLog);
+        modifyMealImages(images, mealLog);
         mealLogRepository.save(mealLog);
         intakeNotifyService.notifyIfOverIntake(memberId);
     }
 
-    public void modify(Long mealLogId, MealLogModifyRequest request) {
+    public void modify(Long mealLogId, MealLogModifyRequest request, List<MultipartFile> images) {
         MealLog mealLog = mealLogQueryService.search(mealLogId);
         modifyMeals(request.meals(), mealLog);
-        modifyMealImages(request.imageUrls(), mealLog);
+        modifyMealImages(images, mealLog);
         mealLogRepository.flush();
         intakeNotifyService.notifyIfOverIntake(mealLog.getMember().getId());
     }
@@ -76,9 +81,10 @@ public class MealLogService {
         mealLog.modifyMeals(meals);
     }
 
-    private void modifyMealImages(List<String> requests, MealLog mealLog) {
+    private void modifyMealImages(List<MultipartFile> images, MealLog mealLog) {
+        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.LIFE_CHECK, images);
         List<MealImage> mealImages =
-                requests.stream()
+                imageUrls.stream()
                         .map(request -> mealImageMapper.toEntity(request, mealLog))
                         .toList();
         mealLog.modifyMealImages(mealImages);
