@@ -64,6 +64,10 @@ include::{snippets}/recipe-get-recipe-details-not-found/http-response.adoc[]
 
 include::{snippets}/recipe-add-recipe/request-headers.adoc[]
 
+==== Request Part
+
+include::{snippets}/recipe-add-recipe/request-parts.adoc[]
+
 include::{snippets}/recipe-add-recipe/http-request.adoc[]
 
 === Response
