@@ -12,6 +12,8 @@ import com.konggogi.veganlife.post.service.PostSearchService;
 import com.konggogi.veganlife.post.service.PostService;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,9 +33,10 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostAddResponse> addPost(
-            @RequestBody @Valid PostFormRequest postFormRequest,
+            @RequestPart @Valid PostFormRequest postFormRequest,
+            @RequestPart @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Post post = postService.add(userDetails.id(), postFormRequest);
+        Post post = postService.add(userDetails.id(), postFormRequest, images);
         return ResponseEntity.ok(postMapper.toPostAddResponse(post));
     }
 
@@ -54,9 +58,10 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
-            @RequestBody PostFormRequest postFormRequest,
+            @RequestPart PostFormRequest postFormRequest,
+            @RequestPart @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.modify(userDetails.id(), postId, postFormRequest);
+        postService.modify(userDetails.id(), postId, postFormRequest, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
