@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +36,7 @@ public class MealLogController {
     private final MealLogService mealLogService;
     private final MealLogSearchService mealLogSearchService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> addMealLog(
             @Valid @RequestPart MealLogAddRequest request,
             @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
@@ -58,7 +59,7 @@ public class MealLogController {
         return ResponseEntity.ok(mealLogSearchService.searchById(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> modifyMealLog(
             @PathVariable Long id,
             @Valid @RequestPart MealLogModifyRequest request,
