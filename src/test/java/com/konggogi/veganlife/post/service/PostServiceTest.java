@@ -5,13 +5,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.util.AwsS3Folders;
+import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -32,6 +36,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -42,6 +49,7 @@ class PostServiceTest {
     @Spy TagMapper tagMapper = new TagMapperImpl();
     @Spy PostImageMapper postImageMapper = new PostImageMapperImpl();
     @Mock TagRepository tagRepository;
+    @Mock AwsS3Uploader awsS3Uploader;
     @InjectMocks PostService postService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Tag tag = TagFixture.DEFAULT.getTag();
@@ -52,15 +60,23 @@ class PostServiceTest {
         // given
         Post post = PostFixture.BAKERY.get();
         Long memberId = member.getId();
-        PostFormRequest request =
-                new PostFormRequest("제목", "내용", List.of("image.png"), List.of("태그"));
+        PostFormRequest request = new PostFormRequest("제목", "내용", List.of("태그"));
         given(memberQueryService.search(memberId)).willReturn(member);
         given(postMapper.toEntity(member, request)).willReturn(post);
         given(tagRepository.findByName(anyString())).willReturn(Optional.empty());
         given(tagRepository.save(any(Tag.class))).willReturn(tag);
         given(postRepository.save(post)).willReturn(post);
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1.png".getBytes()));
+        List<String> imageUrls = List.of("image1.png");
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
         // when
-        Post savedPost = postService.add(memberId, request);
+        Post savedPost = postService.add(memberId, request, images);
         // then
         assertThat(savedPost.getImageUrls()).hasSize(1);
         assertThat(savedPost.getTags()).hasSize(1);
@@ -75,12 +91,11 @@ class PostServiceTest {
     void addNoMemberTest() {
         // given
         Long memberId = member.getId();
-        PostFormRequest request =
-                new PostFormRequest("제목", "내용", List.of("image.png"), List.of("태그"));
+        PostFormRequest request = new PostFormRequest("제목", "내용", List.of("태그"));
         given(memberQueryService.search(memberId))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
-        assertThatThrownBy(() -> postService.add(memberId, request))
+        assertThatThrownBy(() -> postService.add(memberId, request, List.of()))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
         then(memberQueryService).should().search(memberId);
@@ -99,17 +114,25 @@ class PostServiceTest {
     void modifyTest() {
         // given
         Post post = PostFixture.BAKERY.getWithId(1L, member);
-        PostFormRequest request =
-                new PostFormRequest("제목변경", "내용변경", List.of(), List.of("태그1", "태그2"));
+        PostFormRequest request = new PostFormRequest("제목변경", "내용변경", List.of("태그1", "태그2"));
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(tagRepository.save(any(Tag.class))).willReturn(tag);
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1.png".getBytes()));
+        List<String> imageUrls = List.of("image1.png");
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
         // when
-        postService.modify(member.getId(), post.getId(), request);
+        postService.modify(member.getId(), post.getId(), request, images);
         // then
         assertThat(post.getTitle()).isEqualTo(request.title());
         assertThat(post.getContent()).isEqualTo(request.content());
-        assertThat(post.getImageUrls()).isEmpty();
+        assertThat(post.getImageUrls()).hasSize(1);
         assertThat(post.getTags()).hasSize(2);
         then(tagRepository).should(atLeastOnce()).save(any(Tag.class));
     }

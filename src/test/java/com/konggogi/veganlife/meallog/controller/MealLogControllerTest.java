@@ -10,15 +10,17 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.amazonaws.HttpMethod;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.mealdata.domain.MealData;
@@ -48,6 +50,7 @@ import org.mockito.Spy;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(MealLogController.class)
@@ -83,21 +86,38 @@ public class MealLogControllerTest extends RestDocsTest {
                                     .getWithName(2L, "통밀크래커", member)
                                     .getId()));
 
-    List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
-
     @Test
     @DisplayName("식사 기록 등록 API")
     void addMealLogTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/meal-log")
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogAddRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isCreated());
 
@@ -107,7 +127,10 @@ public class MealLogControllerTest extends RestDocsTest {
                                 "meal-log-add",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
+                                requestHeaders(authorizationDesc()),
+                                requestParts(
+                                        partWithName("request").description("식단 기록 추가 DTO"),
+                                        partWithName("images").description("이미지 파일 리스트"))));
     }
 
     @Test
@@ -115,18 +138,37 @@ public class MealLogControllerTest extends RestDocsTest {
     void addMealLogMemberNotFoundTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .given(mealLogService)
-                .add(any(MealLogAddRequest.class), anyLong());
+                .add(any(MealLogAddRequest.class), any(), anyLong());
 
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/meal-log")
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogAddRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isNotFound());
 
@@ -139,18 +181,37 @@ public class MealLogControllerTest extends RestDocsTest {
     void addMealLogMealDataNotFoundTest() throws Exception {
 
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests, imageUrls);
+                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA))
                 .given(mealLogService)
-                .add(any(MealLogAddRequest.class), anyLong());
+                .add(any(MealLogAddRequest.class), any(), anyLong());
 
         ResultActions perform =
                 mockMvc.perform(
-                        post("/api/v1/meal-log")
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogAddRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log")
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isNotFound());
 
@@ -161,7 +222,7 @@ public class MealLogControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식사 기록 목록 조회 API")
     void getMealLogListTest() throws Exception {
-
+        List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
         LocalDate date = LocalDate.of(2023, 12, 22);
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
@@ -202,6 +263,7 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 상세 조회 API")
     void getMealLogDetailsTest() throws Exception {
 
+        List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
@@ -258,15 +320,38 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 수정 API")
     void modifyMealLogTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealAddRequests, imageUrls);
+        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogModifyRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/meal-log/{id}", 1L)
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogModifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log/{id}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isCreated());
 
@@ -277,26 +362,52 @@ public class MealLogControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc()),
-                                pathParameters(parameterWithName("id").description("식단 기록 id"))));
+                                pathParameters(parameterWithName("id").description("식단 기록 id")),
+                                requestParts(
+                                        partWithName("request").description("식단 기록 수정 DTO"),
+                                        partWithName("images").description("이미지 파일 리스트"))));
     }
 
     @Test
     @DisplayName("식사 기록 수정 API Member Not Found 예외")
     void modifyMealLogMemberNotFoundTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealAddRequests, imageUrls);
+        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogModifyRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG))
                 .given(mealLogService)
-                .modify(anyLong(), any(MealLogModifyRequest.class));
+                .modify(anyLong(), any(MealLogModifyRequest.class), any());
 
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/meal-log/{id}", 1L)
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogModifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log/{id}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isNotFound());
 
@@ -308,19 +419,42 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 수정 API MealData Not Found 예외")
     void modifyMealLogMealDataNotFoundTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest =
-                new MealLogModifyRequest(mealAddRequests, imageUrls);
+        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(mealLogModifyRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_DATA))
                 .given(mealLogService)
-                .modify(anyLong(), any(MealLogModifyRequest.class));
+                .modify(anyLong(), any(MealLogModifyRequest.class), any());
 
         ResultActions perform =
                 mockMvc.perform(
-                        put("/api/v1/meal-log/{id}", 1L)
-                                .headers(authorizationHeader())
-                                .content(toJson(mealLogModifyRequest))
-                                .contentType(MediaType.APPLICATION_JSON));
+                        multipart("/api/v1/meal-log/{id}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        requestPostProcessor -> {
+                                            requestPostProcessor.setMethod(HttpMethod.PUT.name());
+                                            return requestPostProcessor;
+                                        })
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isNotFound());
 
