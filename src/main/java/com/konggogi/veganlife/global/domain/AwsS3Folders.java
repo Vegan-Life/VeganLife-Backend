@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.global.util;
+package com.konggogi.veganlife.global.domain;
 
 public enum AwsS3Folders {
     COMMUNITY("community/"),
