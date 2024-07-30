@@ -10,7 +10,6 @@ import org.hibernate.validator.constraints.Length;
 
 public record ProfileModifyRequest(
         @NotBlank @Length(min = 2, max = 10) String nickname,
-        @NotNull String imageUrl,
         @NotNull VegetarianType vegetarianType,
         @NotNull Gender gender,
         @Positive @NotNull Integer birthYear,

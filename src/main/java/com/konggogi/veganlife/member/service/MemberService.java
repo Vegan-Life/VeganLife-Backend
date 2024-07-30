@@ -5,6 +5,8 @@ import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
+import com.konggogi.veganlife.global.util.AwsS3Folders;
+import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
 import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
@@ -21,6 +23,7 @@ import com.konggogi.veganlife.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,8 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
+
+    private final AwsS3Uploader awsS3Uploader;
 
     public MemberLoginDto login(String email) {
         Member member = addIfNotPresent(email);
@@ -67,12 +72,14 @@ public class MemberService {
         return member;
     }
 
-    public Member modifyProfile(Long memberId, ProfileModifyRequest profileRequest) {
+    public Member modifyProfile(
+            Long memberId, ProfileModifyRequest profileRequest, MultipartFile profileImage) {
         validateNickname(profileRequest.nickname());
+        String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
         Member member = memberQueryService.search(memberId);
         member.modifyProfile(
                 profileRequest.nickname(),
-                profileRequest.imageUrl(),
+                profileImageUrl,
                 profileRequest.vegetarianType(),
                 profileRequest.gender(),
                 profileRequest.birthYear(),
