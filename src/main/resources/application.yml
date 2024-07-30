@@ -1,6 +1,11 @@
 spring:
   profiles:
     active: local
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      resolve-lazily: true
   jpa:
     open-in-view: false
     properties:
@@ -35,3 +40,14 @@ springdoc:
     path: /api/v1/docs/swagger
   paths-to-match:
     - /**
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    stack:
+      auto: false
+    s3:
+      bucket: veganlife
+    cloudfront:
+      domain: ${AWS_CLOUDFRONT_DOMAIN}
