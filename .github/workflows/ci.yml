@@ -40,6 +40,9 @@ jobs:
         MARIA_USER: ${{ secrets.MARIA_USER }}
         MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
       run: ./gradlew clean test spotlessCheck
 
     - name: Send Notification to Discord
