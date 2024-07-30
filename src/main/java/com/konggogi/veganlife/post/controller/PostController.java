@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class PostController {
     private final PostSearchService postSearchService;
     private final PostMapper postMapper;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostAddResponse> addPost(
             @RequestPart @Valid PostFormRequest request,
             @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
@@ -55,7 +56,7 @@ public class PostController {
         return ResponseEntity.ok(postSimpleResponsePage);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
             @RequestPart PostFormRequest request,
