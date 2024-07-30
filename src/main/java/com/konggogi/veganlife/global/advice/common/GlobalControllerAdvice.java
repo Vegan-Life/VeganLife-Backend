@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
@@ -150,5 +151,15 @@ public class GlobalControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse.from(ErrorCode.NOT_FOUND_USER_INFO_TOKEN));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadExceedException(
+            MaxUploadSizeExceededException exception) {
+
+        LoggingUtils.exceptionLog(HttpStatus.BAD_REQUEST, exception);
+
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.from(ErrorCode.MAX_UPLOAD_SIZE_EXCEEDED));
     }
 }
