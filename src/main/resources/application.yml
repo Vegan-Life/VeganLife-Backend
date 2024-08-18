@@ -24,6 +24,10 @@ spring:
   h2:
     console:
       enabled: true
+  elasticsearch:
+    host: ${ELASTIC_HOST}
+    username: ${ELASTIC_USER}
+    password: ${ELASTIC_PASSWORD}
 jwt:
   secret-key: ${SECRET_KEY}
   expiration: 7200
