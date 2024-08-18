@@ -15,6 +15,7 @@ import com.konggogi.veganlife.post.domain.mapper.PostMapper;
 import com.konggogi.veganlife.post.domain.mapper.TagMapper;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
+import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostService {
     private final MemberQueryService memberQueryService;
     private final PostRepository postRepository;
+    private final PostElasticRepository postElasticRepository;
     private final PostQueryService postQueryService;
     private final TagRepository tagRepository;
 
@@ -42,7 +44,9 @@ public class PostService {
         List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, images);
         mapToPostTag(postFormRequest.tags()).forEach(post::addPostTag);
         mapToPostImage(imageUrls).forEach(post::addPostImage);
-        return postRepository.save(post);
+        postRepository.save(post);
+        postElasticRepository.save(postMapper.toPostDocument(post));
+        return post;
     }
 
     public void removeMemberFromPost(Long memberId) {
@@ -60,11 +64,13 @@ public class PostService {
         List<PostImage> postImages = mapToPostImage(imageUrls);
         List<PostTag> tags = mapToPostTag(postFormRequest.tags());
         post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
+        postElasticRepository.save(postMapper.toPostDocument(post));
     }
 
     public void remove(Long postId) {
         Post post = postQueryService.search(postId);
         postRepository.delete(post);
+        postElasticRepository.deleteById(postId);
     }
 
     private List<PostTag> mapToPostTag(List<String> tagNames) {

@@ -13,6 +13,7 @@ import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
 import com.konggogi.veganlife.post.domain.Tag;
+import com.konggogi.veganlife.post.domain.document.PostDocument;
 import com.konggogi.veganlife.post.service.dto.PostDetailsDto;
 import com.konggogi.veganlife.post.service.dto.PostSimpleDto;
 import java.util.List;
@@ -65,6 +66,13 @@ public interface PostMapper {
         return new PopularTagsResponse(topTags);
     }
 
+    @Mapping(
+            target = "imageUrl",
+            source = "post.imageUrls",
+            qualifiedByName = "getThumbnailFromPostImageList")
+    @Mapping(target = "tags", source = "post.tags", qualifiedByName = "postTagsToString")
+    PostDocument toPostDocument(Post post);
+
     @Named("postImageToString")
     static String postImageToString(PostImage postImage) {
         return postImage.getImageUrl();
@@ -75,16 +83,19 @@ public interface PostMapper {
         return postTag.getTag().getName();
     }
 
-    @Named("tagsToString")
-    static String tagsToString(Tag tag) {
-        return tag.getName();
-    }
-
     @Named("getThumbnail")
     static String getThumbnail(List<String> imageUrls) {
         if (imageUrls.isEmpty()) {
             return null;
         }
         return imageUrls.get(0);
+    }
+
+    @Named("getThumbnailFromPostImageList")
+    static String getThumbnailFromPostImageList(List<PostImage> imageUrls) {
+        if (imageUrls.isEmpty()) {
+            return null;
+        }
+        return imageUrls.get(0).getImageUrl();
     }
 }
