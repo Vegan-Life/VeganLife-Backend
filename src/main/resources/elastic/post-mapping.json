@@ -1,0 +1,34 @@
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "title": {
+      "type": "text",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "my-ngram-analyzer"
+        },
+        "nori": {
+          "type": "text",
+          "analyzer": "my-nori-analyzer"
+        }
+      }
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "my-nori-analyzer"
+    },
+    "createdAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS||epoch_millis"
+    },
+    "imageUrl": {
+      "type": "text"
+    },
+    "tags": {
+      "type": "keyword"
+    }
+  }
+}
