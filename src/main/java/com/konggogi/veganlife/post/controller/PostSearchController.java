@@ -40,4 +40,11 @@ public class PostSearchController {
         List<Tag> topTags = postQueryService.searchPopularTags();
         return ResponseEntity.ok(postMapper.toPopularTagsResponse(topTags));
     }
+
+    @GetMapping("/complete/search")
+    public ResponseEntity<List<String>> getAutoCompleteSuggestion(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(postQueryService.suggestByKeyword(keyword, size));
+    }
 }
