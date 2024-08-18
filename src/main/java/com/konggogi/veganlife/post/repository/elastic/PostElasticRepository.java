@@ -6,4 +6,5 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PostElasticRepository extends ElasticsearchRepository<PostDocument, Long> {}
+public interface PostElasticRepository
+        extends ElasticsearchRepository<PostDocument, Long>, PostCustomElasticRepository {}
