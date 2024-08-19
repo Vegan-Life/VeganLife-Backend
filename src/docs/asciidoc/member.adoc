@@ -10,28 +10,6 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-== 회원 추가 정보 등록 API
-
-=== Request
-
-==== Header
-
-include::{snippets}/update-additional-info/request-headers.adoc[]
-
-==== Body
-
-include::{snippets}/update-additional-info/http-request.adoc[]
-
-=== Response
-
-==== 200 OK
-
-include::{snippets}/update-additional-info/http-response.adoc[]
-
-==== 409 CONFLICT
-
-include::{snippets}/update-additional-info-duplicated-nickname/http-response.adoc[]
-
 == 회원 탈퇴 API
 
 === Request

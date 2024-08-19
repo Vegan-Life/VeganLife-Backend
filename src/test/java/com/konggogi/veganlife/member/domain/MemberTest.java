@@ -8,34 +8,6 @@ import org.junit.jupiter.api.Test;
 
 class MemberTest {
     @Test
-    @DisplayName("추가 정보 업데이트")
-    void updateMemberInfoTest() {
-        // given
-        Member member = MemberFixture.DEFAULT_M.getOnlyEmailWithId(1L);
-        Member expectedMember = MemberFixture.DEFAULT_F.get();
-        // when
-        member.updateAdditionalInfo(
-                expectedMember.getNickname(),
-                expectedMember.getGender(),
-                expectedMember.getVegetarianType(),
-                expectedMember.getBirthYear(),
-                expectedMember.getHeight(),
-                expectedMember.getWeight());
-        // then
-        assertThat(member.getNickname()).isEqualTo(expectedMember.getNickname());
-        assertThat(member.getGender()).isEqualTo(expectedMember.getGender());
-        assertThat(member.getVegetarianType()).isEqualTo(expectedMember.getVegetarianType());
-        assertThat(member.getBirthYear()).isEqualTo(expectedMember.getBirthYear());
-        assertThat(member.getHeight()).isEqualTo(expectedMember.getHeight());
-        assertThat(member.getWeight()).isEqualTo(expectedMember.getWeight());
-        assertThat(member.isHasAdditionalInfo()).isTrue();
-        assertThat(member.getAMR()).isEqualTo(expectedMember.getAMR());
-        assertThat(member.getDailyCarbs()).isEqualTo(expectedMember.getDailyCarbs());
-        assertThat(member.getDailyProtein()).isEqualTo(expectedMember.getDailyProtein());
-        assertThat(member.getDailyFat()).isEqualTo(expectedMember.getDailyFat());
-    }
-
-    @Test
     @DisplayName("회원 프로필 수정")
     void modifyMemberProfileTest() {
         // given
@@ -52,6 +24,7 @@ class MemberTest {
                 nickname, profileImageUrl, vegetarianType, gender, birthYear, height, weight);
         // then
         assertThat(member.getNickname()).isEqualTo(nickname);
+        assertThat(member.getProfileImageUrl()).isEqualTo(profileImageUrl);
         assertThat(member.getGender()).isEqualTo(gender);
         assertThat(member.getVegetarianType()).isEqualTo(vegetarianType);
         assertThat(member.getBirthYear()).isEqualTo(birthYear);

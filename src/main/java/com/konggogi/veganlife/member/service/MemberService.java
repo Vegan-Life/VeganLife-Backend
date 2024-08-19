@@ -9,7 +9,6 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
 import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
@@ -42,7 +41,6 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
-
     private final AwsS3Uploader awsS3Uploader;
 
     public MemberLoginDto login(String email) {
@@ -59,32 +57,19 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    public Member updateAdditionalInfo(Long memberId, AdditionalInfoUpdateRequest infoRequest) {
-        validateNickname(infoRequest.nickname());
-        Member member = memberQueryService.search(memberId);
-        member.updateAdditionalInfo(
-                infoRequest.nickname(),
-                infoRequest.gender(),
-                infoRequest.vegetarianType(),
-                infoRequest.birthYear(),
-                infoRequest.height(),
-                infoRequest.weight());
-        return member;
-    }
-
     public Member modifyProfile(
-            Long memberId, ProfileModifyRequest profileRequest, MultipartFile profileImage) {
-        validateNickname(profileRequest.nickname());
-        String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
+            Long memberId, ProfileModifyRequest request, MultipartFile profileImage) {
         Member member = memberQueryService.search(memberId);
+        validateNickname(member.getNickname(), request.nickname());
+        String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
         member.modifyProfile(
-                profileRequest.nickname(),
+                request.nickname(),
                 profileImageUrl,
-                profileRequest.vegetarianType(),
-                profileRequest.gender(),
-                profileRequest.birthYear(),
-                profileRequest.height(),
-                profileRequest.weight());
+                request.vegetarianType(),
+                request.gender(),
+                request.birthYear(),
+                request.height(),
+                request.weight());
         return member;
     }
 
@@ -94,13 +79,16 @@ public class MemberService {
                 .orElseGet(() -> memberRepository.save(memberMapper.toMember(email)));
     }
 
-    private void validateNickname(String nickname) {
-        memberRepository
-                .findByNickname(nickname)
-                .ifPresent(
-                        member -> {
-                            throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
-                        });
+    private void validateNickname(String nickname, String newNickname) {
+        if (nickname == null || !nickname.equals(newNickname)) {
+            memberRepository
+                    .findByNickname(newNickname)
+                    .ifPresent(
+                            member -> {
+                                throw new DuplicatedNicknameException(
+                                        ErrorCode.DUPLICATED_NICKNAME);
+                            });
+        }
     }
 
     private void removeRelatedData(Long memberId) {
