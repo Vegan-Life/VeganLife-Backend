@@ -27,6 +27,7 @@ import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
+import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -50,6 +51,7 @@ class PostServiceTest {
     @Spy PostImageMapper postImageMapper = new PostImageMapperImpl();
     @Mock TagRepository tagRepository;
     @Mock AwsS3Uploader awsS3Uploader;
+    @Mock PostElasticRepository postElasticRepository;
     @InjectMocks PostService postService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Tag tag = TagFixture.DEFAULT.getTag();
