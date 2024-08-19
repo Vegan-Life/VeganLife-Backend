@@ -79,17 +79,6 @@ public class Member extends TimeStamped {
         this.hasAdditionalInfo = false;
     }
 
-    public void updateAdditionalInfo(
-            String nickname,
-            Gender gender,
-            VegetarianType vegetarianType,
-            Integer birthYear,
-            Integer height,
-            Integer weight) {
-        updateProfile(nickname, vegetarianType, gender, birthYear, height, weight);
-        this.hasAdditionalInfo = true;
-    }
-
     public void modifyProfile(
             String nickname,
             String profileImageUrl,
@@ -98,8 +87,15 @@ public class Member extends TimeStamped {
             Integer birthYear,
             Integer height,
             Integer weight) {
-        updateProfile(nickname, vegetarianType, gender, birthYear, height, weight);
+        this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
+        this.vegetarianType = vegetarianType;
+        this.gender = gender;
+        this.birthYear = birthYear;
+        this.height = height;
+        this.weight = weight;
+        this.hasAdditionalInfo = true;
+        updateDailyIntake();
     }
 
     private void updateDailyIntake() {
@@ -123,21 +119,5 @@ public class Member extends TimeStamped {
         LocalDate now = LocalDate.now();
         int currentYear = now.getYear();
         return (currentYear - birthYear);
-    }
-
-    private void updateProfile(
-            String nickname,
-            VegetarianType vegetarianType,
-            Gender gender,
-            Integer birthYear,
-            Integer height,
-            Integer weight) {
-        this.nickname = nickname;
-        this.vegetarianType = vegetarianType;
-        this.gender = gender;
-        this.birthYear = birthYear;
-        this.height = height;
-        this.weight = weight;
-        updateDailyIntake();
     }
 }
