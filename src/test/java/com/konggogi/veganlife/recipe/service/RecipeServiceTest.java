@@ -9,8 +9,8 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.times;
 
-import com.konggogi.veganlife.global.util.AwsS3Folders;
-import com.konggogi.veganlife.global.util.AwsS3Uploader;
+import com.konggogi.veganlife.global.AwsS3Uploader;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;

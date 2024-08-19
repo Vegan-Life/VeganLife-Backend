@@ -1,8 +1,8 @@
 package com.konggogi.veganlife.meallog.service;
 
 
-import com.konggogi.veganlife.global.util.AwsS3Folders;
-import com.konggogi.veganlife.global.util.AwsS3Uploader;
+import com.konggogi.veganlife.global.AwsS3Uploader;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;

@@ -1,8 +1,8 @@
 package com.konggogi.veganlife.post.service;
 
 
-import com.konggogi.veganlife.global.util.AwsS3Folders;
-import com.konggogi.veganlife.global.util.AwsS3Uploader;
+import com.konggogi.veganlife.global.AwsS3Uploader;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;

@@ -10,8 +10,8 @@ import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
-import com.konggogi.veganlife.global.util.AwsS3Folders;
-import com.konggogi.veganlife.global.util.AwsS3Uploader;
+import com.konggogi.veganlife.global.AwsS3Uploader;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;

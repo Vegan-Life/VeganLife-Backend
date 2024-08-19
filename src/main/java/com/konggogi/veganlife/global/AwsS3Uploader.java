@@ -1,9 +1,10 @@
-package com.konggogi.veganlife.global.util;
+package com.konggogi.veganlife.global;
 
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
 import java.io.IOException;

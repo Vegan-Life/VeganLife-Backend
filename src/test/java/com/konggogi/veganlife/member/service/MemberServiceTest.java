@@ -4,21 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
+import com.konggogi.veganlife.global.AwsS3Uploader;
+import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
-import com.konggogi.veganlife.global.util.AwsS3Folders;
-import com.konggogi.veganlife.global.util.AwsS3Uploader;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
-import com.konggogi.veganlife.member.controller.dto.request.AdditionalInfoUpdateRequest;
 import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
@@ -124,53 +120,12 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("추가 정보 입력")
-    void updateAdditionalInfoTest() {
-        // given
-        Long memberId = member.getId();
-        AdditionalInfoUpdateRequest request =
-                new AdditionalInfoUpdateRequest(
-                        "테스트유저", Gender.M, VegetarianType.LACTO, 1990, 180, 83);
-        given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
-        given(memberQueryService.search(memberId)).willReturn(member);
-        // when
-        Member updatedMember = memberService.updateAdditionalInfo(memberId, request);
-        // then
-        assertThat(updatedMember.getNickname()).isEqualTo(request.nickname());
-        assertThat(updatedMember.getGender()).isEqualTo(request.gender());
-        assertThat(updatedMember.getVegetarianType()).isEqualTo(request.vegetarianType());
-        assertThat(updatedMember.getBirthYear()).isEqualTo(request.birthYear());
-        assertThat(updatedMember.getHeight()).isEqualTo(request.height());
-        assertThat(updatedMember.getWeight()).isEqualTo(request.weight());
-        then(memberRepository).should().findByNickname(request.nickname());
-    }
-
-    @Test
-    @DisplayName("추가 정보 입력 - Duplicated Nickname")
-    void updateAdditionalInfoDuplicatedNicknameTest() {
-        // given
-        Long memberId = member.getId();
-        Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
-        String nickname = existingMember.getNickname();
-        AdditionalInfoUpdateRequest request =
-                new AdditionalInfoUpdateRequest(
-                        nickname, Gender.F, VegetarianType.VEGAN, 2000, 165, 50);
-        given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(existingMember));
-        // when, then
-        assertThatThrownBy(() -> memberService.updateAdditionalInfo(memberId, request))
-                .isInstanceOf(DuplicatedNicknameException.class);
-        then(memberRepository).should().findByNickname(nickname);
-        then(memberRepository).should(never()).save(any(Member.class));
-    }
-
-    @Test
     @DisplayName("회원 프로필 수정")
     void modifyMemberProfileTest() {
         // given
-        ProfileModifyRequest profileRequest =
+        ProfileModifyRequest request =
                 new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberRepository.findByNickname(profileRequest.nickname()))
-                .willReturn(Optional.empty());
+        given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(anyLong())).willReturn(member);
         MultipartFile profileImage =
                 new MockMultipartFile(
@@ -182,15 +137,14 @@ class MemberServiceTest {
                 .given(awsS3Uploader)
                 .uploadFile(eq(AwsS3Folders.PROFILE), any());
         // when
-        Member updatedMember =
-                memberService.modifyProfile(member.getId(), profileRequest, profileImage);
+        Member update = memberService.modifyProfile(member.getId(), request, profileImage);
         // then
-        assertThat(updatedMember.getNickname()).isEqualTo(profileRequest.nickname());
-        assertThat(updatedMember.getVegetarianType()).isEqualTo(profileRequest.vegetarianType());
-        assertThat(updatedMember.getGender()).isEqualTo(profileRequest.gender());
-        assertThat(updatedMember.getBirthYear()).isEqualTo(profileRequest.birthYear());
-        assertThat(updatedMember.getHeight()).isEqualTo(profileRequest.height());
-        assertThat(updatedMember.getWeight()).isEqualTo(profileRequest.weight());
+        assertThat(update.getNickname()).isEqualTo(request.nickname());
+        assertThat(update.getVegetarianType()).isEqualTo(request.vegetarianType());
+        assertThat(update.getGender()).isEqualTo(request.gender());
+        assertThat(update.getBirthYear()).isEqualTo(request.birthYear());
+        assertThat(update.getHeight()).isEqualTo(request.height());
+        assertThat(update.getWeight()).isEqualTo(request.weight());
         then(memberRepository).should().findByNickname(anyString());
         then(memberQueryService).should().search(anyLong());
     }
@@ -199,50 +153,49 @@ class MemberServiceTest {
     @DisplayName("회원 프로필 수정 시 중복된 닉네임 중복 예외 발생")
     void modifyMemberProfileDuplicatedNicknameTest() {
         // given
-        Long memberId = member.getId();
-        Member existingMember = MemberFixture.DEFAULT_F.getWithId(1L);
+        Member existing = MemberFixture.DEFAULT_F.getWithId(1L);
+        Member other = MemberFixture.DEFAULT_M.getWithId(2L);
+        String newNickname = other.getNickname();
         ProfileModifyRequest request =
                 new ProfileModifyRequest(
-                        existingMember.getNickname(),
-                        VegetarianType.LACTO,
-                        Gender.M,
-                        1993,
-                        190,
-                        90);
-        given(memberRepository.findByNickname(request.nickname()))
-                .willReturn(Optional.of(existingMember));
+                        newNickname, VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberQueryService.search(anyLong())).willReturn(existing);
+        given(memberRepository.findByNickname(anyString())).willReturn(Optional.of(other));
         // when, then
-        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request, null))
+        assertThatThrownBy(() -> memberService.modifyProfile(existing.getId(), request, null))
                 .isInstanceOf(DuplicatedNicknameException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getDescription());
         then(memberRepository).should().findByNickname(anyString());
-        then(memberQueryService).should(never()).search(anyLong());
     }
 
     @Test
-    @DisplayName("회원 프로필 수정 시 회원을 찾을 수 없으면 예외 발생")
-    void modifyNotMemberProfileTest() {
+    @DisplayName("회원 프로필 수정 시 기존 닉네임이 NULL인 경우 종복 검사")
+    void modifyMemberProfileExistingNicknameIsNULL() {
         // given
         Long memberId = member.getId();
         ProfileModifyRequest request =
-                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
-        given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
-        given(memberQueryService.search(member.getId()))
-                .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
-        MultipartFile profileImage =
-                new MockMultipartFile(
-                        "image",
-                        "profileImage1.png",
-                        MediaType.IMAGE_PNG_VALUE,
-                        "profileImage1.png".getBytes());
-        willReturn("profileImage1.png")
-                .given(awsS3Uploader)
-                .uploadFile(eq(AwsS3Folders.PROFILE), any());
-        // when, then
-        assertThatThrownBy(() -> memberService.modifyProfile(memberId, request, profileImage))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
+                new ProfileModifyRequest(
+                        "newNickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(memberRepository.findByNickname(anyString())).willReturn(Optional.empty());
+        // when
+        memberService.modifyProfile(memberId, request, null);
+        // then
         then(memberRepository).should().findByNickname(anyString());
-        then(memberQueryService).should().search(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 프로필 수정 시 기존 닉네임과 같으면 중복 검사 하지 않음")
+    void modifyMemberProfileNotChangeNickname() {
+        // given
+        Member existing = MemberFixture.DEFAULT_F.getWithId(1L);
+        ProfileModifyRequest request =
+                new ProfileModifyRequest(
+                        existing.getNickname(), VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+        given(memberQueryService.search(anyLong())).willReturn(existing);
+        // when
+        memberService.modifyProfile(existing.getId(), request, null);
+        // then
+        then(memberRepository).should(never()).findByNickname(anyString());
     }
 }
