@@ -40,6 +40,9 @@ jobs:
         AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
         AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
+        ELASTIC_HOST: ${{ secrets.ELASTIC_HOST }}
+        ELASTIC_USER: ${{ secrets.ELASTIC_USER }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
       run: |
         ./gradlew clean build
 
