@@ -48,6 +48,6 @@ cloud:
     stack:
       auto: false
     s3:
-      bucket: veganlife
+      bucket: ${AWS_BUCKET_NAME}
     cloudfront:
       domain: ${AWS_CLOUDFRONT_DOMAIN}
