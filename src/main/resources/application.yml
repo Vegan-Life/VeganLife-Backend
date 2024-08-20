@@ -48,6 +48,6 @@ cloud:
     stack:
       auto: false
     s3:
-      bucket: ${AWS_BUCKET_NAME}
+      bucket: ${AWS_S3_BUCKET_NAME}
     cloudfront:
       domain: ${AWS_CLOUDFRONT_DOMAIN}
