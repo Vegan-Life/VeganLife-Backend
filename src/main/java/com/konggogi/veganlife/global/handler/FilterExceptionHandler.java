@@ -1,4 +1,4 @@
-package com.konggogi.veganlife.global.security.handler;
+package com.konggogi.veganlife.global.handler;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthenticationExceptionHandler {
+public class FilterExceptionHandler {
 
     private final ObjectMapper objectMapper;
 

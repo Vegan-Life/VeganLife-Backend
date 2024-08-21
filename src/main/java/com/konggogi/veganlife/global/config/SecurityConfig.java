@@ -1,7 +1,7 @@
 package com.konggogi.veganlife.global.config;
 
 
-import com.konggogi.veganlife.global.security.filter.AuthenticationExceptionTranslationFilter;
+import com.konggogi.veganlife.global.filter.ExceptionTranslationFilter;
 import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
 import com.konggogi.veganlife.global.security.handler.AuthenticationEntryPoint;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationExceptionTranslationFilter authenticationExceptionTranslationFilter;
+    private final ExceptionTranslationFilter exceptionTranslationFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
@@ -61,8 +61,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(
-                        authenticationExceptionTranslationFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(exceptionTranslationFilter, JwtAuthenticationFilter.class)
                 .build();
     }
 

@@ -1,8 +1,8 @@
-package com.konggogi.veganlife.global.security.filter;
+package com.konggogi.veganlife.global.filter;
 
 
 import com.konggogi.veganlife.global.exception.ApiException;
-import com.konggogi.veganlife.global.security.handler.AuthenticationExceptionHandler;
+import com.konggogi.veganlife.global.handler.FilterExceptionHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,9 +14,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
-public class AuthenticationExceptionTranslationFilter extends OncePerRequestFilter {
+public class ExceptionTranslationFilter extends OncePerRequestFilter {
 
-    private final AuthenticationExceptionHandler authenticationExceptionHandler;
+    private final FilterExceptionHandler authenticationExceptionHandler;
 
     @Override
     protected void doFilterInternal(
