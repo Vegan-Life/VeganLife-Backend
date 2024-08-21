@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.konggogi.veganlife.config.MapStructConfig;
+import com.konggogi.veganlife.global.security.filter.AuthenticationExceptionTranslationFilter;
 import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
 import com.konggogi.veganlife.support.security.MockSecurityFilter;
 import java.util.List;
@@ -44,6 +45,10 @@ public abstract class RestDocsTest {
 
     @Autowired private ObjectMapper objectMapper;
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private AuthenticationExceptionTranslationFilter authenticationExceptionTranslationFilter;
+
     protected MockMvc mockMvc;
 
     @BeforeEach
