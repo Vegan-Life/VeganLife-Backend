@@ -3,10 +3,9 @@ package com.konggogi.veganlife.post.controller;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -15,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.konggogi.veganlife.global.exception.ElasticsearchOperationException;
+import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
@@ -109,5 +110,61 @@ class PostSearchControllerTest extends RestDocsTest {
                                 getDocumentRequest(),
                                 getDocumentResponse(),
                                 requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("검색어 자동 완성 API")
+    void getAutoCompleteSuggestionTest() throws Exception {
+        // given
+        List<String> suggest =
+                List.of(
+                        "맛있는 통밀빵 간식 만들기",
+                        "맛있는 최고의 통밀빵 레시피",
+                        "통밀빵 정말 맛있는 카페",
+                        "통밀빵 맛있게 먹는 방법",
+                        "통밀 식빵 맛있게 먹는 방법",
+                        "맛있는 비건 디저트 카페",
+                        "통밀빵 효능");
+        given(postQueryService.suggestByKeyword(anyString(), anyInt())).willReturn(suggest);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/complete/search")
+                                .headers(authorizationHeader())
+                                .queryParam("keyword", "맛있는 통밀빵")
+                                .queryParam("size", "10"));
+        // then
+        perform.andExpect(status().isOk());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "post-complete-search",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        parameterWithName("keyword").description("검색어"),
+                                        parameterWithName("size")
+                                                .description("최대 사이즈(필수X, 디폴트 10)")
+                                                .optional())));
+    }
+
+    @Test
+    @DisplayName("검색어 자동 완성 API - ElasticsearchOperationException")
+    void getAutoCompleteSuggestionEsExceptionTest() throws Exception {
+        // given
+        doThrow(new ElasticsearchOperationException(ErrorCode.ES_OPERATION_FAILED))
+                .when(postQueryService)
+                .suggestByKeyword(anyString(), anyInt());
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/posts/complete/search")
+                                .headers(authorizationHeader())
+                                .queryParam("keyword", "맛있는 통밀빵"));
+        // then
+        perform.andExpect(status().isServiceUnavailable());
+
+        perform.andDo(print()).andDo(document("post-auto-complete-fail", getDocumentResponse()));
     }
 }
