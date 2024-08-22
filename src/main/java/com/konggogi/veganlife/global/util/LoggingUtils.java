@@ -39,11 +39,8 @@ public class LoggingUtils {
         String status = setTextColor(ANSI_RED, httpStatus.toString());
         String message = setTextColor(ANSI_RED, e.getErrorCode().getDescription());
         String filterName =
-                setTextColor(
-                        ANSI_GREEN,
-                        String.valueOf(e.getStackTrace()[0].getClass().getSimpleName()));
-        String methodName =
-                setTextColor(ANSI_GREEN, String.valueOf(e.getStackTrace()[0].getMethodName()));
+                setTextColor(ANSI_GREEN, e.getStackTrace()[0].getClass().getSimpleName());
+        String methodName = setTextColor(ANSI_GREEN, e.getStackTrace()[0].getMethodName());
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
@@ -51,17 +48,13 @@ public class LoggingUtils {
     }
 
     /** 필터 예외 */
-    public static void exceptionLog(HttpStatus httpStatus, Exception e) {
+    public static void exceptionLog(HttpStatus httpStatus, Throwable e) {
         String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
         String exceptionName = setTextColor(ANSI_PURPLE, e.getClass().getName());
         String status = setTextColor(ANSI_RED, httpStatus.toString());
         String message = setTextColor(ANSI_RED, e.getMessage());
-        String filterName =
-                setTextColor(
-                        ANSI_GREEN,
-                        String.valueOf(e.getStackTrace()[0].getClass().getSimpleName()));
-        String methodName =
-                setTextColor(ANSI_GREEN, String.valueOf(e.getStackTrace()[0].getMethodName()));
+        String filterName = setTextColor(ANSI_GREEN, e.getStackTrace()[0].getClassName());
+        String methodName = setTextColor(ANSI_GREEN, e.getStackTrace()[0].getMethodName());
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
@@ -74,13 +67,13 @@ public class LoggingUtils {
         String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
         String exceptionName = setTextColor(ANSI_PURPLE, e.getErrorCode().getCode());
         String status = setTextColor(ANSI_RED, httpStatus.toString());
-        String controllerName = setTextColor(ANSI_GREEN, signature.className());
+        String className = setTextColor(ANSI_GREEN, signature.className());
         String methodName = setTextColor(ANSI_BLUE, signature.methodName());
         String message = setTextColor(ANSI_RED, e.getErrorCode().getDescription());
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
-                errorDate, controllerName, methodName, lineNumber, exceptionName, status, message);
+                errorDate, className, methodName, lineNumber, exceptionName, status, message);
     }
 
     /** Java Common 예외 */
@@ -88,13 +81,13 @@ public class LoggingUtils {
         String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
         String exceptionName = setTextColor(ANSI_PURPLE, e.getClass().getSimpleName());
         String status = setTextColor(ANSI_RED, httpStatus.toString());
-        String controllerName = setTextColor(ANSI_GREEN, signature.className());
+        String className = setTextColor(ANSI_GREEN, signature.className());
         String methodName = setTextColor(ANSI_BLUE, signature.methodName());
         String message = setTextColor(ANSI_RED, e.getMessage());
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
-                errorDate, controllerName, methodName, lineNumber, exceptionName, status, message);
+                errorDate, className, methodName, lineNumber, exceptionName, status, message);
     }
 
     /** Java Common 예외일 경우 메세지 커스텀 가능 */
@@ -103,13 +96,13 @@ public class LoggingUtils {
         String errorDate = setTextColor(ANSI_YELLOW, LocalDateTime.now().format(format));
         String exceptionName = setTextColor(ANSI_PURPLE, e.getClass().getSimpleName());
         String status = setTextColor(ANSI_RED, httpStatus.toString());
-        String controllerName = setTextColor(ANSI_GREEN, signature.className());
+        String className = setTextColor(ANSI_GREEN, signature.className());
         String methodName = setTextColor(ANSI_BLUE, signature.methodName());
         String message = setTextColor(ANSI_RED, detail);
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
         printExceptionLog(
-                errorDate, controllerName, methodName, lineNumber, exceptionName, status, message);
+                errorDate, className, methodName, lineNumber, exceptionName, status, message);
     }
 
     public static String methodArgumentNotValidMessage(MethodArgumentNotValidException exception) {
@@ -134,7 +127,6 @@ public class LoggingUtils {
         StringBuilder errors = new StringBuilder();
         errors.append("Argument: [");
         errors.append(exception.getPropertyName());
-        ;
         errors.append("] -> Required Type: [");
         errors.append(exception.getRequiredType().getSimpleName());
         errors.append("] | Actual Type: [");
@@ -152,7 +144,6 @@ public class LoggingUtils {
         StringBuilder errors = new StringBuilder();
         errors.append("Argument: [");
         errors.append(exception.getParameterName());
-        ;
         errors.append("] -> Required Type: [");
         errors.append(exception.getParameterType());
         errors.append("] 은 null일 수 없습니다.");
