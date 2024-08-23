@@ -1,6 +1,7 @@
 package com.konggogi.veganlife.global.advice.common;
 
 
+import com.konggogi.veganlife.global.exception.ElasticsearchOperationException;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
@@ -119,5 +120,15 @@ public class GlobalControllerAdvice {
         LoggingUtils.exceptionLog(HttpStatus.INTERNAL_SERVER_ERROR, exception);
 
         return ResponseEntity.badRequest().body(ErrorResponse.from(exception.getErrorCode()));
+    }
+
+    @ExceptionHandler(ElasticsearchOperationException.class)
+    public ResponseEntity<ErrorResponse> handleElasticsearchOperationException(
+            ElasticsearchOperationException exception) {
+
+        LoggingUtils.exceptionLog(HttpStatus.SERVICE_UNAVAILABLE, exception);
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ErrorResponse.from(ErrorCode.ES_OPERATION_FAILED));
     }
 }

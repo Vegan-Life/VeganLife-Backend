@@ -12,10 +12,13 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
+import com.konggogi.veganlife.post.domain.document.PostDocument;
+import com.konggogi.veganlife.post.fixture.PostDocumentFixture;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
+import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +36,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 class PostQueryServiceTest {
     @Mock PostRepository postRepository;
     @Mock TagRepository tagRepository;
+    @Mock PostElasticRepository postElasticRepository;
     @InjectMocks PostQueryService postQueryService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
     private final Post post = PostFixture.CHALLENGE.getWithId(1L, member);
@@ -161,5 +165,19 @@ class PostQueryServiceTest {
         // then
         assertThat(result).hasSize(posts.size());
         then(postRepository).should().findByMemberComments(anyLong(), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("검색어 기반 자동 완성")
+    void suggestByKeywordTest() {
+        // given
+        List<PostDocument> postDocuments = List.of(PostDocumentFixture.DEFAULT.getWithId(1L));
+        given(postElasticRepository.findAutoCompleteSuggestion(anyString(), anyInt()))
+                .willReturn(postDocuments);
+        // when
+        List<String> result = postQueryService.suggestByKeyword(anyString(), anyInt());
+        // then
+        assertThat(result).hasSize(postDocuments.size());
+        assertThat(result.get(0)).isEqualTo(postDocuments.get(0).getTitle());
     }
 }

@@ -5,8 +5,10 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
+import com.konggogi.veganlife.post.domain.document.PostDocument;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
+import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PostQueryService {
     private final PostRepository postRepository;
+    private final PostElasticRepository postElasticRepository;
     private final TagRepository tagRepository;
 
     public Post search(Long postId) {
@@ -43,6 +46,12 @@ public class PostQueryService {
 
     public Page<Post> searchByKeyword(Pageable pageable, String keyword) {
         return postRepository.findByKeyword(keyword, pageable);
+    }
+
+    public List<String> suggestByKeyword(String keyword, int size) {
+        return postElasticRepository.findAutoCompleteSuggestion(keyword, size).stream()
+                .map(PostDocument::getTitle)
+                .toList();
     }
 
     public Page<Post> searchByMemberComments(Long memberId, Pageable pageable) {

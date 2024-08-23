@@ -53,3 +53,32 @@ include::{snippets}/popular-tags/http-request.adoc[]
 인기 태그 상위 최대 10개
 
 include::{snippets}/popular-tags/http-response.adoc[]
+
+== 검색어 자동 완성 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/post-complete-search/request-headers.adoc[]
+
+==== Path Variable
+
+include::{snippets}/post-complete-search/query-parameters.adoc[]
+
+==== Body
+
+keyword=맛있는 통밀빵
+
+include::{snippets}/post-complete-search/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/post-complete-search/http-response.adoc[]
+
+==== 503 SERVICE_UNAVAILABLE
+
+include::{snippets}/post-auto-complete-fail/http-response.adoc[]
+

@@ -37,10 +37,8 @@ public class MemberControllerAdvice {
     }
 
     @ExceptionHandler({InvalidJwtException.class, InvalidOauthTokenException.class})
-    public ResponseEntity<ErrorResponse> handleInvalidJwtException(
-            HandlerMethod handlerMethod, ApiException exception) {
-        LoggingUtils.exceptionLog(
-                AopUtils.extractMethodSignature(handlerMethod), HttpStatus.UNAUTHORIZED, exception);
+    public ResponseEntity<ErrorResponse> handleInvalidJwtException(ApiException exception) {
+        LoggingUtils.exceptionLog(HttpStatus.UNAUTHORIZED, exception);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse.from(exception.getErrorCode()));
     }

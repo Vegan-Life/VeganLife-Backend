@@ -65,7 +65,10 @@ public enum ErrorCode {
     MAX_UPLOAD_SIZE_EXCEEDED("FILE_UPLOAD_001", "파일 크기 제한(10MB)을 초과한 파일입니다."),
     NULL_FILE_NAME("FILE_UPLOAD_002", "파일 이름은 null일 수 없습니다."),
     INVALID_EXTENSION("FILE_UPLOAD_003", "유효한 이미지 파일 확장자(jpg, png, gif, jpeg)가 아닙니다."),
-    FILE_UPLOAD_ERROR("FILE_UPLOAD_004", "파일을 업로드 하는 중 에러가 발생했습니다.");
+    FILE_UPLOAD_ERROR("FILE_UPLOAD_004", "파일을 업로드 하는 중 에러가 발생했습니다."),
+
+    // elastic search
+    ES_OPERATION_FAILED("ELASTIC_SEARCH_001", "검색 작업 도중 오류가 발생했습니다.");
 
     private final String code;
     private final String description;
