@@ -1,9 +1,9 @@
 package com.konggogi.veganlife.global.config;
 
 
+import com.konggogi.veganlife.global.filter.ExceptionTranslationFilter;
 import com.konggogi.veganlife.global.security.filter.JwtAuthenticationFilter;
-import com.konggogi.veganlife.global.security.handler.JwtAuthenticationEntryPoint;
-import com.konggogi.veganlife.global.security.handler.ResourceAccessDeniedHandler;
+import com.konggogi.veganlife.global.security.handler.AuthenticationEntryPoint;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -27,8 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final ResourceAccessDeniedHandler resourceAccessDeniedHandler;
+    private final ExceptionTranslationFilter exceptionTranslationFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -43,9 +43,7 @@ public class SecurityConfig {
         return http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(
-                        config ->
-                                config.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                                        .accessDeniedHandler(resourceAccessDeniedHandler))
+                        config -> config.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
@@ -63,6 +61,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(exceptionTranslationFilter, JwtAuthenticationFilter.class)
                 .build();
     }
 

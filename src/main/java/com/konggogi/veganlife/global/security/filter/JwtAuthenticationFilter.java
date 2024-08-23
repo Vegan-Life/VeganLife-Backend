@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -41,21 +40,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String bearerToken = request.getHeader(JwtUtils.AUTH_TOKEN_HEADER);
 
-        /**
-         * 헤더에 Bearer Token이 있는 경우에만 해당 로직 실행 만약 없다면 일단 Filter 계속 수행 -> 인증이 필요한 uri일 경우
-         * Authentication이 존재하지 않으면 unauthroized 응답 반환
-         */
-        try {
-            jwtUtils.extractBearerToken(bearerToken)
-                    .ifPresent(
-                            jwt -> {
-                                jwtUtils.validateToken(jwt);
-                                setAuthentication(request, jwt);
-                                setRefreshTokenAttribute(request, jwt);
-                            });
-        } catch (InvalidJwtException | UsernameNotFoundException e) {
-            request.setAttribute(JwtUtils.JWT_EXCEPTION, e);
-        }
+        jwtUtils.extractBearerToken(bearerToken)
+                .ifPresent(
+                        jwt -> {
+                            jwtUtils.validateToken(jwt);
+                            setAuthentication(request, jwt);
+                            setRefreshTokenAttribute(request, jwt);
+                        });
+
         filterChain.doFilter(request, response);
     }
 

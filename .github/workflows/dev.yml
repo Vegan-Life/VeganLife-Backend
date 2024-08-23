@@ -39,6 +39,7 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
         AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
         ELASTIC_HOST: ${{ secrets.ELASTIC_HOST }}
         ELASTIC_USER: ${{ secrets.ELASTIC_USER }}
@@ -81,27 +82,32 @@ jobs:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Docker Login
+        run: |
+          echo "Docker Login"
+          ssh veganlife-dev 'sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}'
+
       - name: Docker Compose Down
         # home 기준 실행파일의 상대경로를 적어주어야 한다.
         run: |
           echo "Docker Compose Down"
-          ssh veganlife-dev 'docker compose -f veganlife-dev/docker-compose.yml down --rmi all'
+          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml down --rmi all'
 
       - name: Set Docker Networks
         run: |
           echo "Set Docker Networks"
-          ssh veganlife-dev 'docker network rm deploy'
-          ssh veganlife-dev 'docker network create deploy'
+          ssh veganlife-dev 'sudo docker network rm deploy'
+          ssh veganlife-dev 'sudo docker network create deploy'
 
       - name: Docker Compose Up
         run: |
           echo "Docker Compose Up"
-          ssh veganlife-dev 'docker compose -f veganlife-dev/docker-compose.yml up -d'
+          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml up -d'
 
       - name: Clear
         run: |
           echo "Clear"
-          ssh veganlife-dev 'docker system prune -a'
+          ssh veganlife-dev 'sudo docker system prune -a'
 
   healthcheck:
     needs: [build, deploy]
