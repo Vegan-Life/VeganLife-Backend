@@ -72,7 +72,7 @@ public final class AwsS3Uploader {
     private String validateFileExtension(String originalFilename) {
         String fileExtension =
                 originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-        List<String> allowedExtensions = Arrays.asList("jpg", "png", "gif", "jpeg");
+        List<String> allowedExtensions = Arrays.asList("jpg", "png", "gif", "jpeg", "webp");
 
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileUploadException(ErrorCode.INVALID_EXTENSION);
