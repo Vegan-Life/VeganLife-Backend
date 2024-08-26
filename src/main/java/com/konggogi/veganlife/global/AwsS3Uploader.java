@@ -7,12 +7,14 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -47,15 +49,19 @@ public final class AwsS3Uploader {
             return null;
         }
         String newFileName = uploadFolder.getName() + generateRandomFilename(multipartFile);
+        File file = convertMultipartFileToFile(multipartFile);
+        File webpFile = convertFileToWebp(file);
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentLength(webpFile.length());
+        metadata.setContentType("image/webp");
 
-        try {
-            amazonS3.putObject(bucket, newFileName, multipartFile.getInputStream(), metadata);
+        try (FileInputStream fileInputStream = new FileInputStream(webpFile)) {
+            amazonS3.putObject(bucket, newFileName, fileInputStream, metadata);
         } catch (SdkClientException | IOException e) {
             throw new FileUploadException(ErrorCode.FILE_UPLOAD_ERROR);
+        } finally {
+            deleteTempFiles(file, webpFile);
         }
         return cloudfrontDomain + newFileName;
     }
@@ -65,18 +71,46 @@ public final class AwsS3Uploader {
         if (originalFileName == null) {
             throw new FileUploadException(ErrorCode.NULL_FILE_NAME);
         }
-        String extension = validateFileExtension(originalFileName);
-        return UUID.randomUUID() + "." + extension;
+        validateFileExtension(originalFileName);
+        return UUID.randomUUID() + ".webp";
     }
 
-    private String validateFileExtension(String originalFilename) {
+    private void validateFileExtension(String originalFilename) {
         String fileExtension =
                 originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-        List<String> allowedExtensions = Arrays.asList("jpg", "png", "gif", "jpeg", "webp");
+        List<String> allowedExtensions = Arrays.asList("jpg", "png", "jpeg", "webp");
 
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileUploadException(ErrorCode.INVALID_EXTENSION);
         }
-        return fileExtension;
+    }
+
+    private File convertMultipartFileToFile(MultipartFile multipartFile) {
+        File file = new File(multipartFile.getOriginalFilename());
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(multipartFile.getBytes());
+            return file;
+        } catch (IOException e) {
+            throw new FileUploadException(ErrorCode.FILE_CONVERT_ERROR);
+        }
+    }
+
+    private File convertFileToWebp(File file) {
+        File outputFile = new File("resize_" + System.currentTimeMillis() + ".webp");
+        try {
+            return ImmutableImage.loader().fromFile(file).output(WebpWriter.DEFAULT, outputFile);
+        } catch (IOException e) {
+            throw new FileUploadException(ErrorCode.FILE_CONVERT_ERROR);
+        }
+    }
+
+    private void deleteTempFiles(File... files) {
+        for (File file : files) {
+            try {
+                Files.deleteIfExists(file.toPath());
+            } catch (IOException e) {
+                throw new FileUploadException(ErrorCode.FILE_DELETE_ERROR);
+            }
+        }
     }
 }
