@@ -108,6 +108,10 @@ dependencies {
 
     //elastic search
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    //webp
+    implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
+    implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
 }
 
 test {
