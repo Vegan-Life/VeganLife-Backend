@@ -26,8 +26,16 @@ spring:
       enabled: true
   elasticsearch:
     host: ${ELASTIC_HOST}
+    port: ${ELASTIC_PORT}
     username: ${ELASTIC_USER}
     password: ${ELASTIC_PASSWORD}
+    uris: ["https://search-vegan-life-elastic-cy6kvgv27uk6oj7u3aqtv5abqa.ap-northeast-2.es.amazonaws.com"]
+
+management:
+  health:
+    elasticsearch:
+      enabled: false
+
 jwt:
   secret-key: ${SECRET_KEY}
   expiration: 7200
