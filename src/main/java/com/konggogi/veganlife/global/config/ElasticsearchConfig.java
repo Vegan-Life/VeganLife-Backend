@@ -1,24 +1,18 @@
 package com.konggogi.veganlife.global.config;
 
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.elasticsearch.client.RestClient;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.data.client.orhlc.AbstractOpenSearchConfiguration;
+import org.opensearch.data.client.orhlc.ClientConfiguration;
+import org.opensearch.data.client.orhlc.RestClients;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories
-public class ElasticsearchConfig extends ElasticsearchConfiguration {
+@EnableElasticsearchRepositories(basePackages = "com.konggogi.veganlife.*.repository.elastic")
+public class ElasticsearchConfig extends AbstractOpenSearchConfiguration {
+
     @Value("${spring.elasticsearch.username}")
     private String username;
 
@@ -28,24 +22,18 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
     @Value("${spring.elasticsearch.host}")
     private String host;
 
+    @Value("${spring.elasticsearch.port}")
+    private Integer port;
+
     @Override
-    public ClientConfiguration clientConfiguration() {
-        return ClientConfiguration.builder()
-                .connectedTo(host)
-                .usingSsl()
-                .withBasicAuth(username, password)
-                .build();
-    }
+    public RestHighLevelClient opensearchClient() {
 
-    @Bean
-    public ElasticsearchClient elasticsearchClient(RestClient restClient) {
-        ObjectMapper objectMapper =
-                new ObjectMapper()
-                        .registerModule(new JavaTimeModule())
-                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        ElasticsearchTransport transport =
-                new RestClientTransport(restClient, new JacksonJsonpMapper(objectMapper));
-        return new ElasticsearchClient(transport);
+        ClientConfiguration clientConfiguration =
+                ClientConfiguration.builder()
+                        .connectedTo(host + ":" + port)
+                        .usingSsl()
+                        .withBasicAuth(username, password)
+                        .build();
+        return RestClients.create(clientConfiguration).rest();
     }
 }

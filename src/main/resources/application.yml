@@ -26,8 +26,15 @@ spring:
       enabled: true
   elasticsearch:
     host: ${ELASTIC_HOST}
+    port: ${ELASTIC_PORT}
     username: ${ELASTIC_USER}
     password: ${ELASTIC_PASSWORD}
+
+management:
+  health:
+    elasticsearch:
+      enabled: false
+
 jwt:
   secret-key: ${SECRET_KEY}
   expiration: 7200
