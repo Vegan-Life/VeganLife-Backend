@@ -34,7 +34,7 @@ include::{snippets}/sse-subscribe-not-found-member/http-response.adoc[]
 
 include::{snippets}/sse-subscribe-not-found-emitter/http-response.adoc[]
 
-==== 504 SERVICE UNAVAILABLE
+==== 503 SERVICE UNAVAILABLE
 
 include::{snippets}/sse-subscribe-connection-fail/http-response.adoc[]
 
