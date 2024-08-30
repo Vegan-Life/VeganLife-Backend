@@ -44,6 +44,7 @@ jobs:
         ELASTIC_HOST: ${{ secrets.ELASTIC_HOST }}
         ELASTIC_USER: ${{ secrets.ELASTIC_USER }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        ELASTIC_PORT: ${{ secrets.ELASTIC_PORT }}
       run: ./gradlew clean test spotlessCheck
 
     - name: Send Notification to Discord
