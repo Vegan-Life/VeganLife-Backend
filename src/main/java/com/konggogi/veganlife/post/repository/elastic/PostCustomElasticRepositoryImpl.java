@@ -35,7 +35,7 @@ public class PostCustomElasticRepositoryImpl implements PostCustomElasticReposit
 
     private Query autoCompleteSuggestionQuery(String keyword, int size) {
         QueryBuilder matchPhraseQuery =
-                QueryBuilders.matchPhraseQuery("title", keyword).slop(1).boost(3.0f);
+                QueryBuilders.matchPhraseQuery("title", keyword).slop(1).boost(5.0f);
 
         QueryBuilder matchNoriQuery =
                 QueryBuilders.matchQuery("title.nori", keyword)
