@@ -74,9 +74,6 @@
 
 ## 💡문제 해결
 #### [🔗 QueryDsl+복합 인덱스를 사용한 섭취량 조회 API 성능 2배 개선](https://yeon-dev.tistory.com/246)
-#### [🔗 테스트 데이터 삽입 이후 발생하는 슬로우 쿼리 해결](https://publish.obsidian.md/ssoscode/Programming/Spring+JPA/issues/%EC%9D%B8%EB%8D%B1%EC%8A%A4%EB%A5%BC+%EC%83%9D%EC%84%B1%ED%96%88%EC%A7%80%EB%A7%8C%2C+%EC%9D%B4%EB%A5%BC+%ED%99%9C%EC%9A%A9%ED%95%98%EC%A7%80+%EB%AA%BB%ED%95%98%EB%8A%94+%EB%AC%B8%EC%A0%9C)
-#### [🔗 EC2 요금 절감을 위한 노력](https://publish.obsidian.md/ssoscode/Programming/Infra/AWS/issues/EC2+%EB%8B%A4%EC%9A%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EB%93%9C)
-#### [ㄴ🔗 Jenkins ➡️ Github Actions 마이그레이션](https://publish.obsidian.md/ssoscode/Programming/Infra/AWS/issues/Jenkins+%E2%9E%A1%EF%B8%8F+Github+Actions)
 #### [🔗 커스텀 검증 애노테이션을 통해 리스트 내 문자열 길이 검증](https://yeon-dev.tistory.com/247)
 
 <br/>
