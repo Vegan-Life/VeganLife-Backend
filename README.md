@@ -75,7 +75,7 @@
 <br>
 
 ## 💡문제 해결
-#### [🔗 QueryDsl+복합 인덱스를 사용한 섭취량 조회 API 성능 2배 개선](https://yeon-dev.tistory.com/246)
+#### [🔗 QueryDsl+복합 인덱스를 사용한 연간 섭취량 통계 API 응답 시간 97% 개선](https://yeon-dev.tistory.com/246)
 #### [🔗 커스텀 검증 애노테이션을 통해 리스트 내 문자열 길이 검증](https://yeon-dev.tistory.com/247)
 #### [🔗 이미지 파일 WebP 형식 변환을 통한 이미지 로딩 시간 약 1초 단축](https://github.com/Vegan-Life/VeganLife-Backend/pull/312)
 
