@@ -57,7 +57,7 @@ include::{snippets}/sse-subscribe-connection-fail/http-response.adoc[]
 |`+COMMENT_LIKE+`
 | 댓글 좋아요
 
-|`+COMMENT+`
+|`+MENTION+`
 | 댓글에 사용자 언급
 
 |===
