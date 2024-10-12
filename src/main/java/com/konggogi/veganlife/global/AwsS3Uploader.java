@@ -7,19 +7,15 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
-import com.sksamuel.scrimage.ImmutableImage;
-import com.sksamuel.scrimage.webp.WebpWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public final class AwsS3Uploader {
@@ -49,19 +45,15 @@ public final class AwsS3Uploader {
             return null;
         }
         String newFileName = uploadFolder.getName() + generateRandomFilename(multipartFile);
-        File file = convertMultipartFileToFile(multipartFile);
-        File webpFile = convertFileToWebp(file);
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(webpFile.length());
-        metadata.setContentType("image/webp");
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
 
-        try (FileInputStream fileInputStream = new FileInputStream(webpFile)) {
-            amazonS3.putObject(bucket, newFileName, fileInputStream, metadata);
+        try {
+            amazonS3.putObject(bucket, newFileName, multipartFile.getInputStream(), metadata);
         } catch (SdkClientException | IOException e) {
             throw new FileUploadException(ErrorCode.FILE_UPLOAD_ERROR);
-        } finally {
-            deleteTempFiles(file, webpFile);
         }
         return cloudfrontDomain + newFileName;
     }
@@ -82,35 +74,6 @@ public final class AwsS3Uploader {
 
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileUploadException(ErrorCode.INVALID_EXTENSION);
-        }
-    }
-
-    private File convertMultipartFileToFile(MultipartFile multipartFile) {
-        File file = new File(multipartFile.getOriginalFilename());
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(multipartFile.getBytes());
-            return file;
-        } catch (IOException e) {
-            throw new FileUploadException(ErrorCode.FILE_CONVERT_ERROR);
-        }
-    }
-
-    private File convertFileToWebp(File file) {
-        File outputFile = new File("resize_" + System.currentTimeMillis() + ".webp");
-        try {
-            return ImmutableImage.loader().fromFile(file).output(WebpWriter.DEFAULT, outputFile);
-        } catch (IOException e) {
-            throw new FileUploadException(ErrorCode.FILE_CONVERT_ERROR);
-        }
-    }
-
-    private void deleteTempFiles(File... files) {
-        for (File file : files) {
-            try {
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException e) {
-                throw new FileUploadException(ErrorCode.FILE_DELETE_ERROR);
-            }
         }
     }
 }

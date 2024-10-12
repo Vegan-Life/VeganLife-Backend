@@ -109,10 +109,6 @@ dependencies {
     //elastic search
     implementation 'org.opensearch.client:spring-data-opensearch:1.2.1'
     implementation 'org.springframework.data:spring-data-elasticsearch:5.1.12'
-
-    //webp
-    implementation 'com.sksamuel.scrimage:scrimage-core:4.2.0'
-    implementation 'com.sksamuel.scrimage:scrimage-webp:4.2.0'
 }
 
 test {
