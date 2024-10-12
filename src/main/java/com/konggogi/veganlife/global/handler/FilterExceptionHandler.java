@@ -40,8 +40,8 @@ public class FilterExceptionHandler {
         if (response.isCommitted()) {
             return;
         }
-        LoggingUtils.exceptionLog(HttpStatus.UNAUTHORIZED, e.getCause());
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        LoggingUtils.exceptionLog(HttpStatus.INTERNAL_SERVER_ERROR, e.getCause());
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
