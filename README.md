@@ -78,6 +78,8 @@
 #### [🔗 QueryDsl+복합 인덱스를 사용한 연간 섭취량 통계 API 응답 시간 97% 개선](https://yeon-dev.tistory.com/246)
 #### [🔗 커스텀 검증 애노테이션을 통해 리스트 내 문자열 길이 검증](https://yeon-dev.tistory.com/247)
 #### [🔗 이미지 파일 WebP 형식 변환을 통한 이미지 로딩 시간 약 1초 단축](https://github.com/Vegan-Life/VeganLife-Backend/pull/312)
+- [🔗 이미지 압축 로직을 Lambda로 분리, 애플리케이션 응답성 향상](https://github.com/Vegan-Life/VeganLife-Backend/pull/318)
+#### [🔗 ExceptionTranslationFilter 구현, Spring Security Filter 예외 핸들링](https://github.com/Vegan-Life/VeganLife-Backend/pull/308)
 
 <br>
 
