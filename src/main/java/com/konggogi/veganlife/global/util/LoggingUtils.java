@@ -38,8 +38,7 @@ public class LoggingUtils {
         String exceptionName = setTextColor(ANSI_PURPLE, e.getErrorCode().getCode());
         String status = setTextColor(ANSI_RED, httpStatus.toString());
         String message = setTextColor(ANSI_RED, e.getErrorCode().getDescription());
-        String filterName =
-                setTextColor(ANSI_GREEN, e.getStackTrace()[0].getClass().getSimpleName());
+        String filterName = setTextColor(ANSI_GREEN, e.getStackTrace()[0].getClassName());
         String methodName = setTextColor(ANSI_GREEN, e.getStackTrace()[0].getMethodName());
         String lineNumber =
                 setTextColor(RED_UNDERLINED, String.valueOf(e.getStackTrace()[0].getLineNumber()));
