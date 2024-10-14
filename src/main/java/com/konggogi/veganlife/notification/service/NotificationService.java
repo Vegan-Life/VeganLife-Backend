@@ -55,7 +55,7 @@ public class NotificationService {
     public Page<Notification> searchByMember(Long memberId, Pageable pageable) {
 
         Member member = memberQueryService.search(memberId);
-        return notificationRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
+        return notificationRepository.findAllByMember(member.getId(), pageable);
     }
 
     private void sendToClient(Long memberId, Object data) {

@@ -1,7 +1,6 @@
 package com.konggogi.veganlife.notification.repository;
 
 
-import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.notification.domain.Notification;
 import com.konggogi.veganlife.notification.domain.NotificationType;
 import java.time.LocalDate;
@@ -19,5 +18,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     void deleteAllByMemberId(Long memberId);
 
-    Page<Notification> findByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
+    @Query(
+            "select n from Notification n where n.member.id = :memberId and n.type != 'SSE' order by n.createdAt desc")
+    Page<Notification> findAllByMember(Long memberId, Pageable pageable);
 }
