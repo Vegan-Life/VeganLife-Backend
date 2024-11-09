@@ -55,11 +55,11 @@ class NotificationServiceTest {
     void subscribeTest() {
         // given
         Long memberId = member.getId();
-        String lastEventId = "";
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
         // when
-        SseEmitter sseEmitter = notificationService.subscribe(memberId, lastEventId);
+        SseEmitter sseEmitter = notificationService.subscribe(memberId);
         // then
         assertThat(sseEmitter).isNotNull();
         then(emitterRepository).should().save(anyLong(), any(SseEmitter.class));
@@ -70,20 +70,22 @@ class NotificationServiceTest {
     void sendPendingNotificationsTest() {
         // given
         Long memberId = member.getId();
-        String lastEventId = "1";
         LocalDateTime time = LocalDateTime.of(2024, 10, 25, 15, 30);
-        Notification sse = NotificationFixture.SSE.getWithIdAndDate(member, 2L, time);
-        Notification comment = NotificationFixture.COMMENT.getWithIdAndDate(member, 3L, time);
-        Notification intake = NotificationFixture.INTAKE_OVER_30.getWithIdAndDate(member, 4L, time);
-        List<Notification> notifications = List.of(sse, comment, intake);
+        Notification sse = NotificationFixture.SSE.getWithDate(member, time);
+        Notification comment = NotificationFixture.COMMENT.getWithDate(member, time);
+        Notification intakeOver30 = NotificationFixture.INTAKE_OVER_30.getWithDate(member, time);
+        Notification intakeOver60 =
+                NotificationFixture.INTAKE_OVER_60.getWithDate(member, LocalDateTime.now());
+        List<Notification> notifications = List.of(sse, comment, intakeOver30, intakeOver60);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
-        given(notificationRepository.findAllByMemberIdAndIdAfter(anyLong(), anyLong()))
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
+        given(notificationRepository.findAllByMemberIdAndIsSendFalse(anyLong()))
                 .willReturn(notifications);
         // when
-        notificationService.subscribe(memberId, lastEventId);
+        notificationService.subscribe(memberId);
         // then
-        then(notificationRepository).should().findAllByMemberIdAndIdAfter(anyLong(), anyLong());
+        then(notificationRepository).should().findAllByMemberIdAndIsSendFalse(anyLong());
     }
 
     @Test
@@ -91,11 +93,10 @@ class NotificationServiceTest {
     void subscribeNotMemberTest() {
         // given
         Long memberId = member.getId();
-        String lastEventId = "-1";
         given(memberQueryService.search(anyLong()))
                 .willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER));
         // when, then
-        assertThatThrownBy(() -> notificationService.subscribe(memberId, lastEventId))
+        assertThatThrownBy(() -> notificationService.subscribe(memberId))
                 .isInstanceOf(NotFoundEntityException.class)
                 .hasMessageContaining(ErrorCode.NOT_FOUND_MEMBER.getDescription());
     }
@@ -105,6 +106,7 @@ class NotificationServiceTest {
     void sendNotificationTest() {
         // given
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
         // when, then
         assertDoesNotThrow(
                 () ->
