@@ -2,7 +2,6 @@ package com.konggogi.veganlife.notification.service;
 
 
 import com.konggogi.veganlife.global.exception.ErrorCode;
-import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.notification.domain.Notification;
@@ -14,7 +13,10 @@ import com.konggogi.veganlife.notification.repository.EmitterRepository;
 import com.konggogi.veganlife.notification.repository.NotificationRepository;
 import com.konggogi.veganlife.notification.service.dto.NotificationData;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 // TODO: SseService, NotificationService 분리
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class NotificationService {
@@ -33,11 +36,12 @@ public class NotificationService {
     private final MemberQueryService memberQueryService;
     private final NotificationMapper notificationMapper;
 
-    public SseEmitter subscribe(Long memberId) {
+    public SseEmitter subscribe(Long memberId, String lastEventId) {
         Member member = memberQueryService.search(memberId);
         SseEmitter emitter = createEmitter(memberId);
         sendNotification(
                 member, NotificationType.SSE, NotificationMessage.SSE_CONNECTION.getMessage());
+        sendPendingNotifications(member, lastEventId);
         return emitter;
     }
 
@@ -48,17 +52,16 @@ public class NotificationService {
     public void sendNotification(Member member, NotificationType type, String message) {
         Notification notification =
                 notificationRepository.save(notificationMapper.toEntity(member, type, message));
-        NotificationData notificationData = notificationMapper.toNotificationData(notification);
-        sendToClient(member.getId(), notificationData);
+        sendToClient(member.getId(), notification);
     }
 
     public Page<Notification> searchByMember(Long memberId, Pageable pageable) {
-
         Member member = memberQueryService.search(memberId);
         return notificationRepository.findAllByMember(member.getId(), pageable);
     }
 
-    private void sendToClient(Long memberId, Object data) {
+    private void sendToClient(Long memberId, Notification notification) {
+        NotificationData data = notificationMapper.toNotificationData(notification);
         emitterRepository
                 .findById(memberId)
                 .ifPresentOrElse(
@@ -70,9 +73,10 @@ public class NotificationService {
                                 throw new SseConnectionException(ErrorCode.SSE_CONNECTION_ERROR);
                             }
                         },
-                        () -> {
-                            throw new NotFoundEntityException(ErrorCode.NOT_FOUND_EMITTER);
-                        });
+                        () ->
+                                log.warn(
+                                        "Not Found SseEmitter - Failed to send SSE event to memberId: {}",
+                                        memberId));
     }
 
     private SseEmitter createEmitter(Long memberId) {
@@ -84,10 +88,32 @@ public class NotificationService {
         return emitter;
     }
 
-    private SseEmitter.SseEventBuilder createSseEvent(Long memberId, Object data) {
+    private SseEmitter.SseEventBuilder createSseEvent(Long memberId, NotificationData data) {
         return SseEmitter.event()
                 .id(String.valueOf(memberId))
                 .data(data)
                 .reconnectTime(RECONNECTION_TIME);
+    }
+
+    private void sendPendingNotifications(Member member, String lastEventId) {
+        if (lastEventId.isEmpty()) return;
+
+        Long eventId = Long.parseLong(lastEventId);
+        Long memberId = member.getId();
+        List<Notification> notifications =
+                notificationRepository.findAllByMemberIdAndIdAfter(memberId, eventId);
+
+        notifications.forEach(
+                notification -> {
+                    NotificationType type = notification.getType();
+                    if (type == NotificationType.SSE) return;
+
+                    if (type == NotificationType.INTAKE_OVER_30
+                            || type == NotificationType.INTAKE_OVER_60) {
+                        if (!LocalDate.now().equals(notification.getCreatedAt().toLocalDate()))
+                            return;
+                    }
+                    sendToClient(memberId, notification);
+                });
     }
 }
