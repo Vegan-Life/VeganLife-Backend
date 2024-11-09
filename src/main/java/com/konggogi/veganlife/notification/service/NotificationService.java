@@ -36,12 +36,12 @@ public class NotificationService {
     private final MemberQueryService memberQueryService;
     private final NotificationMapper notificationMapper;
 
-    public SseEmitter subscribe(Long memberId, String lastEventId) {
+    public SseEmitter subscribe(Long memberId) {
         Member member = memberQueryService.search(memberId);
         SseEmitter emitter = createEmitter(memberId);
         sendNotification(
                 member, NotificationType.SSE, NotificationMessage.SSE_CONNECTION.getMessage());
-        sendPendingNotifications(member, lastEventId);
+        sendPendingNotifications(memberId);
         return emitter;
     }
 
@@ -68,6 +68,7 @@ public class NotificationService {
                         emitter -> {
                             try {
                                 emitter.send(createSseEvent(memberId, data));
+                                notification.updateIsSend();
                             } catch (IOException exception) {
                                 emitterRepository.deleteById(memberId);
                                 throw new SseConnectionException(ErrorCode.SSE_CONNECTION_ERROR);
@@ -95,13 +96,9 @@ public class NotificationService {
                 .reconnectTime(RECONNECTION_TIME);
     }
 
-    private void sendPendingNotifications(Member member, String lastEventId) {
-        if (lastEventId.isEmpty()) return;
-
-        Long eventId = Long.parseLong(lastEventId);
-        Long memberId = member.getId();
+    private void sendPendingNotifications(Long memberId) {
         List<Notification> notifications =
-                notificationRepository.findAllByMemberIdAndIdAfter(memberId, eventId);
+                notificationRepository.findAllByMemberIdAndIsSendFalse(memberId);
 
         notifications.forEach(
                 notification -> {

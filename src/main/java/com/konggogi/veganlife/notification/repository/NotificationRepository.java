@@ -23,5 +23,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "select n from Notification n where n.member.id = :memberId and n.type != 'SSE' order by n.createdAt desc")
     Page<Notification> findAllByMember(Long memberId, Pageable pageable);
 
-    List<Notification> findAllByMemberIdAndIdAfter(Long memberId, Long id);
+    List<Notification> findAllByMemberIdAndIsSendFalse(Long memberId);
 }
