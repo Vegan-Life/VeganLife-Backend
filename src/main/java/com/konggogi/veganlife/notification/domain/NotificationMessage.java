@@ -20,14 +20,6 @@ public enum NotificationMessage implements MessageFormatter {
         }
     },
 
-    // comment-like
-    COMMENT_LIKE("%s님이 %s님의 댓글에 좋아요를 눌렀습니다!") {
-        @Override
-        public String getMessage(String commentLikeMember, String commentAuthor) {
-            return String.format(this.getMessage(), commentLikeMember, commentAuthor);
-        }
-    },
-
     // mention
     MENTION("%s님이 %s님의 게시글에 언급을 했습니다!") {
         @Override

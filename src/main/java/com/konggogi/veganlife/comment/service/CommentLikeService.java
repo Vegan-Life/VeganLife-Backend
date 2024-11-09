@@ -23,7 +23,6 @@ public class CommentLikeService {
     private final PostQueryService postQueryService;
     private final CommentQueryService commentQueryService;
     private final CommentLikeQueryService commentLikeQueryService;
-    private final CommentLikeNotifyService commentLikeNotifyService;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentLikeMapper commentLikeMapper;
 
@@ -34,7 +33,6 @@ public class CommentLikeService {
         validateCommentLikeIsExist(memberId, commentId);
         CommentLike commentLike = commentLikeMapper.toCommentLike(member, post);
         comment.addCommentLike(commentLike);
-        commentLikeNotifyService.notifyAddCommentLikeIfNotAuthor(memberId, commentId);
     }
 
     public void removeCommentLike(Long memberId, Long postId, Long commentId) {
@@ -62,8 +60,6 @@ public class CommentLikeService {
         return commentLikeQueryService
                 .searchCommentLike(memberId, commentId)
                 .orElseThrow(
-                        () -> {
-                            throw new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_UNLIKED);
-                        });
+                        () -> new IllegalLikeStatusException(ErrorCode.ALREADY_COMMENT_UNLIKED));
     }
 }
