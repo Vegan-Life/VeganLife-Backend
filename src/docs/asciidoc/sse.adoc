@@ -26,6 +26,7 @@ include::{snippets}/sse-subscribe/http-request.adoc[]
 
 ==== 200 OK
 HTTP 응답 바디가 아닌 SSE 연결을 통해 메시지가 전달됩니다.
+SSE 연결이 되어 있지 않은 경우 그 동안 쌓인 알림은 SSE 연결 후 전송됩니다.
 include::{snippets}/sse-subscribe/http-response.adoc[]
 
 ==== 404 NOT FOUND
