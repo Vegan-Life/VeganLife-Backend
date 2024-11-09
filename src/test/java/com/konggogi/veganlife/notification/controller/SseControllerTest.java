@@ -44,8 +44,6 @@ class SseControllerTest extends RestDocsTest {
                     NotificationFixture.INTAKE_OVER_30.getWithDate(member, LocalDateTime.now()),
                     NotificationFixture.MENTION.getWithDate(
                             member, LocalDateTime.now().minusMinutes(30)),
-                    NotificationFixture.COMMENT_LIKE.getWithDate(
-                            member, LocalDateTime.now().minusDays(1)),
                     NotificationFixture.INTAKE_OVER_60.getWithDate(
                             member, LocalDateTime.now().minusDays(2)),
                     NotificationFixture.COMMENT.getWithDate(
@@ -90,23 +88,6 @@ class SseControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("SSE 구독 API - Not Found Emitter")
-    void subscribeNotFoundEmitterTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_EMITTER))
-                .when(notificationService)
-                .subscribe(anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(get("/api/v1/sse/subscribe").headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("sse-subscribe-not-found-emitter", getDocumentResponse()));
-    }
-
-    @Test
     @DisplayName("SSE 구독 API - Sse Connection Fail")
     void subscribeConnectionFailTest() throws Exception {
         // given
@@ -140,7 +121,7 @@ class SseControllerTest extends RestDocsTest {
                                 .queryParam("page", "0")
                                 .queryParam("size", "20"));
 
-        perform.andExpect(status().isOk()).andExpect(jsonPath("$.content.size()").value(5));
+        perform.andExpect(status().isOk()).andExpect(jsonPath("$.content.size()").value(4));
 
         perform.andDo(print())
                 .andDo(

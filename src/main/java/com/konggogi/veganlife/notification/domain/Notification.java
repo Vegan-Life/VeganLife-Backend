@@ -28,11 +28,20 @@ public class Notification extends TimeStamped {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Column(nullable = false)
+    private boolean isSend = false;
+
     @Builder
-    public Notification(Long id, Member member, NotificationType type, String message) {
+    public Notification(
+            Long id, Member member, NotificationType type, String message, boolean isSend) {
         this.id = id;
         this.member = member;
         this.type = type;
         this.message = message;
+        this.isSend = isSend;
+    }
+
+    public void updateIsSend() {
+        this.isSend = true;
     }
 }

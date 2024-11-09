@@ -12,6 +12,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface NotificationMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "isSend", constant = "false")
     Notification toEntity(Member member, NotificationType type, String message);
 
     NotificationData toNotificationData(Notification notification);

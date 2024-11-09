@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.comment.domain.Comment;
@@ -40,7 +39,6 @@ class CommentLikeServiceTest {
     @Mock PostQueryService postQueryService;
     @Mock CommentQueryService commentQueryService;
     @Mock CommentLikeQueryService commentLikeQueryService;
-    @Mock CommentLikeNotifyService commentLikeNotifyService;
     @Mock CommentLikeRepository commentLikeRepository;
     @Spy CommentLikeMapper commentLikeMapper = new CommentLikeMapperImpl();
     @InjectMocks CommentLikeService commentLikeService;
@@ -58,11 +56,6 @@ class CommentLikeServiceTest {
         given(commentQueryService.search(anyLong())).willReturn(comment);
         given(commentLikeQueryService.searchCommentLike(anyLong(), anyLong()))
                 .willReturn(Optional.empty());
-        //        given(likeMapper.toCommentLike(any(Member.class),
-        // any(Post.class))).willReturn(commentLike);
-        doNothing()
-                .when(commentLikeNotifyService)
-                .notifyAddCommentLikeIfNotAuthor(anyLong(), anyLong());
         // when
         commentLikeService.addCommentLike(member.getId(), post.getId(), comment.getId());
         // then

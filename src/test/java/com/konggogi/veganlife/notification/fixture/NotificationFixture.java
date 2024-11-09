@@ -16,10 +16,7 @@ public enum NotificationFixture {
     INTAKE_OVER_60(
             NotificationType.INTAKE_OVER_60, NotificationMessage.OVER_INTAKE.getMessage(600)),
     MENTION(NotificationType.MENTION, NotificationMessage.MENTION.getMessage("test1", "test2")),
-    COMMENT(NotificationType.COMMENT, NotificationMessage.ADD_COMMENT.getMessage("test1", "test2")),
-    COMMENT_LIKE(
-            NotificationType.COMMENT_LIKE,
-            NotificationMessage.COMMENT_LIKE.getMessage("test1", "test2"));
+    COMMENT(NotificationType.COMMENT, NotificationMessage.ADD_COMMENT.getMessage("test1", "test2"));
 
     private final NotificationType type;
     private final String message;
@@ -30,20 +27,48 @@ public enum NotificationFixture {
     }
 
     public Notification get(Member member) {
-        return Notification.builder().type(type).message(message).member(member).build();
+        Notification notification =
+                Notification.builder()
+                        .type(type)
+                        .message(message)
+                        .member(member)
+                        .isSend(false)
+                        .build();
+        return setCreatedAt(notification, LocalDateTime.now());
     }
 
     public Notification getWithId(Long id, Member member) {
-        return Notification.builder().id(id).type(type).message(message).member(member).build();
-    }
-
-    public Notification getWithMessage(Member member, String message) {
-        return Notification.builder().type(type).message(message).member(member).build();
+        Notification notification =
+                Notification.builder()
+                        .id(id)
+                        .type(type)
+                        .message(message)
+                        .member(member)
+                        .isSend(false)
+                        .build();
+        return setCreatedAt(notification, LocalDateTime.now());
     }
 
     public Notification getWithDate(Member member, LocalDateTime createdAt) {
         Notification notification =
-                Notification.builder().type(type).message(message).member(member).build();
+                Notification.builder()
+                        .type(type)
+                        .message(message)
+                        .member(member)
+                        .isSend(false)
+                        .build();
+        return setCreatedAt(notification, createdAt);
+    }
+
+    public Notification getWithIdAndDate(Member member, Long id, LocalDateTime createdAt) {
+        Notification notification =
+                Notification.builder()
+                        .id(id)
+                        .type(type)
+                        .message(message)
+                        .member(member)
+                        .isSend(false)
+                        .build();
         return setCreatedAt(notification, createdAt);
     }
 

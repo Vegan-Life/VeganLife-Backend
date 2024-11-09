@@ -22,6 +22,8 @@ import com.konggogi.veganlife.notification.fixture.NotificationFixture;
 import com.konggogi.veganlife.notification.repository.EmitterRepository;
 import com.konggogi.veganlife.notification.repository.NotificationRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,17 +51,41 @@ class NotificationServiceTest {
     private final Notification notification = NotificationFixture.SSE.get(member);
 
     @Test
-    @DisplayName("SseEmitter 생성")
+    @DisplayName("Sse 구독")
     void subscribeTest() {
         // given
         Long memberId = member.getId();
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
         // when
         SseEmitter sseEmitter = notificationService.subscribe(memberId);
         // then
         assertThat(sseEmitter).isNotNull();
         then(emitterRepository).should().save(anyLong(), any(SseEmitter.class));
+    }
+
+    @Test
+    @DisplayName("Sse 구독 - 미수신 알림 전송")
+    void sendPendingNotificationsTest() {
+        // given
+        Long memberId = member.getId();
+        LocalDateTime time = LocalDateTime.of(2024, 10, 25, 15, 30);
+        Notification sse = NotificationFixture.SSE.getWithDate(member, time);
+        Notification comment = NotificationFixture.COMMENT.getWithDate(member, time);
+        Notification intakeOver30 = NotificationFixture.INTAKE_OVER_30.getWithDate(member, time);
+        Notification intakeOver60 =
+                NotificationFixture.INTAKE_OVER_60.getWithDate(member, LocalDateTime.now());
+        List<Notification> notifications = List.of(sse, comment, intakeOver30, intakeOver60);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
+        given(notificationRepository.findAllByMemberIdAndIsSendFalse(anyLong()))
+                .willReturn(notifications);
+        // when
+        notificationService.subscribe(memberId);
+        // then
+        then(notificationRepository).should().findAllByMemberIdAndIsSendFalse(anyLong());
     }
 
     @Test
@@ -76,6 +106,7 @@ class NotificationServiceTest {
     void sendNotificationTest() {
         // given
         given(emitterRepository.findById(anyLong())).willReturn(Optional.of(sseEmitter));
+        given(notificationRepository.save(any(Notification.class))).willReturn(notification);
         // when, then
         assertDoesNotThrow(
                 () ->
@@ -101,18 +132,15 @@ class NotificationServiceTest {
     }
 
     @Test
-    @DisplayName("알림을 보낼 때 emitter를 찾을 수 없으면 예외 발생")
+    @DisplayName("알림을 보낼 때 SseEmiiter가 없는 경우")
     void sendNotificationNotFoundEmitterTest() {
         // given
         given(emitterRepository.findById(anyLong())).willReturn(Optional.empty());
-        // when, then
-        assertThatThrownBy(
-                        () ->
-                                notificationService.sendNotification(
-                                        member, notification.getType(), notification.getMessage()))
-                .isInstanceOf(NotFoundEntityException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_EMITTER.getDescription());
-        then(emitterRepository).should().findById(anyLong());
+        // when
+        assertDoesNotThrow(
+                () ->
+                        notificationService.sendNotification(
+                                member, notification.getType(), notification.getMessage()));
     }
 
     @Test
@@ -121,5 +149,23 @@ class NotificationServiceTest {
         // when, then
         assertDoesNotThrow(() -> notificationService.removeAll(member.getId()));
         then(notificationRepository).should().deleteAllByMemberId(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 Id로 알림 조회")
+    void searchByMember() {
+        // given
+        Long memberId = member.getId();
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Notification> notifications = List.of(notification);
+        Page<Notification> foundNotifications =
+                PageableExecutionUtils.getPage(notifications, pageable, notifications::size);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(notificationRepository.findAllByMember(anyLong(), any(Pageable.class)))
+                .willReturn(foundNotifications);
+        // when
+        Page<Notification> result = notificationService.searchByMember(memberId, pageable);
+        // then
+        assertThat(result).hasSize(notifications.size());
     }
 }
