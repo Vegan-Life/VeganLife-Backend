@@ -4,8 +4,10 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.konggogi.veganlife.support.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -54,7 +56,7 @@ class SseControllerTest extends RestDocsTest {
     void subscribeTest() throws Exception {
         // given
         SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
-        given(notificationService.subscribe(anyLong())).willReturn(sseEmitter);
+        given(notificationService.subscribe(anyLong(), anyString())).willReturn(sseEmitter);
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/sse/subscribe").headers(authorizationHeader()));
@@ -67,7 +69,12 @@ class SseControllerTest extends RestDocsTest {
                                 "sse-subscribe",
                                 getDocumentRequest(),
                                 getDocumentResponse(),
-                                requestHeaders(authorizationDesc())));
+                                requestHeaders(
+                                        authorizationDesc(),
+                                        headerWithName("Last-Event-ID")
+                                                .optional()
+                                                .description(
+                                                        "마지막 받은 알림 ID를 담는 헤더, 기본값: 빈 문자열 (해당 ID 이후로 받지 못한 알림을 수신할 경우 사용)"))));
     }
 
     @Test
@@ -76,7 +83,7 @@ class SseControllerTest extends RestDocsTest {
         // given
         doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .when(notificationService)
-                .subscribe(anyLong());
+                .subscribe(anyLong(), anyString());
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/sse/subscribe").headers(authorizationHeader()));
@@ -88,29 +95,12 @@ class SseControllerTest extends RestDocsTest {
     }
 
     @Test
-    @DisplayName("SSE 구독 API - Not Found Emitter")
-    void subscribeNotFoundEmitterTest() throws Exception {
-        // given
-        doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_EMITTER))
-                .when(notificationService)
-                .subscribe(anyLong());
-        // when
-        ResultActions perform =
-                mockMvc.perform(get("/api/v1/sse/subscribe").headers(authorizationHeader()));
-        // then
-        perform.andExpect(status().isNotFound());
-
-        perform.andDo(print())
-                .andDo(document("sse-subscribe-not-found-emitter", getDocumentResponse()));
-    }
-
-    @Test
     @DisplayName("SSE 구독 API - Sse Connection Fail")
     void subscribeConnectionFailTest() throws Exception {
         // given
         doThrow(new SseConnectionException(ErrorCode.SSE_CONNECTION_ERROR))
                 .when(notificationService)
-                .subscribe(anyLong());
+                .subscribe(anyLong(), anyString());
         // when
         ResultActions perform =
                 mockMvc.perform(get("/api/v1/sse/subscribe").headers(authorizationHeader()));
