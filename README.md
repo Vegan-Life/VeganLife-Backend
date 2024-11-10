@@ -45,8 +45,14 @@
 <br/>
 
 ## 🗄️서비스 아키텍처
+### 아키텍처
 <p align="center">
-  <img src="https://github.com/Vegan-Life/VeganLife-Backend/assets/47537803/06bd6bbe-c585-4b34-8b2e-624a68c07742" width="80%" />
+  <img src="https://github.com/user-attachments/assets/aa3f62a6-9661-4db7-b0b8-2ca524a7d304" width="80%" />
+</p>
+
+### CICD
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ca730014-74b9-4af3-b520-39994436018b" width="80%" />
 </p>
 
 <br>
@@ -102,10 +108,10 @@
 
 **데이터베이스** <br/>
 ![MariaDB](https://img.shields.io/badge/MariaDB-003545.svg?&style=for-the-badge&logo=MariaDB&logoColor=white)
-![ElasticSearch](https://img.shields.io/badge/elasticsearch-005571.svg?&style=for-the-badge&logo=elasticsearch&logoColor=white)
+![AmazonOpensearch](https://img.shields.io/badge/Amazon_Opensearch-9146FF.svg?&style=for-the-badge&logoColor=white)
 
 **인프라** <br/>
-![AWS](https://img.shields.io/badge/AWS-232F3E.svg?&style=for-the-badge&logo=Amazon%20AWS&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E.svg?&style=for-the-badge&logo=Amazon%20Web%20Services&logoColor=white)
 ![Nginx](https://img.shields.io/badge/nginx-009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 
 **데브옵스** <br/>
