@@ -2,6 +2,8 @@ package com.konggogi.veganlife.recipe.domain;
 
 
 import com.konggogi.veganlife.global.domain.TimeStamped;
+import com.konggogi.veganlife.global.exception.EntityAccessDeniedException;
+import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.member.domain.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,7 +61,6 @@ public class Recipe extends TimeStamped {
     }
 
     public RecipeImage getThumbnail() {
-
         if (recipeImages.isEmpty()) {
             return null;
         }
@@ -76,6 +77,12 @@ public class Recipe extends TimeStamped {
         updateRecipeImages(recipeImages);
         updateIngredients(ingredients);
         updateDescriptions(descriptions);
+    }
+
+    public void checkOwner(Long memberId) {
+        if (!member.getId().equals(memberId)) {
+            throw new EntityAccessDeniedException(ErrorCode.ACCESS_DENIED);
+        }
     }
 
     private void updateRecipeTypes(List<RecipeType> recipeTypes) {

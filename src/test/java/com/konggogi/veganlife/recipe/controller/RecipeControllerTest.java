@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.konggogi.veganlife.global.exception.EntityAccessDeniedException;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
@@ -51,6 +53,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
@@ -345,6 +348,155 @@ public class RecipeControllerTest extends RestDocsTest {
                         document(
                                 "recipe-get-recommended-recipe-recipe-not-found",
                                 getDocumentResponse()));
+    }
+
+    @Test
+    @DisplayName("레시피 수정 API")
+    void modifyRecipeTest() throws Exception {
+
+        RecipeAddRequest recipeAddRequest =
+                new RecipeAddRequest(
+                        "표고버섯 탕수",
+                        List.of(VegetarianType.LACTO),
+                        List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(recipeAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
+        ResultActions perform =
+                mockMvc.perform(
+                        multipart("/api/v1/recipes/{id}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        req -> {
+                                            req.setMethod(HttpMethod.PUT.name());
+                                            return req;
+                                        })
+                                .headers(authorizationHeader()));
+
+        perform.andExpect(status().isCreated());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "modify-recipe",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                pathParameters(parameterWithName("id").description("수정할 레시피 ID")),
+                                requestParts(
+                                        partWithName("request").description("레시피 수정 DTO"),
+                                        partWithName("images").description("레시피 이미지 목록"))));
+    }
+
+    @Test
+    @DisplayName("레시피 수정 API 예외 - Recipe Not Found")
+    void modifyRecipeRecipeNotFoundExceptionTest() throws Exception {
+
+        RecipeAddRequest recipeAddRequest =
+                new RecipeAddRequest(
+                        "표고버섯 탕수",
+                        List.of(VegetarianType.LACTO),
+                        List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+        MockMultipartFile request =
+                new MockMultipartFile(
+                        "request",
+                        "request",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        toJson(recipeAddRequest).getBytes());
+        List<MockMultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image1.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image1".getBytes()),
+                        new MockMultipartFile(
+                                "images",
+                                "image2.png",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "image2".getBytes()));
+
+        willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE))
+                .given(recipeService)
+                .modify(anyLong(), any(RecipeAddRequest.class), any(), anyLong());
+
+        ResultActions perform =
+                mockMvc.perform(
+                        multipart("/api/v1/recipes/{id}", 1L)
+                                .file(images.get(0))
+                                .file(images.get(1))
+                                .file(request)
+                                .with(
+                                        req -> {
+                                            req.setMethod(HttpMethod.PUT.name());
+                                            return req;
+                                        })
+                                .headers(authorizationHeader()));
+
+        perform.andExpect(status().isNotFound());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "modify-recipe-recipe-not-found",
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("레시피 삭제 API")
+    void removeRecipeThrowsAccessDeniedException() throws Exception {
+
+        ResultActions perform =
+                mockMvc.perform(delete("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
+
+        perform.andExpect(status().isNoContent());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "delete-recipe",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                pathParameters(parameterWithName("id").description("수정할 레시피 ID")),
+                                requestHeaders(authorizationDesc())));
+    }
+
+    @Test
+    @DisplayName("레시피 삭제 API - Access Denied")
+    void removeRecipeTest() throws Exception {
+
+        willThrow(new EntityAccessDeniedException(ErrorCode.ACCESS_DENIED))
+                .given(recipeService)
+                .remove(anyLong(), anyLong());
+
+        ResultActions perform =
+                mockMvc.perform(delete("/api/v1/recipes/{id}", 1L).headers(authorizationHeader()));
+
+        perform.andExpect(status().isForbidden());
+
+        perform.andDo(print())
+                .andDo(document("delete-recipe-access-denied", getDocumentResponse()));
     }
 
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {

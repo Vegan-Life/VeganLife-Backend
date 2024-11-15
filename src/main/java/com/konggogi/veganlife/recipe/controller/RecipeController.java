@@ -19,9 +19,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -80,5 +82,25 @@ public class RecipeController {
 
         return ResponseEntity.ok(
                 recipeSearchService.searchAllByKeyword(keyword, pageable, userDetails.id()));
+    }
+
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> modifyRecipe(
+            @PathVariable("id") Long recipeId,
+            @Valid @RequestPart RecipeAddRequest request,
+            @RequestPart(required = false) @Validated @Size(max = 5) List<MultipartFile> images,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        recipeService.modify(recipeId, request, images, userDetails.id());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRecipe(
+            @PathVariable("id") Long recipeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        recipeService.remove(recipeId, userDetails.id());
+        return ResponseEntity.noContent().build();
     }
 }

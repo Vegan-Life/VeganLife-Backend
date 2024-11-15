@@ -2,6 +2,7 @@ package com.konggogi.veganlife.global.advice.common;
 
 
 import com.konggogi.veganlife.global.exception.ElasticsearchOperationException;
+import com.konggogi.veganlife.global.exception.EntityAccessDeniedException;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
@@ -130,5 +131,16 @@ public class GlobalControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(ErrorResponse.from(ErrorCode.ES_OPERATION_FAILED));
+    }
+
+    @ExceptionHandler(EntityAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleEntityAccessDeniedException(
+            HandlerMethod handlerMethod, EntityAccessDeniedException exception) {
+
+        LoggingUtils.exceptionLog(
+                AopUtils.extractMethodSignature(handlerMethod), HttpStatus.FORBIDDEN, exception);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.from(exception.getErrorCode()));
     }
 }
