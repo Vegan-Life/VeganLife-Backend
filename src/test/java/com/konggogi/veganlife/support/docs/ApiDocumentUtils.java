@@ -12,8 +12,7 @@ public interface ApiDocumentUtils {
 
     static OperationRequestPreprocessor getDocumentRequest() {
         return preprocessRequest(
-                modifyUris().scheme("https").host("dev.konggogi.store").removePort(),
-                prettyPrint());
+                modifyUris().scheme("https").host("dev.konggogi.shop").removePort(), prettyPrint());
     }
 
     static OperationResponsePreprocessor getDocumentResponse() {

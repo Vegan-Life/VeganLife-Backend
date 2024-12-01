@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         servers = {
-            @Server(url = "https://dev.konggogi.store", description = "개발 서버"),
+            @Server(url = "https://dev.konggogi.shop", description = "개발 서버"),
             @Server(url = "http://localhost:8080", description = "로컬 서버")
         })
 @Configuration

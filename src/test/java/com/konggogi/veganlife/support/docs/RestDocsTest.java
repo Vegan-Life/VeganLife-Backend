@@ -59,7 +59,7 @@ public abstract class RestDocsTest {
                                 documentationConfiguration(provider)
                                         .uris()
                                         .withScheme("https")
-                                        .withHost("dev.konggogi.store"))
+                                        .withHost("dev.konggogi.shop"))
                         .apply(springSecurity(new MockSecurityFilter()))
                         .addFilter(new CharacterEncodingFilter("UTF-8", true))
                         .alwaysDo(print())
