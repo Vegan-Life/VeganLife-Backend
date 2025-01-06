@@ -35,4 +35,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query(
             "select r from Recipe r left join RecipeLike rl on r.id = rl.recipe.id where rl.member.id = :memberId")
     Page<Recipe> findLikedRecipesByMemberId(Long memberId, Pageable pageable);
+
+    @Query(
+            "select r from Recipe r join fetch r.member where r.member.id = :memberId")
+    Page<Recipe> findAllByMemberId(Long memberId, Pageable pageable);
 }

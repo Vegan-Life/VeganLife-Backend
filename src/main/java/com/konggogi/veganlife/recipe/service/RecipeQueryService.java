@@ -53,4 +53,9 @@ public class RecipeQueryService {
 
         return recipeRepository.findLikedRecipesByMemberId(memberId, pageable);
     }
+
+    public Page<Recipe> searchAllByMemberId(Long memberId, Pageable pageable) {
+
+        return recipeRepository.findAllByMemberId(memberId, pageable);
+    }
 }
