@@ -77,4 +77,12 @@ public class MyPageController {
         return ResponseEntity.ok(
                 recipeSearchService.searchLikedRecipes(userDetails.id(), pageable));
     }
+
+    @GetMapping("/me/recipes")
+    public ResponseEntity<Page<RecipeResponse>> getMyRecipes(
+            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return ResponseEntity.ok(
+                recipeSearchService.searchAllByMemberId(userDetails.id(), pageable));
+    }
 }

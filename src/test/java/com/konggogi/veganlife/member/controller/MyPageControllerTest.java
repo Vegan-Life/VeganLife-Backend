@@ -424,6 +424,44 @@ class MyPageControllerTest extends RestDocsTest {
                                 queryParameters(pageDesc(), sizeDesc())));
     }
 
+    @Test
+    @DisplayName("사용자가 작성한 레시피 목록 조회")
+    void getMyRecipes() throws Exception {
+
+        List<RecipeResponse> recipe =
+                List.of(
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get()), true),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get()), false),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(3L, "통밀 츄러스", RecipeTypeFixture.LACTO.get()), false));
+        Page<RecipeResponse> response =
+                PageableExecutionUtils.getPage(recipe, Pageable.ofSize(20), recipe::size);
+
+        // given
+        given(recipeSearchService.searchAllByMemberId(any(), any(Pageable.class)))
+                .willReturn(response);
+        // when
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/members/me/liked-recipes")
+                                .headers(authorizationHeader())
+                                .queryParam("page", "0")
+                                .queryParam("size", "20"));
+        // then
+        perform.andExpect(status().isOk());
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "get-my-recipes",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(pageDesc(), sizeDesc())));
+    }
+
     private Recipe createRecipe(Long id, String name, RecipeType recipeType) {
 
         Member member = MemberFixture.DEFAULT_M.getWithId(1L);
