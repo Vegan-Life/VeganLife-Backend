@@ -84,8 +84,10 @@ public class RecipeSearchService {
 
         return recipeQueryService
                 .searchAllByMemberId(memberId, pageable)
-                .map(recipe -> recipeMapper.toRecipeResponse(
-                        recipe, isLikedRecipe(recipe.getId(), memberId)));
+                .map(
+                        recipe ->
+                                recipeMapper.toRecipeResponse(
+                                        recipe, isLikedRecipe(recipe.getId(), memberId)));
     }
 
     // TODO: 랜덤 조회를 위해 5개의 쿼리가 발생, 성능 측정 필요

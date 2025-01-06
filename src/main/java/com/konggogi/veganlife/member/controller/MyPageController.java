@@ -80,7 +80,7 @@ public class MyPageController {
 
     @GetMapping("/me/recipes")
     public ResponseEntity<Page<RecipeResponse>> getMyRecipes(
-            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails){
+            Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return ResponseEntity.ok(
                 recipeSearchService.searchAllByMemberId(userDetails.id(), pageable));
