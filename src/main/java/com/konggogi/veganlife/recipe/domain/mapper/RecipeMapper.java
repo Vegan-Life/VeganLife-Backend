@@ -94,7 +94,9 @@ public interface RecipeMapper {
 
     @Named("recipeImageToImageUrl")
     static String recipeImageToImageUrl(RecipeImage recipeImage) {
-
+        if (recipeImage == null) {
+            return null;
+        }
         return recipeImage.getImageUrl();
     }
 

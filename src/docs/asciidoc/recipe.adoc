@@ -72,7 +72,7 @@ include::{snippets}/recipe-add-recipe/http-request.adoc[]
 
 === Response
 
-==== 200 OK
+==== 201 CREATED
 
 include::{snippets}/recipe-add-recipe/http-response.adoc[]
 
