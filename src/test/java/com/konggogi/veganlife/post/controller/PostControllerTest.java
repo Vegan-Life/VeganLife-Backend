@@ -288,14 +288,15 @@ class PostControllerTest extends RestDocsTest {
         // then
         Post post = PostFixture.BAKERY.get();
         List<String> tags = List.of("#맛집");
-        PostFormRequest postFormRequest =
-                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        PostModifyRequest postModifyRequest =
+                new PostModifyRequest(
+                        post.getTitle(), post.getContent(), tags, List.of("existingImage1.jpg"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
                         "request",
                         MediaType.APPLICATION_JSON_VALUE,
-                        toJson(postFormRequest).getBytes());
+                        toJson(postModifyRequest).getBytes());
         List<MockMultipartFile> images =
                 List.of(
                         new MockMultipartFile(
@@ -347,14 +348,15 @@ class PostControllerTest extends RestDocsTest {
         // then
         Post post = PostFixture.BAKERY.get();
         List<String> tags = List.of("#맛집");
-        PostFormRequest postFormRequest =
-                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        PostModifyRequest postModifyRequest =
+                new PostModifyRequest(
+                        post.getTitle(), post.getContent(), tags, List.of("existingImage1.jpg"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
                         "request",
                         MediaType.APPLICATION_JSON_VALUE,
-                        toJson(postFormRequest).getBytes());
+                        toJson(postModifyRequest).getBytes());
         List<MockMultipartFile> images =
                 List.of(
                         new MockMultipartFile(
@@ -397,14 +399,15 @@ class PostControllerTest extends RestDocsTest {
         // given
         Post post = PostFixture.BAKERY.get();
         List<String> tags = List.of("#맛집");
-        PostFormRequest postFormRequest =
-                new PostFormRequest(post.getTitle(), post.getContent(), tags);
+        PostModifyRequest postModifyRequest =
+                new PostModifyRequest(
+                        post.getTitle(), post.getContent(), tags, List.of("existingImage1.jpg"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
                         "request",
                         MediaType.APPLICATION_JSON_VALUE,
-                        toJson(postFormRequest).getBytes());
+                        toJson(postModifyRequest).getBytes());
         List<MockMultipartFile> images =
                 List.of(
                         new MockMultipartFile(
