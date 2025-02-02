@@ -23,6 +23,7 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.PostImageFixture;
@@ -252,6 +253,7 @@ class PostControllerTest extends RestDocsTest {
                 List.of(new PostSimpleDto(post2, imageUrls), new PostSimpleDto(post1, List.of()));
         Page<PostSimpleDto> postSimpleDtoPage =
                 PageableExecutionUtils.getPage(postSimpleDtos, pageable, postSimpleDtos::size);
+
         given(postSearchService.searchAllSimple(any(Pageable.class))).willReturn(postSimpleDtoPage);
         // when
         ResultActions perform =
@@ -309,7 +311,7 @@ class PostControllerTest extends RestDocsTest {
 
         doNothing()
                 .when(postService)
-                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
+                .modify(anyLong(), anyLong(), any(PostModifyRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -368,7 +370,7 @@ class PostControllerTest extends RestDocsTest {
 
         doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_MEMBER))
                 .when(postService)
-                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
+                .modify(anyLong(), anyLong(), any(PostModifyRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(
@@ -418,7 +420,7 @@ class PostControllerTest extends RestDocsTest {
 
         doThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_POST))
                 .when(postService)
-                .modify(anyLong(), anyLong(), any(PostFormRequest.class), any());
+                .modify(anyLong(), anyLong(), any(PostModifyRequest.class), any());
         // when
         ResultActions perform =
                 mockMvc.perform(

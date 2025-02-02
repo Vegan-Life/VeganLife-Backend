@@ -3,9 +3,12 @@ package com.konggogi.veganlife.post.service;
 
 import com.konggogi.veganlife.global.AwsS3Uploader;
 import com.konggogi.veganlife.global.domain.AwsS3Folders;
+import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
@@ -16,7 +19,9 @@ import com.konggogi.veganlife.post.domain.mapper.TagMapper;
 import com.konggogi.veganlife.post.repository.PostRepository;
 import com.konggogi.veganlife.post.repository.TagRepository;
 import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +42,7 @@ public class PostService {
     private final PostImageMapper postImageMapper;
 
     private final AwsS3Uploader awsS3Uploader;
+    private final int MAX_IMAGE_LENGTH = 5;
 
     public Post add(Long memberId, PostFormRequest postFormRequest, List<MultipartFile> images) {
         Member member = memberQueryService.search(memberId);
@@ -56,14 +62,25 @@ public class PostService {
     public void modify(
             Long memberId,
             Long postId,
-            PostFormRequest postFormRequest,
+            PostModifyRequest request,
             List<MultipartFile> multipartFiles) {
+        int existingImageCount =
+                request.existingImageUrls() != null ? request.existingImageUrls().size() : 0;
+        int newImagesCount = multipartFiles != null ? multipartFiles.size() : 0;
+        int totalImageCount = existingImageCount + newImagesCount;
+
+        if (totalImageCount > MAX_IMAGE_LENGTH) {
+            throw new FileUploadException(ErrorCode.FILE_LENGTH_ERROR);
+        }
+
         memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
         List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, multipartFiles);
         List<PostImage> postImages = mapToPostImage(imageUrls);
-        List<PostTag> tags = mapToPostTag(postFormRequest.tags());
-        post.update(postFormRequest.title(), postFormRequest.content(), postImages, tags);
+        postImages.addAll(mapToPostImage(request.existingImageUrls()));
+
+        List<PostTag> tags = mapToPostTag(request.tags());
+        post.update(request.title(), request.content(), postImages, tags);
         postElasticRepository.save(postMapper.toPostDocument(post));
     }
 
@@ -88,6 +105,10 @@ public class PostService {
     }
 
     private List<PostImage> mapToPostImage(List<String> imageUrls) {
-        return imageUrls.stream().map(postImageMapper::toEntity).toList();
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(
+                imageUrls.stream().map(postImageMapper::toEntity).collect(Collectors.toList()));
     }
 }

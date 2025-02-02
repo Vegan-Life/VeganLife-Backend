@@ -3,23 +3,24 @@ package com.konggogi.veganlife.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 
 import com.konggogi.veganlife.global.AwsS3Uploader;
 import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
 import com.konggogi.veganlife.post.domain.mapper.*;
@@ -116,7 +117,9 @@ class PostServiceTest {
     void modifyTest() {
         // given
         Post post = PostFixture.BAKERY.getWithId(1L, member);
-        PostFormRequest request = new PostFormRequest("제목변경", "내용변경", List.of("태그1", "태그2"));
+        PostModifyRequest request =
+                new PostModifyRequest(
+                        "제목변경", "내용변경", List.of("태그1", "태그2"), List.of("existingImage1.jpg"));
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(postQueryService.search(anyLong())).willReturn(post);
         given(tagRepository.save(any(Tag.class))).willReturn(tag);
@@ -127,6 +130,66 @@ class PostServiceTest {
                                 "image1.png",
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
+        List<String> imageUrls = List.of("image1.png");
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
+        // when
+        postService.modify(member.getId(), post.getId(), request, images);
+        // then
+        assertThat(post.getTitle()).isEqualTo(request.title());
+        assertThat(post.getContent()).isEqualTo(request.content());
+        assertThat(post.getImageUrls()).hasSize(2);
+        assertThat(post.getTags()).hasSize(2);
+        then(tagRepository).should(atLeastOnce()).save(any(Tag.class));
+    }
+
+    @Test
+    @DisplayName("게시글 수정 - 이미지 개수 초과 예외")
+    void modifyTFileUploadExceptionTest() {
+        // given
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
+        PostModifyRequest request =
+                new PostModifyRequest(
+                        "제목변경",
+                        "내용변경",
+                        List.of("태그1", "태그2"),
+                        List.of(
+                                "image1.jpg",
+                                "image2.jpg",
+                                "image3.jpg",
+                                "image4.jpg",
+                                "image5.jpg"));
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image6.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image6.png".getBytes()));
+
+        // when, then
+        assertThatThrownBy(() -> postService.modify(member.getId(), post.getId(), request, images))
+                .isInstanceOf(FileUploadException.class)
+                .hasMessageContaining(ErrorCode.FILE_LENGTH_ERROR.getDescription());
+        then(memberQueryService).should(never()).search(member.getId());
+    }
+
+    @Test
+    @DisplayName("게시글 수정 - 빈 이미지 리스트")
+    void modifyEmptyImageUrlsTest() {
+        // given
+        Post post = PostFixture.BAKERY.getWithId(1L, member);
+        given(memberQueryService.search(anyLong())).willReturn(member);
+        given(postQueryService.search(anyLong())).willReturn(post);
+        given(tagRepository.save(any(Tag.class))).willReturn(tag);
+        PostModifyRequest request =
+                new PostModifyRequest("제목변경", "내용변경", List.of("태그1", "태그2"), List.of());
+        List<MultipartFile> images =
+                List.of(
+                        new MockMultipartFile(
+                                "images",
+                                "image6.png",
+                                MediaType.IMAGE_PNG_VALUE,
+                                "image6.png".getBytes()));
         List<String> imageUrls = List.of("image1.png");
         willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
         // when

@@ -3,6 +3,7 @@ package com.konggogi.veganlife.post.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.controller.dto.response.PostAddResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostDetailsResponse;
 import com.konggogi.veganlife.post.controller.dto.response.PostSimpleResponse;
@@ -59,8 +60,8 @@ public class PostController {
     @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
-            @RequestPart PostFormRequest request,
-            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
+            @RequestPart PostModifyRequest request,
+            @RequestPart(required = false) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         postService.modify(userDetails.id(), postId, request, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
