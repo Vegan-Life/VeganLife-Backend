@@ -8,6 +8,7 @@ import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
+import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.PostImage;
 import com.konggogi.veganlife.post.domain.PostTag;
@@ -61,7 +62,7 @@ public class PostService {
     public void modify(
             Long memberId,
             Long postId,
-            PostFormRequest request,
+            PostModifyRequest request,
             List<MultipartFile> multipartFiles) {
         int existingImageCount =
                 request.existingImageUrls() != null ? request.existingImageUrls().size() : 0;

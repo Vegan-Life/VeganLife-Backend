@@ -7,7 +7,8 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
-public record PostFormRequest(
+public record PostModifyRequest(
         @NotBlank @Length(min = 1, max = 20) String title,
         @NotBlank @Length(min = 1, max = 1000) String content,
-        @Size(max = 5) @StringElementLength(min = 2, max = 10) List<String> tags) {}
+        @Size(max = 5) @StringElementLength(min = 2, max = 10) List<String> tags,
+        List<String> existingImageUrls) {}
