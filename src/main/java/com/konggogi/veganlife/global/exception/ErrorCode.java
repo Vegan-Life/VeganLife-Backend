@@ -68,6 +68,7 @@ public enum ErrorCode {
     FILE_CONVERT_ERROR("FILE_UPLOAD_004", "파일을 변환 하는 중 에러가 발생했습니다."),
     FILE_UPLOAD_ERROR("FILE_UPLOAD_005", "파일을 업로드 하는 중 에러가 발생했습니다."),
     FILE_DELETE_ERROR("FILE_UPLOAD_006", "임시 파일을 삭제 하는 중 에러가 발생했습니다."),
+    FILE_LENGTH_ERROR("FILE_UPLOAD_007", "이미지의 총 개수는 5개 이하여야 합니다."),
 
     // elastic search
     ES_OPERATION_FAILED("ELASTIC_SEARCH_001", "검색 작업 도중 오류가 발생했습니다.");

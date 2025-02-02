@@ -60,7 +60,7 @@ public class PostController {
     public ResponseEntity<Void> modifyPost(
             @PathVariable Long postId,
             @RequestPart PostFormRequest request,
-            @RequestPart(required = false) @Size(max = 5) List<MultipartFile> images,
+            @RequestPart(required = false) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         postService.modify(userDetails.id(), postId, request, images);
         return ResponseEntity.status(HttpStatus.CREATED).build();
