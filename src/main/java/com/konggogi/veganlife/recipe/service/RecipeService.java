@@ -7,6 +7,7 @@ import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
+import com.konggogi.veganlife.recipe.controller.dto.request.RecipeModifyRequest;
 import com.konggogi.veganlife.recipe.domain.Recipe;
 import com.konggogi.veganlife.recipe.domain.mapper.RecipeMapper;
 import com.konggogi.veganlife.recipe.repository.RecipeRepository;
@@ -37,7 +38,7 @@ public class RecipeService {
     }
 
     public void modify(
-            Long recipeId, RecipeAddRequest request, List<MultipartFile> images, Long memberId) {
+            Long recipeId, RecipeModifyRequest request, List<MultipartFile> images, Long memberId) {
 
         Recipe recipe =
                 recipeRepository

@@ -4,6 +4,7 @@ package com.konggogi.veganlife.recipe.controller;
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
+import com.konggogi.veganlife.recipe.controller.dto.request.RecipeModifyRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
@@ -87,7 +88,7 @@ public class RecipeController {
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> modifyRecipe(
             @PathVariable("id") Long recipeId,
-            @Valid @RequestPart RecipeAddRequest request,
+            @Valid @RequestPart RecipeModifyRequest request,
             @RequestPart(required = false) @Validated @Size(max = 5) List<MultipartFile> images,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
