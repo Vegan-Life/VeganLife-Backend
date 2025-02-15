@@ -27,6 +27,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
+import com.konggogi.veganlife.recipe.controller.dto.request.RecipeModifyRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
@@ -354,12 +355,13 @@ public class RecipeControllerTest extends RestDocsTest {
     @DisplayName("레시피 수정 API")
     void modifyRecipeTest() throws Exception {
 
-        RecipeAddRequest recipeAddRequest =
-                new RecipeAddRequest(
+        RecipeModifyRequest recipeAddRequest =
+                new RecipeModifyRequest(
                         "표고버섯 탕수",
                         List.of(VegetarianType.LACTO),
                         List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
-                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."),
+                        List.of("existingImage1.png", "existingImage2.png"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -411,12 +413,13 @@ public class RecipeControllerTest extends RestDocsTest {
     @DisplayName("레시피 수정 API 예외 - Recipe Not Found")
     void modifyRecipeRecipeNotFoundExceptionTest() throws Exception {
 
-        RecipeAddRequest recipeAddRequest =
-                new RecipeAddRequest(
+        RecipeModifyRequest recipeAddRequest =
+                new RecipeModifyRequest(
                         "표고버섯 탕수",
                         List.of(VegetarianType.LACTO),
                         List.of("표고버섯 5개", "식용유", "시판 탕수육 소스"),
-                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."));
+                        List.of("표고버섯을 먹기 좋은 크기로 자릅니다.", "표고버섯을 튀깁니다.", "탕수육 소스와 버무립니다."),
+                        List.of("existingImage1.png", "existingImage2.png"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -438,7 +441,7 @@ public class RecipeControllerTest extends RestDocsTest {
 
         willThrow(new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE))
                 .given(recipeService)
-                .modify(anyLong(), any(RecipeAddRequest.class), any(), anyLong());
+                .modify(anyLong(), any(RecipeModifyRequest.class), any(), anyLong());
 
         ResultActions perform =
                 mockMvc.perform(

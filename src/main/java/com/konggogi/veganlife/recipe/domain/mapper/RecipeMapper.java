@@ -4,6 +4,7 @@ package com.konggogi.veganlife.recipe.domain.mapper;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
+import com.konggogi.veganlife.recipe.controller.dto.request.RecipeModifyRequest;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeDetailsResponse;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.domain.Recipe;
@@ -12,7 +13,9 @@ import com.konggogi.veganlife.recipe.domain.RecipeImage;
 import com.konggogi.veganlife.recipe.domain.RecipeIngredient;
 import com.konggogi.veganlife.recipe.domain.RecipeType;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -61,6 +64,37 @@ public interface RecipeMapper {
                         .toList();
         List<RecipeImage> recipeImages =
                 imageUrls.stream().map(imageUrl -> toRecipeImage(imageUrl, recipe)).toList();
+        List<RecipeIngredient> ingredients =
+                request.ingredients().stream()
+                        .map(ingredient -> toRecipeIngredient(ingredient, recipe))
+                        .toList();
+        List<RecipeDescription> descriptions =
+                IntStream.range(0, request.descriptions().size())
+                        .mapToObj(
+                                idx ->
+                                        this.toRecipeDescription(
+                                                idx + 1, request.descriptions().get(idx), recipe))
+                        .toList();
+
+        // TODO: update 내부에서 Recipe와 Recipe 하위 엔티티의 관계를 설정하도록 수정
+        recipe.update(recipeTypes, recipeImages, ingredients, descriptions);
+
+        return recipe;
+    }
+
+    default Recipe toEntity(RecipeModifyRequest request, List<String> imageUrls, Member member) {
+
+        // TODO: 이 로직이 매핑 로직인지, 서비스 로직인지 모호함, 리팩토링 단계에서 추가적으로 고민
+        Recipe recipe = Recipe.builder().name(request.name()).member(member).build();
+
+        List<RecipeType> recipeTypes =
+                request.recipeType().stream()
+                        .map(vegetarianType -> toRecipeType(vegetarianType, recipe))
+                        .toList();
+        List<RecipeImage> recipeImages =
+                Stream.concat(imageUrls.stream(), request.existingImageUrls().stream())
+                        .map(imageUrl -> toRecipeImage(imageUrl, recipe))
+                        .collect(Collectors.toList());
         List<RecipeIngredient> ingredients =
                 request.ingredients().stream()
                         .map(ingredient -> toRecipeIngredient(ingredient, recipe))
