@@ -320,7 +320,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 수정 API")
     void modifyMealLogTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(
+                        mealAddRequests, List.of("existingImage1.png", "existingImage2.png"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -372,7 +374,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 수정 API Member Not Found 예외")
     void modifyMealLogMemberNotFoundTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(
+                        mealAddRequests, List.of("existingImage1.png", "existingImage2.png"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -419,7 +423,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @DisplayName("식사 기록 수정 API MealData Not Found 예외")
     void modifyMealLogMealDataNotFoundTest() throws Exception {
 
-        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(
+                        mealAddRequests, List.of("existingImage1.png", "existingImage2.png"));
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
