@@ -100,7 +100,9 @@ public class MealLogServiceTest {
     @DisplayName("식사 기록 수정")
     void mealLogModifyTest() {
         // given
-        MealLogModifyRequest mealLogModifyRequest = new MealLogModifyRequest(mealAddRequests);
+        MealLogModifyRequest mealLogModifyRequest =
+                new MealLogModifyRequest(
+                        mealAddRequests, List.of("existingImage1.png", "existingImage2.png"));
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();

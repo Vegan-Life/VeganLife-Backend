@@ -17,6 +17,7 @@ import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.IntakeNotifyService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class MealLogService {
     public void modify(Long mealLogId, MealLogModifyRequest request, List<MultipartFile> images) {
         MealLog mealLog = mealLogQueryService.search(mealLogId);
         modifyMeals(request.meals(), mealLog);
-        modifyMealImages(images, mealLog);
+        modifyMealImages(request.existingImageUrls(), images, mealLog);
         mealLogRepository.flush();
         intakeNotifyService.notifyIfOverIntake(mealLog.getMember().getId());
     }
@@ -83,6 +84,18 @@ public class MealLogService {
 
     private void modifyMealImages(List<MultipartFile> images, MealLog mealLog) {
         List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.LIFE_CHECK, images);
+        List<MealImage> mealImages =
+                imageUrls.stream()
+                        .map(request -> mealImageMapper.toEntity(request, mealLog))
+                        .toList();
+        mealLog.modifyMealImages(mealImages);
+    }
+
+    private void modifyMealImages(
+            List<String> existingImages, List<MultipartFile> images, MealLog mealLog) {
+        List<String> imageUrls = new ArrayList<>(existingImages);
+        imageUrls.addAll(awsS3Uploader.uploadFiles(AwsS3Folders.LIFE_CHECK, images));
+
         List<MealImage> mealImages =
                 imageUrls.stream()
                         .map(request -> mealImageMapper.toEntity(request, mealLog))

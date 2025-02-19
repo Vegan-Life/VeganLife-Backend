@@ -527,4 +527,59 @@ public class RecipeControllerTest extends RestDocsTest {
         return RecipeFixture.DEFAULT.getWithName(
                 id, name, recipeTypes, recipeImages, ingredients, descriptions, member);
     }
+
+    @Test
+    @DisplayName("레시피 목록 조회 API")
+    void getRecipeListByKeyword() throws Exception {
+
+        List<RecipeResponse> recipe =
+                List.of(
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(1L, "표고버섯 탕수", RecipeTypeFixture.LACTO.get()), true),
+                        recipeMapper.toRecipeResponse(
+                                createRecipe(2L, "가지 탕수", RecipeTypeFixture.LACTO.get()), false));
+        Page<RecipeResponse> response =
+                PageableExecutionUtils.getPage(recipe, Pageable.ofSize(20), recipe::size);
+
+        given(
+                        recipeSearchService.searchAllByKeyword(
+                                any(String.class), any(Pageable.class), anyLong()))
+                .willReturn(response);
+
+        ResultActions perform =
+                mockMvc.perform(
+                        get("/api/v1/recipes/search")
+                                .headers(authorizationHeader())
+                                .queryParam("keyword", "탕수")
+                                .queryParam("page", "0")
+                                .queryParam("size", "20"));
+
+        perform.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content.[0].id").value(1L))
+                .andExpect(jsonPath("$.content.[0].name").value("표고버섯 탕수"))
+                .andExpect(
+                        jsonPath("$.content.[0].thumbnailUrl").value(recipe.get(0).thumbnailUrl()))
+                .andExpect(jsonPath("$.content.[0].recipeTypes.size()").value(1))
+                .andExpect(
+                        jsonPath("$.content.[0].recipeTypes[0]").value(VegetarianType.LACTO.name()))
+                .andExpect(jsonPath("$.content.[0].author.id").value(member.getId()))
+                .andExpect(jsonPath("$.content.[0].author.nickname").value(member.getNickname()))
+                .andExpect(
+                        jsonPath("$.content.[0].author.vegetarianType")
+                                .value(member.getVegetarianType().name()))
+                .andExpect(jsonPath("$.content.[0].isLiked").value(true));
+
+        perform.andDo(print())
+                .andDo(
+                        document(
+                                "recipe-get-recipe-list-by-keyword",
+                                getDocumentRequest(),
+                                getDocumentResponse(),
+                                requestHeaders(authorizationDesc()),
+                                queryParameters(
+                                        parameterWithName("keyword").description("검색 키워드"),
+                                        pageDesc(),
+                                        sizeDesc())));
+    }
 }

@@ -18,7 +18,7 @@ endif::[]
 
 include::{snippets}/recipe-get-recipe-list/request-headers.adoc[]
 
-==== Parameter
+==== Query Parameter
 
 include::{snippets}/recipe-get-recipe-list/query-parameters.adoc[]
 
@@ -167,3 +167,23 @@ include::{snippets}/recipe-get-recommended-recipe/http-response.adoc[]
 include::{snippets}/recipe-get-recommended-recipe-member-not-found/http-response.adoc[]
 
 include::{snippets}/recipe-get-recommended-recipe-recipe-not-found/http-response.adoc[]
+
+== 레시피 검색 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/recipe-get-recipe-list-by-keyword/request-headers.adoc[]
+
+=== Query Parameter
+
+include::{snippets}/recipe-get-recipe-list-by-keyword/query-parameters.adoc[]
+
+include::{snippets}/recipe-get-recipe-list-by-keyword/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/recipe-get-recipe-list-by-keyword/http-response.adoc[]
