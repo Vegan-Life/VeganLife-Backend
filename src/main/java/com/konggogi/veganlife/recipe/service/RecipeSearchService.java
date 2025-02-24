@@ -95,7 +95,9 @@ public class RecipeSearchService {
     private List<Recipe> getRecommendRecipes(Member member) {
 
         int totalElements = recipeQueryService.countAllRecipeType(member.getVegetarianType());
-
+        if (totalElements == 0) {
+            return List.of();
+        }
         return getRandomPageNumber(totalElements, member.getId()).stream()
                 .map(
                         pageNumber ->
