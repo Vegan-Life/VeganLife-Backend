@@ -40,4 +40,8 @@ public class RecipeType extends TimeStamped {
         this.vegetarianType = vegetarianType;
         this.recipe = recipe;
     }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
 }

@@ -42,4 +42,8 @@ public class RecipeDescription extends TimeStamped {
         this.description = description;
         this.recipe = recipe;
     }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
 }

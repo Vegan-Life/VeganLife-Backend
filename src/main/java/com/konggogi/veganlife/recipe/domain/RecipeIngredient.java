@@ -38,4 +38,8 @@ public class RecipeIngredient extends TimeStamped {
         this.name = name;
         this.recipe = recipe;
     }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
 }
