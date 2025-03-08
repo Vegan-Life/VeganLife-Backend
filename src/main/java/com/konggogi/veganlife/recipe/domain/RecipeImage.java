@@ -36,4 +36,8 @@ public class RecipeImage extends TimeStamped {
         this.imageUrl = imageUrl;
         this.recipe = recipe;
     }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+    }
 }

@@ -87,21 +87,25 @@ public class Recipe extends TimeStamped {
 
     private void updateRecipeTypes(List<RecipeType> recipeTypes) {
         this.recipeTypes.clear();
+        recipeTypes.forEach((recipeType -> recipeType.setRecipe(this)));
         this.recipeTypes.addAll(recipeTypes);
     }
 
     private void updateRecipeImages(List<RecipeImage> recipeImages) {
         this.recipeImages.clear();
+        recipeImages.forEach(recipeImage -> recipeImage.setRecipe(this));
         this.recipeImages.addAll(recipeImages);
     }
 
     private void updateIngredients(List<RecipeIngredient> ingredients) {
         this.ingredients.clear();
+        ingredients.forEach((ingredient) -> ingredient.setRecipe(this));
         this.ingredients.addAll(ingredients);
     }
 
     private void updateDescriptions(List<RecipeDescription> descriptions) {
         this.descriptions.clear();
+        descriptions.forEach((description) -> description.setRecipe(this));
         this.descriptions.addAll(descriptions);
     }
 }
