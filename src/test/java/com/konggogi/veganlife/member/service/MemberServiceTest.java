@@ -124,7 +124,8 @@ class MemberServiceTest {
     void modifyMemberProfileTest() {
         // given
         ProfileModifyRequest request =
-                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                new ProfileModifyRequest(
+                        "nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90, null);
         given(memberRepository.findByNickname(request.nickname())).willReturn(Optional.empty());
         given(memberQueryService.search(anyLong())).willReturn(member);
         MultipartFile profileImage =
@@ -158,7 +159,7 @@ class MemberServiceTest {
         String newNickname = other.getNickname();
         ProfileModifyRequest request =
                 new ProfileModifyRequest(
-                        newNickname, VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                        newNickname, VegetarianType.LACTO, Gender.M, 1993, 190, 90, "profile.png");
         given(memberQueryService.search(anyLong())).willReturn(existing);
         given(memberRepository.findByNickname(anyString())).willReturn(Optional.of(other));
         // when, then
@@ -175,7 +176,13 @@ class MemberServiceTest {
         Long memberId = member.getId();
         ProfileModifyRequest request =
                 new ProfileModifyRequest(
-                        "newNickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                        "newNickname",
+                        VegetarianType.LACTO,
+                        Gender.M,
+                        1993,
+                        190,
+                        90,
+                        "profile.png");
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(memberRepository.findByNickname(anyString())).willReturn(Optional.empty());
         // when
@@ -191,7 +198,13 @@ class MemberServiceTest {
         Member existing = MemberFixture.DEFAULT_F.getWithId(1L);
         ProfileModifyRequest request =
                 new ProfileModifyRequest(
-                        existing.getNickname(), VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                        existing.getNickname(),
+                        VegetarianType.LACTO,
+                        Gender.M,
+                        1993,
+                        190,
+                        90,
+                        "profile.png");
         given(memberQueryService.search(anyLong())).willReturn(existing);
         // when
         memberService.modifyProfile(existing.getId(), request, null);
