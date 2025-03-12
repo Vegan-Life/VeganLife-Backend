@@ -61,10 +61,21 @@ public class MemberService {
             Long memberId, ProfileModifyRequest request, MultipartFile profileImage) {
         Member member = memberQueryService.search(memberId);
         validateNickname(member.getNickname(), request.nickname());
-        String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
+        if (request.existingImageUrl() == null) {
+            String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
+            member.modifyProfile(
+                    request.nickname(),
+                    profileImageUrl,
+                    request.vegetarianType(),
+                    request.gender(),
+                    request.birthYear(),
+                    request.height(),
+                    request.weight());
+            return member;
+        }
         member.modifyProfile(
                 request.nickname(),
-                profileImageUrl,
+                request.existingImageUrl(),
                 request.vegetarianType(),
                 request.gender(),
                 request.birthYear(),

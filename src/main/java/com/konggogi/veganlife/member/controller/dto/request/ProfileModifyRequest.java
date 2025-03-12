@@ -14,4 +14,5 @@ public record ProfileModifyRequest(
         @NotNull Gender gender,
         @Positive @NotNull Integer birthYear,
         @Positive @NotNull Integer height,
-        @Positive @NotNull Integer weight) {}
+        @Positive @NotNull Integer weight,
+        String existingImageUrl) {}
