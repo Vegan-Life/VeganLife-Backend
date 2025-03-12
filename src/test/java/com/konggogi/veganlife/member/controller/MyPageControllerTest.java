@@ -129,7 +129,8 @@ class MyPageControllerTest extends RestDocsTest {
                         member.getGender(),
                         member.getBirthYear(),
                         member.getHeight(),
-                        member.getWeight());
+                        member.getWeight(),
+                        member.getProfileImageUrl());
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -177,7 +178,8 @@ class MyPageControllerTest extends RestDocsTest {
     void modifyMemberProfileDuplicatedNicknameTest() throws Exception {
         // given
         ProfileModifyRequest profileModifyRequest =
-                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                new ProfileModifyRequest(
+                        "nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90, "profile.png");
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -217,7 +219,8 @@ class MyPageControllerTest extends RestDocsTest {
     void modifyNotMemberProfileTest() throws Exception {
         // given
         ProfileModifyRequest profileModifyRequest =
-                new ProfileModifyRequest("nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90);
+                new ProfileModifyRequest(
+                        "nickname", VegetarianType.LACTO, Gender.M, 1993, 190, 90, "profile.png");
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
