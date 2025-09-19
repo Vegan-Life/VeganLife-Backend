@@ -5,6 +5,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  cloud:
+    gcp:
+      core:
+        enabled: false
+      storage:
+        enabled: false
+        bucket:
+          name: test-name
+          host: test-host
+
 logging:
   level:
     com.konggogi.veganlife: debug # ref: https://blog.datalust.co/choosing-the-right-log-levels/

@@ -3,6 +3,7 @@ package com.konggogi.veganlife.support.restassured;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.storage.Storage;
 import com.konggogi.veganlife.config.JpaAuditingConfig;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.member.domain.Gender;
@@ -27,6 +28,7 @@ public class IntegrationTest {
     @Autowired private MemberRepository memberRepository;
     @Autowired private JwtProvider jwtProvider;
     @MockBean PostElasticRepository postElasticRepository;
+    @MockBean Storage storage;
 
     protected static final String AUTHORIZATION = "Authorization";
 
