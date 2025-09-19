@@ -4,14 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
 
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
@@ -56,7 +61,7 @@ class MemberServiceTest {
     @Mock JwtProvider jwtProvider;
     @Mock RefreshTokenService refreshTokenService;
     @Spy MemberMapper memberMapper = new MemberMapperImpl();
-    @Mock AwsS3Uploader awsS3Uploader;
+    @Mock FileUploader awsS3Uploader;
     @InjectMocks MemberService memberService;
     private final Member member = MemberFixture.DEFAULT_F.getOnlyEmailWithId(1L);
 
@@ -136,7 +141,7 @@ class MemberServiceTest {
                         "profileImage1.png".getBytes());
         willReturn("profileImage1.png")
                 .given(awsS3Uploader)
-                .uploadFile(eq(AwsS3Folders.PROFILE), any());
+                .uploadFile(eq(Directory.PROFILE), any());
         // when
         Member update = memberService.modifyProfile(member.getId(), request, profileImage);
         // then

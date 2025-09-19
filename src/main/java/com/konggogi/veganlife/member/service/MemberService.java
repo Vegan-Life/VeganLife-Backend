@@ -3,9 +3,9 @@ package com.konggogi.veganlife.member.service;
 
 import com.konggogi.veganlife.comment.service.CommentLikeService;
 import com.konggogi.veganlife.comment.service.CommentService;
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.global.security.jwt.JwtProvider;
 import com.konggogi.veganlife.mealdata.service.MealDataService;
 import com.konggogi.veganlife.meallog.service.MealLogService;
@@ -41,7 +41,7 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberMapper memberMapper;
-    private final AwsS3Uploader awsS3Uploader;
+    private final FileUploader awsS3Uploader;
 
     public MemberLoginDto login(String email) {
         Member member = addIfNotPresent(email);
@@ -62,7 +62,7 @@ public class MemberService {
         Member member = memberQueryService.search(memberId);
         validateNickname(member.getNickname(), request.nickname());
         if (request.existingImageUrl() == null) {
-            String profileImageUrl = awsS3Uploader.uploadFile(AwsS3Folders.PROFILE, profileImage);
+            String profileImageUrl = awsS3Uploader.uploadFile(Directory.PROFILE, profileImage);
             member.modifyProfile(
                     request.nickname(),
                     profileImageUrl,

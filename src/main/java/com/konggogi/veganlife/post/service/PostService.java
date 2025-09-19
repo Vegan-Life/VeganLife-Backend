@@ -1,10 +1,10 @@
 package com.konggogi.veganlife.post.service;
 
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
@@ -41,13 +41,13 @@ public class PostService {
     private final TagMapper tagMapper;
     private final PostImageMapper postImageMapper;
 
-    private final AwsS3Uploader awsS3Uploader;
+    private final FileUploader awsS3Uploader;
     private final int MAX_IMAGE_LENGTH = 5;
 
     public Post add(Long memberId, PostFormRequest postFormRequest, List<MultipartFile> images) {
         Member member = memberQueryService.search(memberId);
         Post post = postMapper.toEntity(member, postFormRequest);
-        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, images);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(Directory.COMMUNITY, images);
         mapToPostTag(postFormRequest.tags()).forEach(post::addPostTag);
         mapToPostImage(imageUrls).forEach(post::addPostImage);
         postRepository.save(post);
@@ -75,7 +75,7 @@ public class PostService {
 
         memberQueryService.search(memberId);
         Post post = postQueryService.search(postId);
-        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.COMMUNITY, multipartFiles);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(Directory.COMMUNITY, multipartFiles);
         List<PostImage> postImages = mapToPostImage(imageUrls);
         postImages.addAll(mapToPostImage(request.existingImageUrls()));
 

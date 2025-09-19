@@ -10,8 +10,8 @@ import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.mealdata.domain.MealData;
 import com.konggogi.veganlife.mealdata.fixture.MealDataFixture;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
@@ -22,7 +22,12 @@ import com.konggogi.veganlife.meallog.domain.Meal;
 import com.konggogi.veganlife.meallog.domain.MealImage;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
-import com.konggogi.veganlife.meallog.domain.mapper.*;
+import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapper;
+import com.konggogi.veganlife.meallog.domain.mapper.MealImageMapperImpl;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapper;
+import com.konggogi.veganlife.meallog.domain.mapper.MealLogMapperImpl;
+import com.konggogi.veganlife.meallog.domain.mapper.MealMapper;
+import com.konggogi.veganlife.meallog.domain.mapper.MealMapperImpl;
 import com.konggogi.veganlife.meallog.fixture.MealFixture;
 import com.konggogi.veganlife.meallog.fixture.MealImageFixture;
 import com.konggogi.veganlife.meallog.fixture.MealLogFixture;
@@ -54,7 +59,7 @@ public class MealLogServiceTest {
     @Spy MealLogMapper mealLogMapper = new MealLogMapperImpl();
     @Spy MealMapper mealMapper = new MealMapperImpl();
     @Spy MealImageMapper mealImageMapper = new MealImageMapperImpl();
-    @Mock AwsS3Uploader awsS3Uploader;
+    @Mock FileUploader awsS3Uploader;
     @InjectMocks MealLogService mealLogService;
 
     Member member = Member.builder().id(1L).email("test123@test.com").build();
@@ -87,7 +92,7 @@ public class MealLogServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
         List<String> imageUrls = List.of("image1.png", "image2.jpeg");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.LIFE_CHECK), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.LIFE_CHECK), any());
         // when
         mealLogService.add(mealLogAddRequest, images, member.getId());
         // then
@@ -118,7 +123,7 @@ public class MealLogServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
         List<String> imageUrls = List.of("image1.png", "image2.jpeg");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.LIFE_CHECK), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.LIFE_CHECK), any());
         // when
         mealLogService.modify(1L, mealLogModifyRequest, images);
         // then

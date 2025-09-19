@@ -3,7 +3,9 @@ package com.konggogi.veganlife.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
@@ -11,11 +13,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.FileUploadException;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -23,7 +25,12 @@ import com.konggogi.veganlife.post.controller.dto.request.PostFormRequest;
 import com.konggogi.veganlife.post.controller.dto.request.PostModifyRequest;
 import com.konggogi.veganlife.post.domain.Post;
 import com.konggogi.veganlife.post.domain.Tag;
-import com.konggogi.veganlife.post.domain.mapper.*;
+import com.konggogi.veganlife.post.domain.mapper.PostImageMapper;
+import com.konggogi.veganlife.post.domain.mapper.PostImageMapperImpl;
+import com.konggogi.veganlife.post.domain.mapper.PostMapper;
+import com.konggogi.veganlife.post.domain.mapper.PostMapperImpl;
+import com.konggogi.veganlife.post.domain.mapper.TagMapper;
+import com.konggogi.veganlife.post.domain.mapper.TagMapperImpl;
 import com.konggogi.veganlife.post.fixture.PostFixture;
 import com.konggogi.veganlife.post.fixture.TagFixture;
 import com.konggogi.veganlife.post.repository.PostRepository;
@@ -51,7 +58,7 @@ class PostServiceTest {
     @Spy TagMapper tagMapper = new TagMapperImpl();
     @Spy PostImageMapper postImageMapper = new PostImageMapperImpl();
     @Mock TagRepository tagRepository;
-    @Mock AwsS3Uploader awsS3Uploader;
+    @Mock FileUploader awsS3Uploader;
     @Mock PostElasticRepository postElasticRepository;
     @InjectMocks PostService postService;
     private final Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -77,7 +84,7 @@ class PostServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
         List<String> imageUrls = List.of("image1.png");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.COMMUNITY), any());
         // when
         Post savedPost = postService.add(memberId, request, images);
         // then
@@ -131,7 +138,7 @@ class PostServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
         List<String> imageUrls = List.of("image1.png");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.COMMUNITY), any());
         // when
         postService.modify(member.getId(), post.getId(), request, images);
         // then
@@ -191,7 +198,7 @@ class PostServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image6.png".getBytes()));
         List<String> imageUrls = List.of("image1.png");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.COMMUNITY), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.COMMUNITY), any());
         // when
         postService.modify(member.getId(), post.getId(), request, images);
         // then
