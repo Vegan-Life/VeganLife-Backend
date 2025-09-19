@@ -69,7 +69,7 @@ public class GCSImageFileUploader implements FileUploader {
         if (originalFileName == null) {
             throw new FileUploadException(ErrorCode.NULL_FILE_NAME);
         }
-        if (fileExtensionValidator.isValid(originalFileName)) {
+        if (!fileExtensionValidator.isValid(originalFileName)) {
             throw new FileUploadException(ErrorCode.INVALID_EXTENSION);
         }
         return UUID.randomUUID() + ".webp";
