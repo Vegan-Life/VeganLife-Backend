@@ -9,11 +9,13 @@ import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.repository.MemberRepository;
+import com.konggogi.veganlife.post.repository.elastic.PostElasticRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 
 @ExtendWith(DatabaseClearExtension.class)
@@ -24,6 +26,7 @@ public class IntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private MemberRepository memberRepository;
     @Autowired private JwtProvider jwtProvider;
+    @MockBean PostElasticRepository postElasticRepository;
 
     protected static final String AUTHORIZATION = "Authorization";
 
