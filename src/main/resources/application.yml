@@ -24,6 +24,13 @@ spring:
     port: ${ELASTIC_PORT}
     username: ${ELASTIC_USER}
     password: ${ELASTIC_PASSWORD}
+  cloud:
+    gcp:
+      storage:
+        project-id: ${GCP_PROJECT_ID}
+        bucket:
+          name: ${BUCKET_NAME}
+          host: ${BUCKET_HOST}
 
 management:
   health:
@@ -46,14 +53,3 @@ springdoc:
     path: /api/v1/docs/swagger
   paths-to-match:
     - /**
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
-    stack:
-      auto: false
-    s3:
-      bucket: ${AWS_S3_BUCKET_NAME}
-    cloudfront:
-      domain: ${AWS_CLOUDFRONT_DOMAIN}

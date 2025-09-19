@@ -10,11 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-  cloud:
-    gcp:
-      storage:
-        project-id: ${GCP_PROJECT_ID}
-        bucket: ${BUCKET_NAME}
+
 logging:
   level:
     com.konggogi.veganlife: info

@@ -21,11 +21,11 @@ public class GCSImageFileUploader implements FileUploader {
     private final Storage storage;
     private final FileExtensionValidator fileExtensionValidator;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${spring.cloud.gcp.storage.bucket.name}")
     private String bucket;
 
-    @Value("${cloud.aws.cloudfront.domain}")
-    private String cloudfrontDomain;
+    @Value("${spring.cloud.gcp.storage.bucket.host}")
+    private String host;
 
     public GCSImageFileUploader(Storage storage) {
         this.storage = storage;
@@ -61,7 +61,7 @@ public class GCSImageFileUploader implements FileUploader {
         } catch (IOException e) {
             throw new FileUploadException(ErrorCode.FILE_UPLOAD_ERROR);
         }
-        return cloudfrontDomain + newFileName;
+        return String.format("%s/%s/%s", host, bucket, newFileName);
     }
 
     private String generateRandomFilename(MultipartFile multipartFile) {

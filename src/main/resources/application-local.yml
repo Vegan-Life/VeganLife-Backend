@@ -15,8 +15,7 @@ spring:
       storage:
         credentials:
           location: ${GCP_CREDENTIAL_LOCATION}
-        project-id: ${GCP_PROJECT_ID}
-        bucket: ${BUCKET_NAME}
+
 logging:
   level:
     com.konggogi.veganlife: debug # ref: https://blog.datalust.co/choosing-the-right-log-levels/
