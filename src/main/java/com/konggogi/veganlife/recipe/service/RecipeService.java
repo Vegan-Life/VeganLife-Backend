@@ -1,10 +1,10 @@
 package com.konggogi.veganlife.recipe.service;
 
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
 import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.global.exception.NotFoundEntityException;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeAddRequest;
 import com.konggogi.veganlife.recipe.controller.dto.request.RecipeModifyRequest;
@@ -27,11 +27,11 @@ public class RecipeService {
 
     private final RecipeMapper recipeMapper;
 
-    private final AwsS3Uploader awsS3Uploader;
+    private final FileUploader awsS3Uploader;
 
     public void add(RecipeAddRequest request, List<MultipartFile> images, Long memberId) {
 
-        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.RECIPE, images);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(Directory.RECIPE, images);
         Recipe recipe =
                 recipeMapper.toEntity(request, imageUrls, memberQueryService.search(memberId));
         recipeRepository.save(recipe);
@@ -46,7 +46,7 @@ public class RecipeService {
                         .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_RECIPE));
         recipe.checkOwner(memberId);
 
-        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.RECIPE, images);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(Directory.RECIPE, images);
         Recipe updated = recipeMapper.toEntity(request, imageUrls, recipe.getMember());
         recipe.update(
                 updated.getRecipeTypes(),

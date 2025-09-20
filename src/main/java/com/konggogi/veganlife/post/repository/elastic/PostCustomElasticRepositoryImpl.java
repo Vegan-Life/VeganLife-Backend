@@ -1,57 +1,71 @@
 package com.konggogi.veganlife.post.repository.elastic;
 
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchPhraseQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.util.ObjectBuilder;
+import com.konggogi.veganlife.global.exception.ElasticsearchOperationException;
+import com.konggogi.veganlife.global.exception.ErrorCode;
 import com.konggogi.veganlife.post.domain.document.PostDocument;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.opensearch.common.unit.Fuzziness;
-import org.opensearch.data.client.orhlc.NativeSearchQueryBuilder;
-import org.opensearch.index.query.Operator;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.index.query.QueryBuilders;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class PostCustomElasticRepositoryImpl implements PostCustomElasticRepository {
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchClient elasticsearchClient;
     private final String POSTS_INDEX = "posts";
 
     @Override
     public List<PostDocument> findAutoCompleteSuggestion(String keyword, int size) {
-        SearchHits<PostDocument> response =
-                elasticsearchOperations.search(
-                        autoCompleteSuggestionQuery(keyword, size),
-                        PostDocument.class,
-                        IndexCoordinates.of(POSTS_INDEX));
+        try {
+            SearchResponse<PostDocument> response =
+                    elasticsearchClient.search(
+                            s -> autoCompleteSuggestionQuery(s, keyword, size), PostDocument.class);
 
-        return response.getSearchHits().stream().map(SearchHit::getContent).toList();
+            return response.hits().hits().stream().map(Hit::source).toList();
+        } catch (IOException e) {
+            throw new ElasticsearchOperationException(ErrorCode.ES_OPERATION_FAILED);
+        }
     }
 
-    private Query autoCompleteSuggestionQuery(String keyword, int size) {
-        QueryBuilder matchPhraseQuery =
-                QueryBuilders.matchPhraseQuery("title", keyword).slop(1).boost(5.0f);
+    private ObjectBuilder<SearchRequest> autoCompleteSuggestionQuery(
+            SearchRequest.Builder builder, String keyword, int size) {
+        Query matchPhraseQuery =
+                MatchPhraseQuery.of(b -> b.field("title").query(keyword).slop(1).boost(3.0f))
+                        ._toQuery();
 
-        QueryBuilder matchNoriQuery =
-                QueryBuilders.matchQuery("title.nori", keyword)
-                        .operator(Operator.AND)
-                        .boost(2.0f)
-                        .fuzziness(Fuzziness.ONE);
+        Query matchNoriQuery =
+                MatchQuery.of(
+                                b ->
+                                        b.field("title.nori")
+                                                .query(keyword)
+                                                .operator(Operator.And)
+                                                .boost(2.0f)
+                                                .fuzziness("1"))
+                        ._toQuery();
 
-        QueryBuilder matchNgramQuery = QueryBuilders.matchQuery("title.ngram", keyword);
+        Query matchNgramQuery =
+                MatchQuery.of(b -> b.field("title.ngram").query(keyword))._toQuery();
 
-        QueryBuilder boolQuery =
-                QueryBuilders.boolQuery()
-                        .should(matchPhraseQuery)
-                        .should(matchNoriQuery)
-                        .should(matchNgramQuery)
-                        .minimumShouldMatch(1);
+        Query boolQuery =
+                BoolQuery.of(
+                                b ->
+                                        b.should(matchPhraseQuery)
+                                                .should(matchNoriQuery)
+                                                .should(matchNgramQuery)
+                                                .minimumShouldMatch("1"))
+                        ._toQuery();
 
-        return new NativeSearchQueryBuilder().withQuery(boolQuery).withMaxResults(size).build();
+        return builder.index(POSTS_INDEX).size(size).query(boolQuery);
     }
 }

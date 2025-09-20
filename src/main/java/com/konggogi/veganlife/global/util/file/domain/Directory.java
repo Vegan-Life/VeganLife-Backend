@@ -1,6 +1,6 @@
-package com.konggogi.veganlife.global.domain;
+package com.konggogi.veganlife.global.util.file.domain;
 
-public enum AwsS3Folders {
+public enum Directory {
     COMMUNITY("community/"),
     LIFE_CHECK("lifecheck/"),
     PROFILE("profile/"),
@@ -8,7 +8,7 @@ public enum AwsS3Folders {
 
     private final String name;
 
-    AwsS3Folders(String name) {
+    Directory(String name) {
         this.name = name;
     }
 

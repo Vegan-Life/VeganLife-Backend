@@ -1,8 +1,8 @@
 package com.konggogi.veganlife.meallog.service;
 
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.mealdata.service.MealDataQueryService;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealAddRequest;
 import com.konggogi.veganlife.meallog.controller.dto.request.MealLogAddRequest;
@@ -39,7 +39,7 @@ public class MealLogService {
     private final MealMapper mealMapper;
     private final MealImageMapper mealImageMapper;
 
-    private final AwsS3Uploader awsS3Uploader;
+    private final FileUploader awsS3Uploader;
 
     public void add(MealLogAddRequest request, List<MultipartFile> images, Long memberId) {
         MealLog mealLog =
@@ -83,7 +83,7 @@ public class MealLogService {
     }
 
     private void modifyMealImages(List<MultipartFile> images, MealLog mealLog) {
-        List<String> imageUrls = awsS3Uploader.uploadFiles(AwsS3Folders.LIFE_CHECK, images);
+        List<String> imageUrls = awsS3Uploader.uploadFiles(Directory.LIFE_CHECK, images);
         List<MealImage> mealImages =
                 imageUrls.stream()
                         .map(request -> mealImageMapper.toEntity(request, mealLog))
@@ -94,7 +94,7 @@ public class MealLogService {
     private void modifyMealImages(
             List<String> existingImages, List<MultipartFile> images, MealLog mealLog) {
         List<String> imageUrls = new ArrayList<>(existingImages);
-        imageUrls.addAll(awsS3Uploader.uploadFiles(AwsS3Folders.LIFE_CHECK, images));
+        imageUrls.addAll(awsS3Uploader.uploadFiles(Directory.LIFE_CHECK, images));
 
         List<MealImage> mealImages =
                 imageUrls.stream()

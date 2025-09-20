@@ -5,6 +5,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 1000
+  cloud:
+    gcp:
+      storage:
+        credentials:
+          location: ${GCP_CREDENTIAL_LOCATION}
+
 logging:
   level:
     com.konggogi.veganlife: debug # ref: https://blog.datalust.co/choosing-the-right-log-levels/

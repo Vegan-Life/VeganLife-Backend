@@ -9,8 +9,8 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.times;
 
-import com.konggogi.veganlife.global.AwsS3Uploader;
-import com.konggogi.veganlife.global.domain.AwsS3Folders;
+import com.konggogi.veganlife.global.util.file.FileUploader;
+import com.konggogi.veganlife.global.util.file.domain.Directory;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
@@ -42,7 +42,7 @@ public class RecipeServiceTest {
     @Mock MemberQueryService memberQueryService;
     @Mock RecipeRepository recipeRepository;
     @Spy RecipeMapper recipeMapper = new RecipeMapperImpl();
-    @Mock AwsS3Uploader awsS3Uploader;
+    @Mock FileUploader awsS3Uploader;
     @InjectMocks RecipeService recipeService;
 
     private Member member = MemberFixture.DEFAULT_M.getWithId(1L);
@@ -65,7 +65,7 @@ public class RecipeServiceTest {
                                 MediaType.IMAGE_PNG_VALUE,
                                 "image1.png".getBytes()));
         List<String> imageUrls = List.of("image1.png");
-        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(AwsS3Folders.RECIPE), any());
+        willReturn(imageUrls).given(awsS3Uploader).uploadFiles(eq(Directory.RECIPE), any());
         Recipe recipe = recipeMapper.toEntity(request, imageUrls, member);
 
         given(memberQueryService.search(anyLong())).willReturn(member);
