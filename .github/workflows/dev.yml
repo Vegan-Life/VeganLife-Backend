@@ -33,18 +33,17 @@ jobs:
 
     - name: Build with Gradle Wrapper
       env:
-        MARIA_URL: ${{ secrets.MARIA_URL }}
-        MARIA_USER: ${{ secrets.MARIA_USER }}
-        MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
-        AWS_CLOUDFRONT_DOMAIN: ${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
+        BUCKET_HOST: ${{ secrets.BUCKET_HOST }}
+        BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         ELASTIC_HOST: ${{ secrets.ELASTIC_HOST }}
         ELASTIC_USER: ${{ secrets.ELASTIC_USER }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
         ELASTIC_PORT: ${{ secrets.ELASTIC_PORT }}
+        MARIA_URL: ${{ secrets.MARIA_URL }}
+        MARIA_USER: ${{ secrets.MARIA_USER }}
+        MARIA_PASSWORD: ${{ secrets.MARIA_PASSWORD }}
       run: |
         ./gradlew clean build
 
@@ -59,84 +58,84 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKER_REPO }}/veganlife-dev
 
-  deploy:
-    needs: build
-    name: Deploy Server via SSH
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Configure SSH
-        run: |
-          echo "Configure SSH"
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
-          chmod 600 ~/.ssh/veganlife-dev.key
-          cat >>~/.ssh/config <<END
-          Host veganlife-dev
-            HostName $SSH_HOST
-            User $SSH_USERNAME
-            IdentityFile ~/.ssh/veganlife-dev.key
-            StrictHostKeyChecking no
-          END
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Docker Login
-        run: |
-          echo "Docker Login"
-          ssh veganlife-dev 'sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}'
-
-      - name: Docker Compose Down
-        # home 기준 실행파일의 상대경로를 적어주어야 한다.
-        run: |
-          echo "Docker Compose Down"
-          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml down --rmi all'
-
-      - name: Set Docker Networks
-        run: |
-          echo "Set Docker Networks"
-          ssh veganlife-dev 'sudo docker network rm deploy'
-          ssh veganlife-dev 'sudo docker network create deploy'
-
-      - name: Docker Compose Up
-        run: |
-          echo "Docker Compose Up"
-          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml up -d'
-
-      - name: Clear
-        run: |
-          echo "Clear"
-          ssh veganlife-dev 'sudo docker system prune -a'
-
-  healthcheck:
-    needs: [build, deploy]
-    name: Server Health Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Health Check
-        run: |
-          attempt_count=10
-          for ((i=1; i<=$attempt_count; i++)); do
-              response=$(curl -IsS --max-time 5 "$DEV_HEALTHCHECK_URL" | head -n 1 | cut -d$' ' -f2)
-              if [ "$response" == "200" ]; then
-                  echo "헬스 체크 성공 - HTTP 상태코드: $response"
-                  exit 0
-              else
-                  echo "헬스 체크 실패 - HTTP 상태코드: $response"
-              fi
-              sleep 3
-          done
-
-          echo "헬스 체크 $attempt_count회 시도 중 실패"
-          exit 1
-        env:
-          DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
-
-      - name: Send Notification to Discord
-        uses: sarisia/actions-status-discord@v1.14.0
-        if: always()  # 배포 결과 Discord 전송
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+#  deploy:
+#    needs: build
+#    name: Deploy Server via SSH
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Configure SSH
+#        run: |
+#          echo "Configure SSH"
+#          mkdir -p ~/.ssh/
+#          echo "$SSH_PRIVATE_KEY" > ~/.ssh/veganlife-dev.key
+#          chmod 600 ~/.ssh/veganlife-dev.key
+#          cat >>~/.ssh/config <<END
+#          Host veganlife-dev
+#            HostName $SSH_HOST
+#            User $SSH_USERNAME
+#            IdentityFile ~/.ssh/veganlife-dev.key
+#            StrictHostKeyChecking no
+#          END
+#        env:
+#          SSH_HOST: ${{ secrets.SSH_HOST }}
+#          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+#          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#
+#      - name: Docker Login
+#        run: |
+#          echo "Docker Login"
+#          ssh veganlife-dev 'sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}'
+#
+#      - name: Docker Compose Down
+#        # home 기준 실행파일의 상대경로를 적어주어야 한다.
+#        run: |
+#          echo "Docker Compose Down"
+#          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml down --rmi all'
+#
+#      - name: Set Docker Networks
+#        run: |
+#          echo "Set Docker Networks"
+#          ssh veganlife-dev 'sudo docker network rm deploy'
+#          ssh veganlife-dev 'sudo docker network create deploy'
+#
+#      - name: Docker Compose Up
+#        run: |
+#          echo "Docker Compose Up"
+#          ssh veganlife-dev 'sudo docker compose -f veganlife-dev/docker-compose.yml up -d'
+#
+#      - name: Clear
+#        run: |
+#          echo "Clear"
+#          ssh veganlife-dev 'sudo docker system prune -a'
+#
+#  healthcheck:
+#    needs: [build, deploy]
+#    name: Server Health Check
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Health Check
+#        run: |
+#          attempt_count=10
+#          for ((i=1; i<=$attempt_count; i++)); do
+#              response=$(curl -IsS --max-time 5 "$DEV_HEALTHCHECK_URL" | head -n 1 | cut -d$' ' -f2)
+#              if [ "$response" == "200" ]; then
+#                  echo "헬스 체크 성공 - HTTP 상태코드: $response"
+#                  exit 0
+#              else
+#                  echo "헬스 체크 실패 - HTTP 상태코드: $response"
+#              fi
+#              sleep 3
+#          done
+#
+#          echo "헬스 체크 $attempt_count회 시도 중 실패"
+#          exit 1
+#        env:
+#          DEV_HEALTHCHECK_URL: ${{ secrets.DEV_HEALTHCHECK_URL }}
+#
+#      - name: Send Notification to Discord
+#        uses: sarisia/actions-status-discord@v1.14.0
+#        if: always()  # 배포 결과 Discord 전송
+#        with:
+#          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
