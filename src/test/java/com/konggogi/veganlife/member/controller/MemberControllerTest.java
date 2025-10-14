@@ -180,7 +180,7 @@ class MemberControllerTest extends RestDocsTest {
                                         parameterWithName("memberId")
                                                 .description("식단 목록을 조회할 사용자의 id")),
                                 queryParameters(
-                                        parameterWithName("page").description("페이지 크기"),
+                                        parameterWithName("page").description("페이지 번호"),
                                         parameterWithName("size").description("페이지 사이즈"))));
     }
 
@@ -224,7 +224,7 @@ class MemberControllerTest extends RestDocsTest {
                                         parameterWithName("memberId")
                                                 .description("피드 목록을 조회할 사용자의 id")),
                                 queryParameters(
-                                        parameterWithName("page").description("페이지 크기"),
+                                        parameterWithName("page").description("페이지 번호"),
                                         parameterWithName("size").description("페이지 사이즈"))));
     }
 
@@ -284,7 +284,7 @@ class MemberControllerTest extends RestDocsTest {
                                         parameterWithName("memberId")
                                                 .description("레시피 목록을 조회할 사용자의 id")),
                                 queryParameters(
-                                        parameterWithName("page").description("페이지 크기"),
+                                        parameterWithName("page").description("페이지 번호"),
                                         parameterWithName("size").description("페이지 사이즈"))));
     }
 }
