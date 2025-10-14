@@ -13,6 +13,7 @@ import com.konggogi.veganlife.recipe.domain.RecipeImage;
 import com.konggogi.veganlife.recipe.domain.RecipeIngredient;
 import com.konggogi.veganlife.recipe.domain.RecipeType;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,7 +27,7 @@ public interface RecipeMapper {
     @Mapping(
             source = "recipe.thumbnail",
             target = "thumbnailUrl",
-            qualifiedByName = "recipeImageToImageUrl")
+            qualifiedByName = "optionalRecipeImageToImageUrl")
     @Mapping(
             source = "recipe.recipeTypes",
             target = "recipeTypes",
@@ -132,6 +133,11 @@ public interface RecipeMapper {
             return null;
         }
         return recipeImage.getImageUrl();
+    }
+
+    @Named("optionalRecipeImageToImageUrl")
+    static String optionalRecipeImageToImageUrl(Optional<RecipeImage> recipeImage) {
+        return recipeImage.map(RecipeImage::getImageUrl).orElse(null);
     }
 
     @Named("recipeTypeToVegetarianType")

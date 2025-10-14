@@ -20,6 +20,12 @@ public enum RecipeFixture {
         this.name = name;
     }
 
+    public Recipe getSimpleWithRecipeTypes(Long id, List<RecipeType> recipeTypes, Member member) {
+        Recipe recipe = Recipe.builder().id(id).name(name).member(member).build();
+        recipeTypes.forEach(recipeType -> setRecipe(recipeType, recipe));
+        return recipe;
+    }
+
     public Recipe get(
             List<RecipeType> recipeTypes,
             List<RecipeImage> recipeImages,

@@ -3,7 +3,7 @@ package com.konggogi.veganlife.member.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.member.controller.dto.request.ProfileModifyRequest;
-import com.konggogi.veganlife.member.controller.dto.response.MemberProfileResponse;
+import com.konggogi.veganlife.member.controller.dto.response.MyProfileResponse;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.domain.mapper.MemberMapper;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -35,14 +35,14 @@ public class MyPageController {
     private final PostMapper postMapper;
 
     @GetMapping("/profile")
-    public ResponseEntity<MemberProfileResponse> getMemberDetails(
+    public ResponseEntity<MyProfileResponse> getMemberDetails(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Member member = memberQueryService.search(userDetails.id());
         return ResponseEntity.ok(memberMapper.toMemberProfileResponse(member));
     }
 
     @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MemberProfileResponse> modifyMemberProfile(
+    public ResponseEntity<MyProfileResponse> modifyMemberProfile(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestPart @Valid ProfileModifyRequest request,
             @RequestPart(required = false) MultipartFile image) {

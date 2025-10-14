@@ -10,6 +10,7 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,7 +25,7 @@ public interface MealLogMapper {
     @Mapping(
             source = "mealLog.thumbnail",
             target = "thumbnailUrl",
-            qualifiedByName = "mealImageToImageUrl")
+            qualifiedByName = "optionalMealImageToImageUrl")
     @Mapping(target = "totalCalorie", expression = "java(mealLog.getTotalCalorie())")
     MealLogListResponse toMealLogListResponse(MealLog mealLog);
 
@@ -48,10 +49,14 @@ public interface MealLogMapper {
 
     @Named("mealImageToImageUrl")
     static String mealImageToImageUrl(MealImage mealImage) {
-
         if (mealImage == null) {
             return null;
         }
         return mealImage.getImageUrl();
+    }
+
+    @Named("optionalMealImageToImageUrl")
+    static String optionalMealImageToImageUrl(Optional<MealImage> thumbnail) {
+        return thumbnail.map(MealImage::getImageUrl).orElse(null);
     }
 }

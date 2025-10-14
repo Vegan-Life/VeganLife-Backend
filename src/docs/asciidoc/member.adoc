@@ -29,3 +29,92 @@ include::{snippets}/remove-member/http-response.adoc[]
 ==== 404 NOT FOUND
 
 include::{snippets}/remove-member-not-found/http-response.adoc[]
+
+== 다른 사용자의 프로필 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-member-profile/request-headers.adoc[]
+
+==== Path Variable
+include::{snippets}/get-member-profile/path-parameters.adoc[]
+
+include::{snippets}/get-member-profile/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-member-profile/http-response.adoc[]
+
+==== 404 NOT FOUND
+
+include::{snippets}/remove-member-not-found/http-response.adoc[]
+
+== 다른 사용자의 식단 기록 목록 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-member-meal-log-list/request-headers.adoc[]
+
+==== Path Variable
+include::{snippets}/get-member-meal-log-list/path-parameters.adoc[]
+
+==== Query Parameters
+include::{snippets}/get-member-meal-log-list/query-parameters.adoc[]
+
+include::{snippets}/get-member-meal-log-list/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-member-meal-log-list/http-response.adoc[]
+
+== 다른 사용자의 피드 목록 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-member-post-list/request-headers.adoc[]
+
+==== Path Variable
+include::{snippets}/get-member-post-list/path-parameters.adoc[]
+
+==== Query Parameters
+include::{snippets}/get-member-post-list/query-parameters.adoc[]
+
+include::{snippets}/get-member-post-list/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-member-post-list/http-response.adoc[]
+
+== 다른 사용자의 레시피 목록 조회 API
+
+=== Request
+
+==== Header
+
+include::{snippets}/get-member-recipe-list/request-headers.adoc[]
+
+==== Path Variable
+include::{snippets}/get-member-recipe-list/path-parameters.adoc[]
+
+==== Query Parameters
+include::{snippets}/get-member-recipe-list/query-parameters.adoc[]
+
+include::{snippets}/get-member-recipe-list/http-request.adoc[]
+
+=== Response
+
+==== 200 OK
+
+include::{snippets}/get-member-recipe-list/http-response.adoc[]
