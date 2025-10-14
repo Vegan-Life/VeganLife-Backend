@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -108,5 +109,12 @@ public class Post extends TimeStamped {
         participants.add(this.member);
         participants.addAll(this.comments.stream().map(Comment::getMember).toList());
         return new ArrayList<>(participants);
+    }
+
+    public Optional<PostImage> getThumbnail() {
+        if (imageUrls.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(imageUrls.get(0));
     }
 }

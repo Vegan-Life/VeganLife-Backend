@@ -7,6 +7,7 @@ import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.ToIntFunction;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,12 +60,11 @@ public class MealLog extends TimeStamped {
         this.mealImages.addAll(mealImages);
     }
 
-    public MealImage getThumbnail() {
-
+    public Optional<MealImage> getThumbnail() {
         if (mealImages.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return mealImages.get(0);
+        return Optional.of(mealImages.get(0));
     }
 
     public int getTotalCalorie() {

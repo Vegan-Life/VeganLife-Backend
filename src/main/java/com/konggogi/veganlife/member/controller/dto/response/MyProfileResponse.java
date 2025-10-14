@@ -4,7 +4,7 @@ package com.konggogi.veganlife.member.controller.dto.response;
 import com.konggogi.veganlife.member.domain.Gender;
 import com.konggogi.veganlife.member.domain.VegetarianType;
 
-public record MemberProfileResponse(
+public record MyProfileResponse(
         String email,
         String nickname,
         VegetarianType vegetarianType,

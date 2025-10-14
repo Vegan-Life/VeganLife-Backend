@@ -18,6 +18,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,11 +61,11 @@ public class Recipe extends TimeStamped {
         this.member = member;
     }
 
-    public RecipeImage getThumbnail() {
+    public Optional<RecipeImage> getThumbnail() {
         if (recipeImages.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return recipeImages.get(0);
+        return Optional.of(recipeImages.get(0));
     }
 
     public void update(

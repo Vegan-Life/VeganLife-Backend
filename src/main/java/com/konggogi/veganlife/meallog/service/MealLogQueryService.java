@@ -6,11 +6,14 @@ import com.konggogi.veganlife.global.exception.NotFoundEntityException;
 import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
+import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MealLogQueryService {
-
     private final MealLogRepository mealLogRepository;
+    private final MemberQueryService memberQueryService;
 
     public List<MealLog> searchByDateAndMember(LocalDate date, Member member) {
 
@@ -37,5 +40,10 @@ public class MealLogQueryService {
             Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
                 memberId, startDateTime, endDateTime);
+    }
+
+    public Page<MealLog> searchAllByMember(Long memberId, Pageable pageable) {
+        Member member = memberQueryService.search(memberId);
+        return mealLogRepository.findAllByMember(member, pageable);
     }
 }
