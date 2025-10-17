@@ -45,8 +45,7 @@ public class IntakeNutrientsService {
                 .datesUntil(endDate.plusDays(1))
                 .map(
                         date -> {
-                            return aggregateCaloriesOfMealTypeForPeriod(
-                                    memberId, startDate, endDate);
+                            return aggregateDailyCaloriesOfMealTypeForDay(memberId, date);
                         })
                 .toList();
     }

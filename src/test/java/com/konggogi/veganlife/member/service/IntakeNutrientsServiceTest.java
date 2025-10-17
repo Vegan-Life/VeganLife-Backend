@@ -104,10 +104,9 @@ class IntakeNutrientsServiceTest {
                 createTotalCalorieOfMealTypes(totalCalorie);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
+                                anyLong(), any(LocalDate.class)))
                 .willReturn(totalCalorieOfMealTypes);
-
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchWeeklyIntakeCalories(
