@@ -9,11 +9,8 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,14 +33,21 @@ public class MealLogQueryService {
                 .orElseThrow(() -> new NotFoundEntityException(ErrorCode.NOT_FOUND_MEAL_LOG));
     }
 
-    public List<TotalCalorieOfMealType> sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-            Long memberId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                memberId, startDateTime, endDateTime);
+    public List<TotalCalorieOfMealType> sumCaloriesOfMealTypeByMemberIdAndDate(
+            Long memberId, LocalDate date) {
+        return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndDate(memberId, date);
     }
 
-    public Page<MealLog> searchAllByMember(Long memberId, Pageable pageable) {
+    public List<TotalCalorieOfMealType> sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+            Long memberId, LocalDate startDate, LocalDate EndDate) {
+        return mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                memberId, startDate, EndDate);
+    }
+
+    public List<MealLog> searchWeeklyMealLogs(Long memberId) {
         Member member = memberQueryService.search(memberId);
-        return mealLogRepository.findAllByMember(member, pageable);
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(6);
+        return mealLogRepository.findAllByDateBetweenAndMember(startDate, endDate, member);
     }
 }
