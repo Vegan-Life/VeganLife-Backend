@@ -25,14 +25,11 @@ public interface MealLogRepository extends JpaRepository<MealLog, Long>, MealLog
 
     void deleteAllByMemberId(Long memberId);
 
-    @Query(" select distinct m from MealLog m join fetch m.meals where m.member = :member")
-    Page<MealLog> findAllByMember(Member member, Pageable pageable);
-
     @Query(
             " select distinct m from MealLog m join fetch m.meals"
                     + " where m.date between :startDate and :endDate"
                     + " and m.member = :member"
-                    + " order by m.createdAt desc")
+                    + " order by m.date desc")
     List<MealLog> findAllByDateBetweenAndMember(
             LocalDate startDate, LocalDate endDate, Member member);
 }
