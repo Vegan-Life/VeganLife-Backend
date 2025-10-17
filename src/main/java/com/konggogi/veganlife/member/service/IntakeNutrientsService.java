@@ -45,7 +45,8 @@ public class IntakeNutrientsService {
                 .datesUntil(endDate.plusDays(1))
                 .map(
                         date -> {
-                            return aggregateDailyCaloriesOfMealTypeForDay(memberId, date);
+                            return aggregateCaloriesOfMealTypeForPeriod(
+                                    memberId, startDate, endDate);
                         })
                 .toList();
     }
@@ -83,8 +84,7 @@ public class IntakeNutrientsService {
 
     private IntakeCalorie aggregateDailyCaloriesOfMealTypeForDay(Long memberId, LocalDate date) {
         List<TotalCalorieOfMealType> caloriesOfMeals =
-                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                        memberId, date.atStartOfDay(), date.atTime(23, 59, 59));
+                mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(memberId, date);
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
@@ -92,7 +92,7 @@ public class IntakeNutrientsService {
             Long memberId, LocalDate startDate, LocalDate endDate) {
         List<TotalCalorieOfMealType> caloriesOfMeals =
                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                        memberId, startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+                        memberId, startDate, endDate);
         return createCaloriesOfMealType(caloriesOfMeals);
     }
 
