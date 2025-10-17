@@ -54,7 +54,8 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 저장 테스트")
     void mealLogSaveTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
+        LocalDate date = LocalDate.now();
+        MealLog mealLog = createMealLog(member, mealData, date, MealLogFixture.BREAKFAST);
         // when
         MealLog result = mealLogRepository.save(mealLog);
         // then
@@ -77,13 +78,13 @@ public class MealLogRepositoryTest {
         List<MealImage> mealImages1 =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         MealLog mealLog1 =
-                MealLogFixture.BREAKFAST.getWithDate(
+                MealLogFixture.BREAKFAST.get(
                         LocalDate.of(2023, 12, 22), meals1, mealImages1, member);
         List<Meal> meals2 = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages2 =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         MealLog mealLog2 =
-                MealLogFixture.BREAKFAST.getWithDate(
+                MealLogFixture.BREAKFAST.get(
                         LocalDate.of(2023, 12, 23), meals2, mealImages2, member);
         mealLogRepository.save(mealLog1);
         mealLogRepository.save(mealLog2);
@@ -99,7 +100,8 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 수정 테스트 - 연관된 자식 엔티티를 삭제하고 새로 삽입한다")
     void mealLogUpdateTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
+        LocalDate date = LocalDate.now();
+        MealLog mealLog = createMealLog(member, mealData, date, MealLogFixture.BREAKFAST);
         mealLogRepository.saveAndFlush(mealLog);
         // when
         List<Meal> modifiedMeals = new ArrayList<>();
@@ -120,10 +122,11 @@ public class MealLogRepositoryTest {
     @DisplayName("MealLog 삭제 테스트 - 연관된 자식 엔티티도 같이 삭제된다")
     void mealLogDeleteTest() {
         // given
+        LocalDate date = LocalDate.now();
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(date, meals, mealImages, member);
         mealLogRepository.saveAndFlush(mealLog);
         // when
         mealLogRepository.deleteById(mealLog.getId());
@@ -143,10 +146,11 @@ public class MealLogRepositoryTest {
     @DisplayName("회원의 MealLog 모두 삭제")
     void deleteAllByMemberIdTest() {
         // given
-        MealLog mealLog = createMealLog(member, mealData, null, MealLogFixture.BREAKFAST);
+        LocalDate date = LocalDate.now();
+        MealLog mealLog = createMealLog(member, mealData, date, MealLogFixture.BREAKFAST);
         Member otherMember = MemberFixture.DEFAULT_F.get();
         memberRepository.save(otherMember);
-        MealLog otherMealLog = createMealLog(otherMember, mealData, null, MealLogFixture.BREAKFAST);
+        MealLog otherMealLog = createMealLog(otherMember, mealData, date, MealLogFixture.BREAKFAST);
         mealLogRepository.save(mealLog);
         mealLogRepository.save(otherMealLog);
         // when
@@ -167,10 +171,6 @@ public class MealLogRepositoryTest {
                         .mapToObj(idx -> MealImageFixture.DEFAULT.get())
                         .toList();
 
-        if (date != null) {
-            return mealTypeOfFixture.getWithDate(date, meals, mealImages, member);
-        } else {
-            return mealTypeOfFixture.get(meals, mealImages, member);
-        }
+        return mealTypeOfFixture.get(date, meals, mealImages, member);
     }
 }

@@ -45,7 +45,9 @@ import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -139,35 +141,34 @@ class MemberControllerTest extends RestDocsTest {
         List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        List<MealLog> mealLogs =
-                List.of(MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member));
-        Page<MealLog> mealLogList = new PageImpl<>(mealLogs, Pageable.ofSize(10), mealLogs.size());
-        given(mealLogQueryService.searchAllByMember(anyLong(), any(Pageable.class)))
-                .willReturn(mealLogList);
+        Map<LocalDate, List<MealLog>> mealLogs = new LinkedHashMap<>();
+        mealLogs.put(
+                LocalDate.of(2025, 10, 18),
+                List.of(
+                        MealLogFixture.BREAKFAST.get(
+                                3L, LocalDate.of(2025, 10, 18), meals, mealImages, member)));
+        mealLogs.put(
+                LocalDate.of(2025, 10, 17),
+                List.of(
+                        MealLogFixture.LUNCH.get(
+                                2L, LocalDate.of(2025, 10, 17), meals, mealImages, member)));
+        mealLogs.put(
+                LocalDate.of(2025, 10, 16),
+                List.of(
+                        MealLogFixture.BREAKFAST.get(
+                                1L, LocalDate.of(2025, 10, 16), meals, mealImages, member)));
+        given(mealLogQueryService.searchWeeklyMealLogs(anyLong())).willReturn(mealLogs);
 
         ResultActions perform =
                 mockMvc.perform(
                         get("/api/v1/members/{memberId}/meal-log", memberId)
-                                .headers(authorizationHeader())
-                                .queryParam("page", "0")
-                                .queryParam("size", "10"));
+                                .headers(authorizationHeader()));
 
         perform.andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(mealLogs.size()))
-                .andExpect(jsonPath("$.content[0].id").value(mealLogs.get(0).getId()))
-                .andExpect(
-                        jsonPath("$.content[0].mealType")
-                                .value(mealLogs.get(0).getMealType().name()))
-                .andExpect(
-                        jsonPath("$.content[0].thumbnailUrl")
-                                .value(
-                                        mealLogs.get(0)
-                                                .getThumbnail()
-                                                .map(MealImage::getImageUrl)
-                                                .orElse(null)))
-                .andExpect(
-                        jsonPath("$.content[0].totalCalorie")
-                                .value(mealLogs.get(0).getTotalCalorie()));
+                .andExpect(jsonPath("$.size()").value(mealLogs.size()))
+                .andExpect(jsonPath("$.[0].date").value(LocalDate.of(2025, 10, 18).toString()))
+                .andExpect(jsonPath("$.[1].date").value(LocalDate.of(2025, 10, 17).toString()))
+                .andExpect(jsonPath("$.[2].date").value(LocalDate.of(2025, 10, 16).toString()));
 
         perform.andDo(print())
                 .andDo(
@@ -178,10 +179,7 @@ class MemberControllerTest extends RestDocsTest {
                                 requestHeaders(authorizationDesc()),
                                 pathParameters(
                                         parameterWithName("memberId")
-                                                .description("식단 목록을 조회할 사용자의 id")),
-                                queryParameters(
-                                        parameterWithName("page").description("페이지 번호"),
-                                        parameterWithName("size").description("페이지 사이즈"))));
+                                                .description("식단 목록을 조회할 사용자의 id"))));
     }
 
     @Test

@@ -27,7 +27,6 @@ import com.konggogi.veganlife.member.service.dto.IntakeCalorie;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
@@ -105,15 +104,14 @@ class IntakeNutrientsServiceTest {
                 createTotalCalorieOfMealTypes(totalCalorie);
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
-                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                        mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDate(
+                                anyLong(), any(LocalDate.class)))
                 .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchWeeklyIntakeCalories(
                         member.getId(), startDate, endDate);
         // then
-
         assertThat(intakeCalories).hasSize(7);
         assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
         assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
@@ -132,11 +130,12 @@ class IntakeNutrientsServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
                         mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
                 intakeNutrientsService.searchMonthlyIntakeCalories(member.getId(), startDate);
+
         // then
         assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
         assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
@@ -155,7 +154,7 @@ class IntakeNutrientsServiceTest {
         given(memberQueryService.search(anyLong())).willReturn(member);
         given(
                         mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(totalCalorieOfMealTypes);
         // when
         List<IntakeCalorie> intakeCalories =
@@ -170,12 +169,12 @@ class IntakeNutrientsServiceTest {
 
     private List<MealLog> createMealLogs(LocalDate date) {
         return List.of(
-                MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member),
-                MealLogFixture.LUNCH.getWithDate(date, meals, mealImages, member),
-                MealLogFixture.DINNER.getWithDate(date, meals, mealImages, member),
-                MealLogFixture.BREAKFAST_SNACK.getWithDate(date, meals, mealImages, member),
-                MealLogFixture.LUNCH_SNACK.getWithDate(date, meals, mealImages, member),
-                MealLogFixture.DINNER_SNACK.getWithDate(date, meals, mealImages, member));
+                MealLogFixture.BREAKFAST.get(date, meals, mealImages, member),
+                MealLogFixture.LUNCH.get(date, meals, mealImages, member),
+                MealLogFixture.DINNER.get(date, meals, mealImages, member),
+                MealLogFixture.BREAKFAST_SNACK.get(date, meals, mealImages, member),
+                MealLogFixture.LUNCH_SNACK.get(date, meals, mealImages, member),
+                MealLogFixture.DINNER_SNACK.get(date, meals, mealImages, member));
     }
 
     private List<TotalCalorieOfMealType> createTotalCalorieOfMealTypes(int totalCalorie) {

@@ -8,6 +8,7 @@ import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.domain.MealType;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import org.mapstruct.Named;
 public interface MealLogMapper {
 
     @Mapping(target = "id", ignore = true)
-    MealLog toEntity(MealType mealType, Member member);
+    MealLog toEntity(MealType mealType, LocalDate date, Member member);
 
     @Mapping(
             source = "mealLog.thumbnail",

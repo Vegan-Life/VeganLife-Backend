@@ -57,7 +57,7 @@ class MealLogCustomRepositoryImplTest {
 
     @Test
     @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
-    void sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetweenTest() {
+    void sumCaloriesOfMealTypeByMemberIdAndDateBetweenTest() {
         // given
         LocalDate startDate = LocalDate.of(2024, 2, 18);
         LocalDate endDate = LocalDate.of(2024, 2, 24);
@@ -75,10 +75,9 @@ class MealLogCustomRepositoryImplTest {
                                             });
                         });
         // when
-
         List<TotalCalorieOfMealType> totalCaloriesOfMealTypes =
-                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                        member.getId(), startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+                mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                        member.getId(), startDate, endDate);
         Map<MealType, Integer> totalCalorieOfMealTypeMap =
                 toTotalCalorieOfMealTypeMap(totalCaloriesOfMealTypes);
         // then
@@ -103,12 +102,7 @@ class MealLogCustomRepositoryImplTest {
                 IntStream.range(0, mealData.size())
                         .mapToObj(idx -> MealImageFixture.DEFAULT.get())
                         .toList();
-
-        if (date != null) {
-            return mealTypeOfFixture.getWithDate(date, meals, mealImages, member);
-        } else {
-            return mealTypeOfFixture.get(meals, mealImages, member);
-        }
+        return mealTypeOfFixture.get(date, meals, mealImages, member);
     }
 
     private Map<MealType, Integer> toTotalCalorieOfMealTypeMap(

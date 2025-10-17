@@ -5,6 +5,7 @@ import com.konggogi.veganlife.global.domain.TimeStamped;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.dto.IntakeNutrients;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,9 @@ public class MealLog extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private MealType mealType;
 
+    @Column(nullable = false)
+    private LocalDate date;
+
     @OneToMany(mappedBy = "mealLog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meal> meals = new ArrayList<>();
 
@@ -44,9 +48,10 @@ public class MealLog extends TimeStamped {
     private Member member;
 
     @Builder
-    public MealLog(Long id, MealType mealType, Member member) {
+    public MealLog(Long id, MealType mealType, LocalDate date, Member member) {
         this.id = id;
         this.mealType = mealType;
+        this.date = date;
         this.member = member;
     }
 

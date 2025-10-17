@@ -43,7 +43,8 @@ public class MealLogService {
 
     public void add(MealLogAddRequest request, List<MultipartFile> images, Long memberId) {
         MealLog mealLog =
-                mealLogMapper.toEntity(request.mealType(), memberQueryService.search(memberId));
+                mealLogMapper.toEntity(
+                        request.mealType(), request.date(), memberQueryService.search(memberId));
         modifyMeals(request.meals(), mealLog);
         modifyMealImages(images, mealLog);
         mealLogRepository.save(mealLog);

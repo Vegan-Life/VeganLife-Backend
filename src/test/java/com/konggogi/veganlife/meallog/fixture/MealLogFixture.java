@@ -25,48 +25,24 @@ public enum MealLogFixture {
         this.mealType = mealType;
     }
 
-    public MealLog get(List<Meal> meals, List<MealImage> mealImages, Member member) {
-        MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
-        meals.forEach(meal -> setMealLog(meal, mealLog));
-        mealImages.forEach(mealImage -> setMealLog(mealImage, mealLog));
-        mealLog.getMeals().addAll(meals);
-        mealLog.getMealImages().addAll(mealImages);
-        return mealLog;
-    }
-
-    public MealLog get(Long id, List<Meal> meals, List<MealImage> mealImages, Member member) {
-        MealLog mealLog = MealLog.builder().id(id).mealType(mealType).member(member).build();
-        meals.forEach(meal -> setMealLog(meal, mealLog));
-        mealImages.forEach(mealImage -> setMealLog(mealImage, mealLog));
-        mealLog.getMeals().addAll(meals);
-        mealLog.getMealImages().addAll(mealImages);
-        return mealLog;
-    }
-
-    public MealLog getWithDate(
+    public MealLog get(
             LocalDate date, List<Meal> meals, List<MealImage> mealImages, Member member) {
-        MealLog mealLog = MealLog.builder().mealType(mealType).member(member).build();
+        MealLog mealLog = MealLog.builder().mealType(mealType).date(date).member(member).build();
         meals.forEach(meal -> setMealLog(meal, mealLog));
         mealImages.forEach(mealImage -> setMealLog(mealImage, mealLog));
         mealLog.getMeals().addAll(meals);
         mealLog.getMealImages().addAll(mealImages);
-        return setCreatedAt(mealLog, date);
+        return mealLog;
     }
 
-    public MealLog getWithDate(
+    public MealLog get(
             Long id, LocalDate date, List<Meal> meals, List<MealImage> mealImages, Member member) {
-        MealLog mealLog = MealLog.builder().id(id).mealType(mealType).member(member).build();
+        MealLog mealLog =
+                MealLog.builder().id(id).mealType(mealType).date(date).member(member).build();
         meals.forEach(meal -> setMealLog(meal, mealLog));
         mealImages.forEach(mealImage -> setMealLog(mealImage, mealLog));
         mealLog.getMeals().addAll(meals);
         mealLog.getMealImages().addAll(mealImages);
-        return setCreatedAt(mealLog, date);
-    }
-
-    private MealLog setCreatedAt(MealLog mealLog, LocalDate date) {
-        Field createdAt = ReflectionUtils.findField(MealLog.class, "createdAt");
-        ReflectionUtils.makeAccessible(createdAt);
-        ReflectionUtils.setField(createdAt, mealLog, date.atStartOfDay());
         return mealLog;
     }
 
