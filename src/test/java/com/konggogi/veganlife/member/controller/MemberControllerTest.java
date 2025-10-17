@@ -144,19 +144,19 @@ class MemberControllerTest extends RestDocsTest {
         Map<LocalDate, List<MealLog>> mealLogs = new LinkedHashMap<>();
         mealLogs.put(
                 LocalDate.of(2025, 10, 18),
-                List.of(MealLogFixture.BREAKFAST.get(
-                        3L, LocalDate.of(2025, 10, 18), meals, mealImages, member))
-        );
+                List.of(
+                        MealLogFixture.BREAKFAST.get(
+                                3L, LocalDate.of(2025, 10, 18), meals, mealImages, member)));
         mealLogs.put(
                 LocalDate.of(2025, 10, 17),
-                List.of(MealLogFixture.LUNCH.get(
-                        2L, LocalDate.of(2025, 10, 17), meals, mealImages, member))
-        );
+                List.of(
+                        MealLogFixture.LUNCH.get(
+                                2L, LocalDate.of(2025, 10, 17), meals, mealImages, member)));
         mealLogs.put(
                 LocalDate.of(2025, 10, 16),
-                List.of(MealLogFixture.BREAKFAST.get(
-                        1L, LocalDate.of(2025, 10, 16), meals, mealImages, member))
-        );
+                List.of(
+                        MealLogFixture.BREAKFAST.get(
+                                1L, LocalDate.of(2025, 10, 16), meals, mealImages, member)));
         given(mealLogQueryService.searchWeeklyMealLogs(anyLong())).willReturn(mealLogs);
 
         ResultActions perform =
