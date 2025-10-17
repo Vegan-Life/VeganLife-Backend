@@ -35,6 +35,7 @@ import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.IntakeNotifyService;
 import com.konggogi.veganlife.member.service.MemberQueryService;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
@@ -79,8 +80,9 @@ public class MealLogServiceTest {
     @DisplayName("식사 기록 저장")
     void mealLogAddTest() {
         // given
+        LocalDate date = LocalDate.now();
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, date, mealAddRequests);
         given(memberQueryService.search(1L)).willReturn(member);
         doNothing().when(intakeNotifyService).notifyIfOverIntake(1L);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
@@ -108,10 +110,11 @@ public class MealLogServiceTest {
         MealLogModifyRequest mealLogModifyRequest =
                 new MealLogModifyRequest(
                         mealAddRequests, List.of("existingImage1.png", "existingImage2.png"));
+        LocalDate date = LocalDate.now();
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(meals, mealImages, member);
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(date, meals, mealImages, member);
         given(mealLogQueryService.search(1L)).willReturn(mealLog);
         doNothing().when(intakeNotifyService).notifyIfOverIntake(1L);
         mealData.forEach(m -> given(mealDataQueryService.search(m.getId())).willReturn(m));
@@ -135,10 +138,11 @@ public class MealLogServiceTest {
     @DisplayName("식사 기록 삭제")
     void mealLogRemoveTest() {
         // given
+        LocalDate date = LocalDate.now();
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        MealLog mealLog = MealLogFixture.DINNER.get(1L, meals, mealImages, member);
+        MealLog mealLog = MealLogFixture.DINNER.get(1L, date, meals, mealImages, member);
         given(mealLogQueryService.search(1L)).willReturn(mealLog);
         // when
         mealLogService.remove(1L);

@@ -89,9 +89,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식사 기록 등록 API")
     void addMealLogTest() throws Exception {
-
+        LocalDate date = LocalDate.now();
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, date, mealAddRequests);
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -136,9 +136,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식사 기록 등록 API Member Not Found 예외")
     void addMealLogMemberNotFoundTest() throws Exception {
-
+        LocalDate date = LocalDate.now();
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, date, mealAddRequests);
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -179,9 +179,9 @@ public class MealLogControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식사 기록 등록 API MealData Not Found 예외")
     void addMealLogMealDataNotFoundTest() throws Exception {
-
+        LocalDate date = LocalDate.now();
         MealLogAddRequest mealLogAddRequest =
-                new MealLogAddRequest(MealType.BREAKFAST, mealAddRequests);
+                new MealLogAddRequest(MealType.BREAKFAST, date, mealAddRequests);
         MockMultipartFile request =
                 new MockMultipartFile(
                         "request",
@@ -230,11 +230,12 @@ public class MealLogControllerTest extends RestDocsTest {
         List<MealLogListResponse> mealLogs =
                 List.of(
                         mealLogMapper.toMealLogListResponse(
-                                MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member)),
+                                MealLogFixture.BREAKFAST.get(1L, date, meals, mealImages, member)),
                         mealLogMapper.toMealLogListResponse(
-                                MealLogFixture.LUNCH.get(2L, meals, mealImages, member)),
+                                MealLogFixture.LUNCH.get(2L, date, meals, mealImages, member)),
                         mealLogMapper.toMealLogListResponse(
-                                MealLogFixture.DINNER_SNACK.get(3L, meals, mealImages, member)));
+                                MealLogFixture.DINNER_SNACK.get(
+                                        3L, date, meals, mealImages, member)));
 
         given(mealLogSearchService.searchByDate(date, member.getId())).willReturn(mealLogs);
 
@@ -262,14 +263,14 @@ public class MealLogControllerTest extends RestDocsTest {
     @Test
     @DisplayName("식사 기록 상세 조회 API")
     void getMealLogDetailsTest() throws Exception {
-
+        LocalDate date = LocalDate.now();
         List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
         List<Meal> meals = mealData.stream().map(MealFixture.DEFAULT::get).toList();
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
         MealLogDetailsResponse mealLog =
                 mealLogMapper.toMealLogDetailsResponse(
-                        MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member));
+                        MealLogFixture.BREAKFAST.get(1L, date, meals, mealImages, member));
 
         given(mealLogSearchService.searchById(1L)).willReturn(mealLog);
 

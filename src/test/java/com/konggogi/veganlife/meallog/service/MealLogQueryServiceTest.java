@@ -19,7 +19,6 @@ import com.konggogi.veganlife.meallog.repository.MealLogRepository;
 import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.fixture.MemberFixture;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +53,7 @@ public class MealLogQueryServiceTest {
                 IntStream.range(0, 3).mapToObj(idx -> MealImageFixture.DEFAULT.get()).toList();
         LocalDate date = LocalDate.of(2023, 12, 22);
         List<MealLog> mealLogs =
-                List.of(MealLogFixture.BREAKFAST.getWithDate(date, meals, mealImages, member));
+                List.of(MealLogFixture.BREAKFAST.get(date, meals, mealImages, member));
         given(mealLogRepository.findAllByDateAndMember(date, member)).willReturn(mealLogs);
 
         List<MealLog> found = mealLogQueryService.searchByDateAndMember(date, member);
@@ -66,7 +65,7 @@ public class MealLogQueryServiceTest {
     @Test
     @DisplayName("해당 id의 MealLog 상세 조회")
     void searchTest() {
-
+        LocalDate date = LocalDate.now();
         List<Meal> meals =
                 List.of(
                         MealFixture.DEFAULT.get(1L, mealData.get(0)),
@@ -74,7 +73,7 @@ public class MealLogQueryServiceTest {
                         MealFixture.DEFAULT.get(3L, mealData.get(2)));
         List<MealImage> mealImages =
                 LongStream.range(1, 4).mapToObj(MealImageFixture.DEFAULT::get).toList();
-        MealLog mealLog = MealLogFixture.BREAKFAST.get(1L, meals, mealImages, member);
+        MealLog mealLog = MealLogFixture.BREAKFAST.get(1L, date, meals, mealImages, member);
 
         given(mealLogRepository.findById(1L)).willReturn(Optional.ofNullable(mealLog));
 
@@ -99,17 +98,17 @@ public class MealLogQueryServiceTest {
     @Test
     @DisplayName("회원 id와 기간에 해당하는 MealLog를 MealType별로 합산")
     void sumCaloriesOfMealTypeByMemberIdAndDateBetweenTest() {
-        LocalDateTime startDateTime = LocalDate.of(2024, 2, 18).atStartOfDay();
-        LocalDateTime endDateTime = LocalDate.of(2024, 2, 24).atTime(23, 59, 59);
+        LocalDate startDate = LocalDate.of(2024, 2, 18);
+        LocalDate endDate = LocalDate.of(2024, 2, 24);
         given(
-                        mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndCreatedAtBetween(
-                                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                        mealLogRepository.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
+                                anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(new ArrayList<>());
 
         assertThatNoException()
                 .isThrownBy(
                         () ->
                                 mealLogQueryService.sumCaloriesOfMealTypeByMemberIdAndDateBetween(
-                                        member.getId(), startDateTime, endDateTime));
+                                        member.getId(), startDate, endDate));
     }
 }
