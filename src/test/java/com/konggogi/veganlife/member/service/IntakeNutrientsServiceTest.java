@@ -112,7 +112,6 @@ class IntakeNutrientsServiceTest {
                 intakeNutrientsService.searchWeeklyIntakeCalories(
                         member.getId(), startDate, endDate);
         // then
-        System.out.println(intakeCalories);
         assertThat(intakeCalories).hasSize(7);
         assertThat(intakeCalories.get(0).breakfast()).isEqualTo(totalCalorie);
         assertThat(intakeCalories.get(0).lunch()).isEqualTo(totalCalorie);
