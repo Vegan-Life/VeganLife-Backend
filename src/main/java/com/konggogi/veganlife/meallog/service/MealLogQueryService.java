@@ -9,7 +9,10 @@ import com.konggogi.veganlife.member.domain.Member;
 import com.konggogi.veganlife.member.service.MemberQueryService;
 import com.konggogi.veganlife.member.service.dto.TotalCalorieOfMealType;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +47,15 @@ public class MealLogQueryService {
                 memberId, startDate, EndDate);
     }
 
-    public List<MealLog> searchWeeklyMealLogs(Long memberId) {
+    public Map<LocalDate, List<MealLog>> searchWeeklyMealLogs(Long memberId) {
         Member member = memberQueryService.search(memberId);
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(6);
-        return mealLogRepository.findAllByDateBetweenAndMember(startDate, endDate, member);
+        return mealLogRepository.findAllByDateBetweenAndMember(startDate, endDate, member).stream()
+                .collect(
+                        Collectors.groupingBy(
+                                MealLog::getDate,
+                                LinkedHashMap::new,
+                                Collectors.toList())); // 순서 보장
     }
 }

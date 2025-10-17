@@ -3,7 +3,6 @@ package com.konggogi.veganlife.member.controller;
 
 import com.konggogi.veganlife.global.security.user.UserDetailsImpl;
 import com.konggogi.veganlife.meallog.controller.dto.response.DailyMealLogListResponse;
-import com.konggogi.veganlife.meallog.domain.MealLog;
 import com.konggogi.veganlife.meallog.service.MealLogQueryService;
 import com.konggogi.veganlife.member.controller.dto.response.ProfileResponse;
 import com.konggogi.veganlife.member.service.MemberQueryService;
@@ -13,7 +12,6 @@ import com.konggogi.veganlife.post.service.PostQueryService;
 import com.konggogi.veganlife.recipe.controller.dto.response.RecipeResponse;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,10 +48,7 @@ public class MemberController {
     public ResponseEntity<List<DailyMealLogListResponse>> getMembersMealLogList(
             @PathVariable Long memberId) {
         return ResponseEntity.ok(
-                mealLogQueryService.searchWeeklyMealLogs(memberId).stream()
-                        .collect(Collectors.groupingBy(MealLog::getDate))
-                        .entrySet()
-                        .stream()
+                mealLogQueryService.searchWeeklyMealLogs(memberId).entrySet().stream()
                         .map(DailyMealLogListResponse::from)
                         .toList());
     }

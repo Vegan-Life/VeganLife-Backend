@@ -45,7 +45,9 @@ import com.konggogi.veganlife.recipe.fixture.RecipeTypeFixture;
 import com.konggogi.veganlife.recipe.service.RecipeSearchService;
 import com.konggogi.veganlife.support.docs.RestDocsTest;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -139,14 +141,22 @@ class MemberControllerTest extends RestDocsTest {
         List<String> imageUrls = List.of("image1.png", "image2.png", "image3.png");
         List<MealImage> mealImages =
                 imageUrls.stream().map(MealImageFixture.DEFAULT::getWithImageUrl).toList();
-        List<MealLog> mealLogs =
-                List.of(
-                        MealLogFixture.BREAKFAST.get(
-                                3L, LocalDate.of(2025, 10, 18), meals, mealImages, member),
-                        MealLogFixture.LUNCH.get(
-                                2L, LocalDate.of(2025, 10, 17), meals, mealImages, member),
-                        MealLogFixture.BREAKFAST.get(
-                                1L, LocalDate.of(2025, 10, 16), meals, mealImages, member));
+        Map<LocalDate, List<MealLog>> mealLogs = new LinkedHashMap<>();
+        mealLogs.put(
+                LocalDate.of(2025, 10, 18),
+                List.of(MealLogFixture.BREAKFAST.get(
+                        3L, LocalDate.of(2025, 10, 18), meals, mealImages, member))
+        );
+        mealLogs.put(
+                LocalDate.of(2025, 10, 17),
+                List.of(MealLogFixture.LUNCH.get(
+                        2L, LocalDate.of(2025, 10, 17), meals, mealImages, member))
+        );
+        mealLogs.put(
+                LocalDate.of(2025, 10, 16),
+                List.of(MealLogFixture.BREAKFAST.get(
+                        1L, LocalDate.of(2025, 10, 16), meals, mealImages, member))
+        );
         given(mealLogQueryService.searchWeeklyMealLogs(anyLong())).willReturn(mealLogs);
 
         ResultActions perform =
